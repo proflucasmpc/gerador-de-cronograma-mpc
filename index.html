@@ -561,13 +561,14 @@
     .tools-button {
       position: fixed;
       right: 22px;
-      bottom: 18px;
+      bottom: var(--tools-button-bottom, 18px);
       z-index: 82;
       min-height: 52px;
       padding-inline: 19px;
       border: 2px solid var(--gold);
       box-shadow: 0 14px 34px rgba(0,0,0,.3);
       white-space: nowrap;
+      transition: bottom .22s ease, transform .16s ease;
     }
     .tools-button::before {
       content: "✦";
@@ -620,10 +621,6 @@
       15%, 75% {
         box-shadow: 0 0 0 5px rgba(var(--accent-rgb), .32), 0 18px 44px rgba(0,0,0,.16);
       }
-    }
-
-    @media (max-width: 1380px) {
-      .tools-button { bottom: 112px; }
     }
 
     .tools-intro {
@@ -999,6 +996,66 @@
     .tutorial-dots i.active { background: var(--gold); }
 
     .share-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
+    .share-grid [hidden] { display: none !important; }
+
+    .share-reward-confirm {
+      margin-top: 16px;
+      padding: 15px;
+      border: 1px solid var(--gold);
+      border-radius: 15px;
+      background: var(--surface-2);
+    }
+    .share-reward-confirm[hidden] { display: none !important; }
+    .share-reward-confirm .consent-row { margin-top: 12px; }
+    .share-reward-confirm .btn { width: 100%; margin-top: 12px; }
+
+    .export-choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .export-choice {
+      display: grid;
+      grid-template-columns: 50px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 112px;
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface-2);
+      color: var(--text);
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      transition: .16s ease;
+    }
+    .export-choice:hover {
+      transform: translateY(-2px);
+      border-color: var(--gold);
+      background: var(--surface);
+    }
+    .export-choice:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px;
+    }
+    .export-choice-icon {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 950;
+    }
+    .export-choice strong { display: block; margin-bottom: 5px; }
+    .export-choice small { display: block; color: var(--muted); line-height: 1.45; }
+    .print-title { display: none; }
+
     .notice { padding: 13px 15px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); line-height: 1.45; }
     .notice.success { background: var(--success-bg); border-color: var(--success); }
     .notice.danger { background: var(--danger-bg); border-color: var(--danger); }
@@ -1074,7 +1131,6 @@
       .tools-grid { grid-template-columns: 1fr; }
       .tools-button {
         right: 12px;
-        bottom: 174px;
         min-height: 48px;
         max-width: calc(100% - 24px);
         white-space: normal;
@@ -1084,6 +1140,8 @@
       .pomodoro-controls { grid-template-columns: 1fr; }
       .pomodoro-controls .primary-control { grid-column: auto; }
       .share-grid { grid-template-columns: 1fr; }
+      .export-choice-grid { grid-template-columns: 1fr; }
+
       .footer-ad { grid-template-columns: 1fr; text-align: left; }
       .footer-ad .btn { grid-column: auto; width: 100%; text-align: center; }
       .palette-grid { grid-template-columns: 1fr; }
@@ -1149,7 +1207,6 @@
       .footer-ad .btn { min-height: 38px; padding: 7px 10px; }
       .tools-button {
         right: 8px;
-        bottom: 137px;
         width: auto;
         max-width: calc(100% - 16px);
         min-height: 42px;
@@ -1163,8 +1220,12 @@
       *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
     }
     @media print {
-      .topbar, .hero, .course-banner, .sidebar, .toolbar, .ai-panel, .tools-button, .footer-ad, footer, .add-task, .task-actions { display: none !important; }
-      body { background: #fff; }
+      @page { size: A4 landscape; margin: 10mm; }
+      .topbar, .hero, .course-banner, .sidebar, .toolbar, .ai-panel, .tools-button, .footer-ad, footer, .add-task, .task-actions, .modal-backdrop { display: none !important; }
+      .print-title { display: block !important; margin: 0 0 14px; color: #07152b; }
+      .print-title h1 { margin: 0 0 4px; font-size: 22pt; }
+      .print-title p { margin: 0; color: #45546a; }
+      body { background: #fff; color: #07152b; }
       .container { max-width: none; padding: 0; }
       .layout { display: block; }
       .card { box-shadow: none; border: 0; padding: 0; }
@@ -1349,6 +1410,10 @@
         </section>
 
         <section class="card tool-destination" id="scheduleCard">
+          <div class="print-title">
+            <h1>Gerador de Cronograma MPC</h1>
+            <p id="printSubtitle">Cronograma de estudos para concursos</p>
+          </div>
           <div class="section-title">
             <div>
               <h2 id="scheduleViewTitle">Seu cronograma semanal</h2>
@@ -1356,10 +1421,7 @@
             </div>
             <div class="toolbar tool-destination" id="scheduleTools">
               <button class="btn btn-secondary btn-small" id="saveBtn">Salvar</button>
-              <button class="btn btn-secondary btn-small" id="exportBtn">Exportar</button>
-              <button class="btn btn-secondary btn-small" id="importBtn">Importar</button>
-              <button class="btn btn-secondary btn-small" id="icsBtn">Calendário</button>
-              <button class="btn btn-secondary btn-small" id="printBtn">Imprimir</button>
+              <button class="btn btn-primary btn-small" id="exportBtn">Exportar</button>
               <button class="btn btn-danger btn-small" id="clearBtn">Limpar</button>
             </div>
           </div>
@@ -1488,12 +1550,11 @@
           <div class="tools-grid">
             <button class="tool-card tool-link" type="button" data-tool-action="colors" aria-label="Ir para Paletas e modo escuro"><span class="tool-icon">14</span><span class="tool-card-copy"><strong>Paletas e modo escuro</strong><p>Escolha entre diferentes combinações de cores e utilize o tema claro ou escuro.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
             <button class="tool-card tool-link" type="button" data-tool-action="autosave" aria-label="Ir para Salvamento automático"><span class="tool-icon">15</span><span class="tool-card-copy"><strong>Salvamento automático</strong><p>O cronograma, as preferências e o progresso permanecem salvos neste navegador.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
-            <button class="tool-card tool-link" type="button" data-tool-action="files" aria-label="Ir para Exportar e importar"><span class="tool-icon">16</span><span class="tool-card-copy"><strong>Exportar e importar</strong><p>Faça uma cópia do planejamento em JSON e restaure o arquivo quando necessário.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
-            <button class="tool-card tool-link" type="button" data-tool-action="calendar" aria-label="Ir para Calendário e impressão"><span class="tool-icon">17</span><span class="tool-card-copy"><strong>Calendário e impressão</strong><p>Exporte atividades em formato ICS para o calendário ou gere uma versão impressa.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
-            <button class="tool-card tool-link" type="button" data-tool-action="tutorial" aria-label="Ir para Tutorial completo"><span class="tool-icon">18</span><span class="tool-card-copy"><strong>Tutorial completo</strong><p>Aprenda o funcionamento da plataforma em uma apresentação guiada.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
-            <button class="tool-card tool-link" type="button" data-tool-action="privacy" aria-label="Ir para Privacidade e consentimento"><span class="tool-icon">19</span><span class="tool-card-copy"><strong>Privacidade e consentimento</strong><p>Consulte a política, os termos de uso e as regras de tratamento dos dados.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
-            <button class="tool-card tool-link" type="button" data-tool-action="whatsapp" aria-label="Ir para Acesso e suporte pelo WhatsApp"><span class="tool-icon">20</span><span class="tool-card-copy"><strong>Acesso e suporte pelo WhatsApp</strong><p>Conclua a liberação gratuita e fale diretamente com o Prof. Lucas MPC.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
-            <button class="tool-card tool-link" type="button" data-tool-action="mentorship" aria-label="Ir para Mentoria para concursos"><span class="tool-icon">21</span><span class="tool-card-copy"><strong>Mentoria para concursos</strong><p>Acesse informações sobre acompanhamento personalizado para organizar os estudos.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
+            <button class="tool-card tool-link" type="button" data-tool-action="files" aria-label="Ir para Exportar em PDF ou Excel"><span class="tool-icon">16</span><span class="tool-card-copy"><strong>Exportar em PDF ou Excel</strong><p>Baixe uma versão para leitura e impressão ou uma planilha compatível com o Excel.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
+            <button class="tool-card tool-link" type="button" data-tool-action="tutorial" aria-label="Ir para Tutorial completo"><span class="tool-icon">17</span><span class="tool-card-copy"><strong>Tutorial completo</strong><p>Aprenda o funcionamento da plataforma em uma apresentação guiada.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
+            <button class="tool-card tool-link" type="button" data-tool-action="privacy" aria-label="Ir para Privacidade e consentimento"><span class="tool-icon">18</span><span class="tool-card-copy"><strong>Privacidade e consentimento</strong><p>Consulte a política, os termos de uso e as regras de tratamento dos dados.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
+            <button class="tool-card tool-link" type="button" data-tool-action="whatsapp" aria-label="Ir para Acesso e suporte pelo WhatsApp"><span class="tool-icon">19</span><span class="tool-card-copy"><strong>Acesso e suporte pelo WhatsApp</strong><p>Conclua a liberação gratuita e fale diretamente com o Prof. Lucas MPC.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
+            <button class="tool-card tool-link" type="button" data-tool-action="mentorship" aria-label="Ir para Mentoria para concursos"><span class="tool-icon">20</span><span class="tool-card-copy"><strong>Mentoria para concursos</strong><p>Acesse informações sobre acompanhamento personalizado para organizar os estudos.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
           </div>
         </section>
       </div>
@@ -1615,20 +1676,53 @@
   </div>
 
 
+
+  <!-- Exportação -->
+  <div class="modal-backdrop" id="exportModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="exportTitle">Exportar cronograma</h2>
+          <p class="helper" style="margin:5px 0 0">Escolha um dos dois formatos disponíveis.</p>
+        </div>
+        <button class="close" data-close="exportModal" aria-label="Fechar">×</button>
+      </div>
+      <div class="export-choice-grid">
+        <button class="export-choice" id="exportPdfBtn" type="button">
+          <span class="export-choice-icon">PDF</span>
+          <span><strong>Arquivo PDF</strong><small>Abre a tela de impressão para salvar o cronograma como PDF.</small></span>
+        </button>
+        <button class="export-choice" id="exportExcelBtn" type="button">
+          <span class="export-choice-icon">XLS</span>
+          <span><strong>Arquivo Excel</strong><small>Baixa uma planilha com cronograma, disciplinas e resumo.</small></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Compartilhamento -->
   <div class="modal-backdrop" id="shareModal" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
-      <div class="modal-head"><h2 id="shareTitle">Compartilhe o planejador</h2><button class="close" data-close="shareModal">×</button></div>
-      <p>Estou usando o Gerador de Cronograma MPC, uma ferramenta gratuita para criar cronogramas online para organizar meus estudos para concursos e estou gostando bastante. Recomendo. Você que está estudando para concursos vai gostar também. Acesse o link.</p>
+      <div class="modal-head"><h2 id="shareTitle">Compartilhe o Gerador de Cronograma MPC</h2><button class="close" data-close="shareModal">×</button></div>
+      <p id="shareDescription">Estou usando o Gerador de Cronograma MPC, uma ferramenta gratuita para criar cronogramas online e organizar os estudos para concursos.</p>
       <div class="share-grid">
         <button class="btn btn-dark" data-share="whatsapp">WhatsApp</button>
         <button class="btn btn-dark" data-share="facebook">Facebook</button>
         <button class="btn btn-dark" data-share="twitter">X / Twitter</button>
         <button class="btn btn-dark" data-share="linkedin">LinkedIn</button>
-        <button class="btn btn-secondary" data-share="native">Compartilhar no celular</button>
-        <button class="btn btn-secondary" data-share="copy">Copiar texto e link</button>
+        <button class="btn btn-primary" data-share="native">Compartilhar pelo celular</button>
+        <button class="btn btn-secondary" data-share="copy" id="copyShareBtn">Copiar texto e link</button>
       </div>
-      <p class="helper">Quando os créditos terminarem, acionar uma opção de compartilhamento libera um novo pacote de 20 créditos. A plataforma consegue registrar o acionamento do botão, mas o navegador não consegue confirmar se a publicação foi concluída ou permaneceu ativa.</p>
+      <div class="share-reward-confirm" id="shareRewardConfirm" hidden>
+        <strong>Conclua o compartilhamento para liberar os créditos</strong>
+        <p class="helper" id="shareRewardStatus">Escolha uma rede social. Depois, retorne a esta página e confirme.</p>
+        <label class="consent-row">
+          <input id="shareConfirmCheckbox" type="checkbox">
+          <span>Confirmo que concluí o compartilhamento do Gerador de Cronograma MPC.</span>
+        </label>
+        <button class="btn btn-primary" id="shareConfirmBtn" type="button" disabled>Liberar 20 créditos</button>
+      </div>
+      <p class="helper" id="shareHelper">Escolha uma opção para divulgar a ferramenta.</p>
     </div>
   </div>
 
@@ -1749,8 +1843,8 @@
       </div>
 
       <div class="modal-actions">
-        <button class="btn btn-secondary" data-close="privacyModal" type="button">Voltar sem concordar</button>
-        <button class="btn btn-primary" id="acknowledgePrivacyBtn" type="button">Li e entendi o documento</button>
+        <button class="btn btn-secondary" data-close="privacyModal" type="button">Fechar documento</button>
+        <button class="btn btn-primary" id="acknowledgePrivacyBtn" type="button">Voltar ao cadastro</button>
       </div>
     </div>
   </div>
@@ -1780,11 +1874,11 @@
             <input id="regWhatsapp" type="tel" autocomplete="tel" inputmode="tel" required placeholder="(DDD) número">
           </div>
           <div class="consent-row field full">
-            <input id="privacyConsent" type="checkbox" required disabled>
+            <input id="privacyConsent" type="checkbox" required>
             <div class="consent-copy">
-              <label for="privacyConsent">Li e concordo com a Política de Privacidade, os Termos de Uso e o tratamento dos dados necessários ao funcionamento da plataforma.</label>
-              <button class="legal-link" id="openPrivacyBtn" type="button">Ler a Política de Privacidade e os Termos de Uso</button>
-              <span class="consent-status" id="privacyReadStatus">Abra e confirme a leitura do documento para habilitar esta opção.</span>
+              <label for="privacyConsent">Concordo com a Política de Privacidade, os Termos de Uso e o tratamento dos dados necessários ao funcionamento da plataforma.</label>
+              <button class="legal-link" id="openPrivacyBtn" type="button">Consultar a Política de Privacidade e os Termos de Uso</button>
+              <span class="consent-status" id="privacyReadStatus">A consulta ao documento está disponível, mas não é necessário abri-lo antes de marcar a concordância.</span>
             </div>
           </div>
           <div class="consent-row field full">
@@ -1841,14 +1935,11 @@
     </div>
   </div>
 
-  <!-- Importação -->
-  <input type="file" id="importFile" accept="application/json" hidden>
-
   <script>
   (() => {
     'use strict';
     const STORAGE_KEY = 'geradorCronogramaMpcData';
-    const DATA_SCHEMA_VERSION = 1;
+    const DATA_SCHEMA_VERSION = 2;
     const LEGACY_STORAGE_KEYS = ['cronogramaLucasMpcV11'];
     const TUTORIAL_SESSION_KEY = 'cronogramaTutorialAbertoNestaSessaoV2';
     const DAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
@@ -1900,6 +1991,9 @@
     let focusInterval = null;
     let toastTimer = null;
     let shareRewardPending = false;
+    let shareAttempted = false;
+    let shareConfirmTimer = null;
+    let lastTrackedInteraction = 0;
     let monthOffset = 0;
     let taskDateContext = '';
 
@@ -1974,15 +2068,9 @@
       const checkbox=el('privacyConsent');
       const status=el('privacyReadStatus');
       if(!checkbox || !status) return;
-      checkbox.disabled=!state.privacyAcknowledged;
-      if(state.privacyAcknowledged){
-        status.textContent='Documento aberto e leitura confirmada. Agora você pode marcar a concordância.';
-        status.classList.add('ready');
-      }else{
-        checkbox.checked=false;
-        status.textContent='Abra e confirme a leitura do documento para habilitar esta opção.';
-        status.classList.remove('ready');
-      }
+      checkbox.disabled=false;
+      status.textContent='A consulta ao documento está disponível, mas não é necessário abri-lo antes de marcar a concordância.';
+      status.classList.toggle('ready', Boolean(state.privacyAcknowledged));
     }
 
     function openPrivacyDocument(){
@@ -2027,8 +2115,8 @@
           <div class="field subject-priority"><label>Prioridade</label><select>${[1,2,3,4,5].map(v=>`<option value="${v}" ${v===s.priority?'selected':''}>${v}</option>`).join('')}</select></div>
           <div class="field subject-level"><label>Nível</label><select><option value="iniciante" ${s.level==='iniciante'?'selected':''}>Iniciante</option><option value="intermediario" ${s.level==='intermediario'?'selected':''}>Intermediário</option><option value="avancado" ${s.level==='avancado'?'selected':''}>Avançado</option></select></div>
           <button class="btn btn-danger btn-small remove-subject" type="button" aria-label="Remover disciplina">Remover</button>`;
-        row.querySelector('.remove-subject').addEventListener('click',()=>{ if(state.subjects.length<=1) return toast('Mantenha pelo menos uma disciplina.'); state.subjects=state.subjects.filter(x=>x.id!==s.id); renderSubjects(); saveState(); updateStats(); });
-        row.querySelectorAll('input,select').forEach(x=>x.addEventListener('change',()=>{ collectSettings(); saveState(); updateStats(); }));
+        row.querySelector('.remove-subject').addEventListener('click',()=>{ if(state.subjects.length<=1) return toast('Mantenha pelo menos uma disciplina.'); state.subjects=state.subjects.filter(x=>x.id!==s.id); meaningfulAction(); renderSubjects(); saveState(); updateStats(); });
+        row.querySelectorAll('input,select').forEach(x=>x.addEventListener('change',()=>{ collectSettings(); trackMeaningfulInteraction(); updateStats(); }));
         el('subjectList').appendChild(row);
       });
     }
@@ -2361,12 +2449,22 @@
     function setupDaySelect(){ el('taskDay').innerHTML=DAYS.map((d,i)=>`<option value="${i}">${d}</option>`).join(''); }
 
     function meaningfulAction(){
+      if(state.registered) return;
       state.actionCount=(state.actionCount||0)+1;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       if(state.actionCount>=5){
         state.adEligible=true;
         startAdClock();
-        if(!state.registered) setTimeout(enforceAccessGate,120);
+        setTimeout(enforceAccessGate,120);
       }
+    }
+
+    function trackMeaningfulInteraction(){
+      const now=Date.now();
+      if(now-lastTrackedInteraction<350) return;
+      lastTrackedInteraction=now;
+      meaningfulAction();
+      saveState();
     }
 
     function consumeCredit(){
@@ -2524,22 +2622,119 @@
       el('footerAd').classList.add('show');
     }
 
-    function exportJson(){
-      saveState(); const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='meu-cronograma-concursos.json'; a.click(); URL.revokeObjectURL(a.href);
+    function downloadBlob(blob, filename){
+      const link=document.createElement('a');
+      const url=URL.createObjectURL(blob);
+      link.href=url;
+      link.download=filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),800);
     }
-    function importJson(file){
-      const reader=new FileReader(); reader.onload=()=>{ try{ const data=JSON.parse(reader.result); state={...defaultState(),...data}; saveState(); initialize(); toast('Cronograma importado.'); }catch{toast('Arquivo inválido.');} }; reader.readAsText(file);
-    }
-    function exportIcs(){
+
+    function exportPdf(){
       if(!state.tasks.length) return toast('Adicione atividades antes de exportar.');
-      const now=new Date(); const monday=new Date(now); const diff=(now.getDay()+6)%7; monday.setDate(now.getDate()-diff); monday.setHours(0,0,0,0);
-      const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Prof Lucas MPC//Cronograma Concursos//PT-BR'];
-      state.tasks.forEach(t=>{ const d=new Date(monday); d.setDate(monday.getDate()+t.day); const [sh,sm]=t.start.split(':').map(Number),[eh,em]=t.end.split(':').map(Number); const start=new Date(d);start.setHours(sh,sm); const end=new Date(d);end.setHours(eh,em);
-        const fmt=x=>x.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
-        lines.push('BEGIN:VEVENT',`UID:${t.id}@prof-lucas-mpc`,`DTSTART:${fmt(start)}`,`DTEND:${fmt(end)}`,`SUMMARY:${escapeIcs(t.subject+' — '+t.activity)}`,`DESCRIPTION:${escapeIcs(t.notes||'Cronograma de estudos')}`,'END:VEVENT');
-      }); lines.push('END:VCALENDAR'); const blob=new Blob([lines.join('\r\n')],{type:'text/calendar'}); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='cronograma-estudos.ics';a.click();URL.revokeObjectURL(a.href);
+      collectSettings();
+      const subtitle=[
+        state.goal ? `Objetivo: ${state.goal}` : '',
+        state.examDate ? `Prova: ${new Date(state.examDate+'T12:00:00').toLocaleDateString('pt-BR')}` : ''
+      ].filter(Boolean).join(' · ') || 'Cronograma de estudos para concursos';
+      el('printSubtitle').textContent=subtitle;
+      closeModal('exportModal');
+      const oldTitle=document.title;
+      document.title='Cronograma de Estudos - Prof. Lucas MPC';
+      const restore=()=>{document.title=oldTitle;};
+      window.addEventListener('afterprint',restore,{once:true});
+      toast('Na janela seguinte, escolha “Salvar como PDF”.');
+      setTimeout(()=>{
+        window.print();
+        setTimeout(restore,1500);
+      },180);
     }
-    function escapeIcs(v){return String(v).replace(/\\/g,'\\\\').replace(/,/g,'\\,').replace(/;/g,'\\;').replace(/\n/g,'\\n');}
+
+    function xmlEscape(value=''){
+      return String(value)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&apos;');
+    }
+
+    function excelCell(value, type='String'){
+      return `<Cell><Data ss:Type="${type}">${xmlEscape(value)}</Data></Cell>`;
+    }
+
+    function excelRow(values){
+      return `<Row>${values.map(item=>excelCell(item.value,item.type||'String')).join('')}</Row>`;
+    }
+
+    function excelWorksheet(name, rows){
+      return `<Worksheet ss:Name="${xmlEscape(name)}"><Table>${rows.join('')}</Table></Worksheet>`;
+    }
+
+    function exportExcel(){
+      if(!state.tasks.length) return toast('Adicione atividades antes de exportar.');
+      collectSettings();
+
+      const summaryRows=[
+        excelRow([{value:'GERADOR DE CRONOGRAMA MPC'}]),
+        excelRow([{value:'Objetivo'},{value:state.goal||'Não informado'}]),
+        excelRow([{value:'Data da prova'},{value:state.examDate||'Não informada'}]),
+        excelRow([{value:'Horas disponíveis por dia'},{value:state.hoursPerDay,type:'Number'}]),
+        excelRow([{value:'Duração padrão da sessão (min)'},{value:state.sessionMinutes,type:'Number'}]),
+        excelRow([{value:'Horário preferido'},{value:state.preferredStart}]),
+        excelRow([{value:'Dias disponíveis'},{value:state.availableDays.map(day=>DAYS[day]).join(', ')}]),
+        excelRow([{value:'Créditos restantes'},{value:state.credits,type:'Number'}])
+      ];
+
+      const taskRows=[
+        excelRow([
+          {value:'Dia'}, {value:'Data'}, {value:'Início'}, {value:'Término'},
+          {value:'Disciplina'}, {value:'Atividade'}, {value:'Tipo'},
+          {value:'Observações'}, {value:'Concluída'}
+        ]),
+        ...[...state.tasks]
+          .sort((a,b)=>(a.date||'').localeCompare(b.date||'') || a.day-b.day || a.start.localeCompare(b.start))
+          .map(task=>excelRow([
+            {value:DAYS[task.day]||''},
+            {value:task.date||''},
+            {value:task.start||''},
+            {value:task.end||''},
+            {value:task.subject||''},
+            {value:task.activity||''},
+            {value:task.type||''},
+            {value:task.notes||''},
+            {value:task.done?'Sim':'Não'}
+          ]))
+      ];
+
+      const subjectRows=[
+        excelRow([{value:'Disciplina'},{value:'Prioridade'},{value:'Nível'}]),
+        ...state.subjects.map(subject=>excelRow([
+          {value:subject.name},
+          {value:subject.priority,type:'Number'},
+          {value:subject.level}
+        ]))
+      ];
+
+      const workbook=`<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ ${excelWorksheet('Resumo',summaryRows)}
+ ${excelWorksheet('Cronograma',taskRows)}
+ ${excelWorksheet('Disciplinas',subjectRows)}
+</Workbook>`;
+
+      const blob=new Blob(['\ufeff',workbook],{type:'application/vnd.ms-excel;charset=utf-8;'});
+      downloadBlob(blob,'cronograma-de-estudos-prof-lucas-mpc.xls');
+      closeModal('exportModal');
+      toast('Arquivo Excel baixado.');
+    }
 
     function initTutorial(){
       const steps=[...document.querySelectorAll('.tutorial-step')], dots=el('tutorialDots'); dots.innerHTML=steps.map((_,i)=>`<i class="${i===0?'active':''}"></i>`).join('');
@@ -2679,7 +2874,10 @@
 
       el('focusStartBtn').onclick=()=>{
         if(state.focusRunning) stop();
-        else startTimer();
+        else{
+          meaningfulAction();
+          startTimer();
+        }
       };
 
       el('focusResetBtn').onclick=()=>{
@@ -2787,10 +2985,7 @@
           toast('As alterações também são salvas automaticamente neste navegador.');
           break;
         case 'files':
-          goToToolTarget('scheduleTools',['exportBtn','importBtn']);
-          break;
-        case 'calendar':
-          goToToolTarget('scheduleTools',['icsBtn','printBtn']);
+          goToToolTarget('scheduleTools',['exportBtn']);
           break;
         case 'tutorial':
           closeModal('toolsModal');
@@ -2817,6 +3012,219 @@
       }
     }
 
+
+    function currentShareUrl(){
+      return window.location.href.split('#')[0];
+    }
+
+    function resetShareConfirmation(){
+      clearTimeout(shareConfirmTimer);
+      shareAttempted=false;
+      const area=el('shareRewardConfirm');
+      const checkbox=el('shareConfirmCheckbox');
+      const button=el('shareConfirmBtn');
+      if(area) area.hidden=true;
+      if(checkbox) checkbox.checked=false;
+      if(button){
+        button.disabled=true;
+        button.dataset.ready='false';
+      }
+    }
+
+    function openShareModal(rewardRequired=false){
+      shareRewardPending=Boolean(rewardRequired);
+      resetShareConfirmation();
+      el('shareTitle').textContent=rewardRequired
+        ? 'Compartilhe para liberar mais 20 créditos'
+        : 'Compartilhe o Gerador de Cronograma MPC';
+      el('shareHelper').textContent=rewardRequired
+        ? 'Copiar o link não libera créditos. Escolha uma opção de compartilhamento e conclua o envio.'
+        : 'Escolha uma opção para divulgar a ferramenta.';
+      el('copyShareBtn').hidden=rewardRequired;
+      openModal('shareModal');
+    }
+
+    function updateShareConfirmButton(){
+      const button=el('shareConfirmBtn');
+      const checkbox=el('shareConfirmCheckbox');
+      if(!button || !checkbox) return;
+      button.disabled=!(shareAttempted && button.dataset.ready==='true' && checkbox.checked);
+    }
+
+    function markShareAttempt(channel){
+      if(!shareRewardPending) return;
+      shareAttempted=true;
+      const area=el('shareRewardConfirm');
+      const status=el('shareRewardStatus');
+      const button=el('shareConfirmBtn');
+      area.hidden=false;
+      button.disabled=true;
+      button.dataset.ready='false';
+      status.textContent=`A opção ${channel} foi aberta. Conclua o compartilhamento, retorne a esta página e aguarde a liberação do botão.`;
+      clearTimeout(shareConfirmTimer);
+      shareConfirmTimer=setTimeout(()=>{
+        button.dataset.ready='true';
+        status.textContent='Marque a confirmação abaixo para liberar o novo pacote de créditos.';
+        updateShareConfirmButton();
+      },4500);
+    }
+
+    function completeShareReward(){
+      if(!shareRewardPending) return;
+      if(state.credits>0){
+        shareRewardPending=false;
+        closeModal('shareModal');
+        return;
+      }
+      state.credits+=20;
+      state.sharePackages=(state.sharePackages||0)+1;
+      shareRewardPending=false;
+      resetShareConfirmation();
+      saveState();
+      updateCredits();
+      closeModal('shareModal');
+      closeModal('creditModal');
+      toast('Compartilhamento confirmado. Mais 20 créditos foram liberados.');
+    }
+
+    async function copyShareMessage(){
+      const message=`${SHARE_TEXT}\n\n${currentShareUrl()}`;
+      try{
+        await navigator.clipboard.writeText(message);
+        toast('Texto e link copiados.');
+      }catch{
+        const textarea=document.createElement('textarea');
+        textarea.value=message;
+        textarea.style.position='fixed';
+        textarea.style.opacity='0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+        toast('Texto e link copiados.');
+      }
+    }
+
+    async function share(kind){
+      const url=currentShareUrl();
+      const message=`${SHARE_TEXT}\n\n${url}`;
+
+      if(kind==='copy'){
+        if(shareRewardPending){
+          toast('Copiar o link não libera créditos. Realize um compartilhamento.');
+          return;
+        }
+        await copyShareMessage();
+        return;
+      }
+
+      if(kind==='native'){
+        if(!navigator.share){
+          toast('O compartilhamento do celular não está disponível neste navegador. Escolha outra opção.');
+          return;
+        }
+        try{
+          await navigator.share({
+            title:'Gerador de Cronograma MPC',
+            text:SHARE_TEXT,
+            url
+          });
+          if(shareRewardPending) completeShareReward();
+          else toast('Obrigado por compartilhar a ferramenta.');
+        }catch(error){
+          if(error?.name!=='AbortError') toast('Não foi possível abrir o compartilhamento neste navegador.');
+        }
+        return;
+      }
+
+      const links={
+        whatsapp:`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`,
+        facebook:`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(SHARE_TEXT)}`,
+        twitter:`https://twitter.com/intent/tweet?text=${encodeURIComponent(SHARE_TEXT)}&url=${encodeURIComponent(url)}`,
+        linkedin:`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
+      };
+
+      const destination=links[kind];
+      if(!destination) return;
+
+      const popup=window.open(destination,'_blank');
+      if(!popup) window.location.href=destination;
+
+      if(shareRewardPending){
+        const names={whatsapp:'WhatsApp',facebook:'Facebook',twitter:'X / Twitter',linkedin:'LinkedIn'};
+        markShareAttempt(names[kind]||'selecionada');
+      }else{
+        toast('A opção de compartilhamento foi aberta.');
+      }
+    }
+
+
+    function positionToolsButton(){
+      const button=el('toolsButton');
+      const ad=el('footerAd');
+      if(!button) return;
+
+      const baseGap=window.innerWidth<=480 ? 10 : 14;
+      const fallbackBottom=window.innerWidth<=480 ? 10 : 18;
+
+      if(!ad){
+        document.documentElement.style.setProperty('--tools-button-bottom',`${fallbackBottom}px`);
+        return;
+      }
+
+      const styles=getComputedStyle(ad);
+      const rect=ad.getBoundingClientRect();
+      const visible=styles.display!=='none'
+        && styles.visibility!=='hidden'
+        && rect.height>0
+        && rect.bottom>0
+        && rect.top<window.innerHeight;
+
+      if(!visible){
+        document.documentElement.style.setProperty('--tools-button-bottom',`${fallbackBottom}px`);
+        return;
+      }
+
+      const distanceFromViewportBottom=Math.max(0,window.innerHeight-rect.top);
+      document.documentElement.style.setProperty(
+        '--tools-button-bottom',
+        `${Math.ceil(distanceFromViewportBottom+baseGap)}px`
+      );
+    }
+
+    function setupFloatingLayout(){
+      positionToolsButton();
+
+      window.addEventListener('resize',positionToolsButton,{passive:true});
+      window.addEventListener('orientationchange',()=>{
+        setTimeout(positionToolsButton,180);
+      });
+
+      const ad=el('footerAd');
+      if(ad && 'ResizeObserver' in window){
+        const observer=new ResizeObserver(()=>positionToolsButton());
+        observer.observe(ad);
+      }
+
+      if(ad && 'MutationObserver' in window){
+        const mutationObserver=new MutationObserver(()=>positionToolsButton());
+        mutationObserver.observe(ad,{
+          attributes:true,
+          attributeFilter:['class','style'],
+          childList:true,
+          subtree:true
+        });
+      }
+
+      if(document.fonts?.ready){
+        document.fonts.ready.then(positionToolsButton).catch(()=>{});
+      }
+
+      setTimeout(positionToolsButton,80);
+      setTimeout(positionToolsButton,350);
+      setTimeout(positionToolsButton,1000);
+    }
+
     function registerEvents(){
       el('themeBtn').onclick=()=>{state.theme=state.theme==='dark'?'light':'dark';applyTheme();saveState();};
       el('paletteBtn').onclick=()=>{renderPaletteOptions();openModal('paletteModal');};
@@ -2832,16 +3240,18 @@
         renderPrivacyConsent();
         closeModal('privacyModal');
         setTimeout(()=>el('privacyConsent')?.focus(),50);
-        toast('Leitura confirmada. Marque a concordância para continuar.');
       };
       document.querySelectorAll('[data-schedule-style]').forEach(button=>{
-        button.addEventListener('click',()=>setScheduleStyle(button.dataset.scheduleStyle));
+        button.addEventListener('click',()=>{
+          setScheduleStyle(button.dataset.scheduleStyle);
+          trackMeaningfulInteraction();
+        });
       });
       el('addChecklistBtn').onclick=()=>openTaskModal(0);
       el('prevMonthBtn').onclick=()=>{monthOffset--;renderMonthly();};
       el('nextMonthBtn').onclick=()=>{monthOffset++;renderMonthly();};
       el('tutorialBtn').onclick=()=>{tutorialIndex=0;initTutorial();openModal('tutorialModal');};
-      el('shareBtn').onclick=()=>{shareRewardPending=false;openModal('shareModal');};
+      el('shareBtn').onclick=()=>openShareModal(false);
 
       el('toolsGoPomodoro').onclick=()=>navigateFromTools('pomodoro');
       el('toolsOpenTutorial').onclick=()=>{
@@ -2857,7 +3267,7 @@
       };
       el('heroGenerateBtn').onclick=()=>generateSchedule('generate'); el('generateAiBtn').onclick=()=>generateSchedule('generate');
       el('rebalanceAiBtn').onclick=()=>generateSchedule('rebalance'); el('reviewsAiBtn').onclick=()=>generateSchedule('reviews'); el('weakAiBtn').onclick=()=>generateSchedule('weak');
-      el('addSubjectBtn').onclick=()=>{collectSettings();state.subjects.push({id:cryptoId(),name:'Nova disciplina',priority:3,level:'iniciante'});renderSubjects();saveState();};
+      el('addSubjectBtn').onclick=()=>{collectSettings();state.subjects.push({id:cryptoId(),name:'Nova disciplina',priority:3,level:'iniciante'});meaningfulAction();renderSubjects();saveState();};
       el('taskForm').onsubmit=e=>{
         e.preventDefault();
         const id=el('taskId').value;
@@ -2889,15 +3299,31 @@
         closeModal('taskModal');
         renderSchedule();
       };
-      el('saveBtn').onclick=()=>saveState(true); el('exportBtn').onclick=exportJson; el('importBtn').onclick=()=>el('importFile').click(); el('importFile').onchange=e=>e.target.files[0]&&importJson(e.target.files[0]); el('icsBtn').onclick=exportIcs; el('printBtn').onclick=()=>window.print();
+      el('saveBtn').onclick=()=>saveState(true);
+      el('exportBtn').onclick=()=>openModal('exportModal');
+      el('exportPdfBtn').onclick=exportPdf;
+      el('exportExcelBtn').onclick=exportExcel;
       el('clearBtn').onclick=()=>{if(confirm('Apagar todas as atividades do cronograma?')){state.tasks=[];saveState();renderSchedule();toast('Cronograma limpo.');}};
       el('refreshInsightsBtn').onclick=renderInsights; el('expandStatsBtn').onclick=updateStats;
-      el('creditShareBtn').onclick=()=>{closeModal('creditModal');shareRewardPending=true;openModal('shareModal');};
+      el('creditShareBtn').onclick=()=>{closeModal('creditModal');openShareModal(true);};
       document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{
         if(b.dataset.close==='tutorialModal') sessionStorage.setItem(TUTORIAL_SESSION_KEY,'1');
         closeModal(b.dataset.close);
       });
       document.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>share(b.dataset.share));
+      el('shareConfirmCheckbox').onchange=updateShareConfirmButton;
+      el('shareConfirmBtn').onclick=completeShareReward;
+      document.addEventListener('visibilitychange',()=>{
+        if(!document.hidden && shareRewardPending && shareAttempted){
+          const button=el('shareConfirmBtn');
+          if(button && button.dataset.ready!=='true'){
+            clearTimeout(shareConfirmTimer);
+            button.dataset.ready='true';
+            el('shareRewardStatus').textContent='Marque a confirmação abaixo para liberar o novo pacote de créditos.';
+            updateShareConfirmButton();
+          }
+        }
+      });
       document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{
         if(e.target===m && m.dataset.required!=='true') closeModal(m.id);
       }));
@@ -2910,16 +3336,12 @@
       });
       el('registerForm').onsubmit=e=>{
         e.preventDefault();
-        if(!state.privacyAcknowledged){
-          toast('Leia a Política de Privacidade e os Termos de Uso antes de continuar.');
-          openPrivacyDocument();
-          return;
-        }
         if(!el('privacyConsent').checked){
-          toast('Marque a concordância obrigatória para continuar.');
+          toast('Marque a concordância com a Política de Privacidade e os Termos de Uso.');
           el('privacyConsent').focus();
           return;
         }
+        state.privacyAcknowledged=true;
         state.registered=false;
         state.awaitingWhatsapp=true;
         state.whatsappOpened=false;
@@ -2964,7 +3386,7 @@
       document.querySelectorAll('[data-tool-action]').forEach(item=>{
         item.addEventListener('click',()=>navigateFromTools(item.dataset.toolAction));
       });
-      document.querySelectorAll('#goal,#examDate,#hoursPerDay,#sessionMinutes,#preferredStart,#availableDays input').forEach(x=>x.addEventListener('change',()=>saveState()));
+      document.querySelectorAll('#goal,#examDate,#hoursPerDay,#sessionMinutes,#preferredStart,#availableDays input').forEach(x=>x.addEventListener('change',trackMeaningfulInteraction));
     }
 
 
@@ -3073,6 +3495,7 @@
       startAdClock();
       renderAccessGate();
       renderPrivacyConsent();
+      setupFloatingLayout();
 
       if(platformAccessRequired()){
         setTimeout(enforceAccessGate,120);
