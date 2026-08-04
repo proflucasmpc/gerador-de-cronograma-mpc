@@ -6,6 +6,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Use o Gerador de Cronograma MPC para criar gratuitamente cronogramas de estudos para concursos em formato checklist, ciclos, semanal ou mensal.">
   <title>Gerador de Cronograma MPC | Planejamento para Concursos</title>
+  <!-- Google Analytics 4 — Prof. Lucas MPC -->
+  <script>
+    window.MPC_GA_ID = 'G-5ZQHHYEH86';
+    window.MPC_GA_CONSENT_KEY = 'mpcAnalyticsConsent';
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+
+    (function(){
+      const saved = localStorage.getItem(window.MPC_GA_CONSENT_KEY);
+      gtag('consent', 'default', {
+        analytics_storage: saved === 'granted' ? 'granted' : 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        functionality_storage: 'granted',
+        security_storage: 'granted',
+        wait_for_update: 500
+      });
+
+      gtag('js', new Date());
+      gtag('config', window.MPC_GA_ID, {
+        anonymize_ip: true,
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false
+      });
+
+      window.setMpcAnalyticsConsent = function(value){
+        const granted = value === 'granted';
+        localStorage.setItem(window.MPC_GA_CONSENT_KEY, granted ? 'granted' : 'denied');
+        gtag('consent', 'update', {
+          analytics_storage: granted ? 'granted' : 'denied',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied'
+        });
+
+        const panel = document.getElementById('analyticsConsent');
+        if(panel) panel.hidden = true;
+
+        if(granted){
+          gtag('event', 'analytics_consent_granted');
+          gtag('event', 'page_view', {
+            page_title: document.title,
+            page_location: location.href,
+            page_path: location.pathname
+          });
+        }
+      };
+
+      window.openMpcAnalyticsPreferences = function(){
+        const panel = document.getElementById('analyticsConsent');
+        if(panel){
+          panel.hidden = false;
+          panel.querySelector('.analytics-consent-title')?.focus();
+        }
+      };
+
+      window.trackMpcEvent = function(name, parameters={}){
+        if(localStorage.getItem(window.MPC_GA_CONSENT_KEY) !== 'granted') return;
+        gtag('event', name, parameters);
+      };
+    })();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5ZQHHYEH86"></script>
+
   <link rel="icon" type="image/webp" href="data:image/webp;base64,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">
   <style>
     :root {
@@ -32,6 +97,51 @@
       --radius: 22px;
     }
 
+
+
+    .analytics-consent {
+      position: fixed;
+      left: 50%;
+      top: 88px;
+      transform: translateX(-50%);
+      z-index: 220;
+      width: min(720px, calc(100% - 24px));
+      padding: 14px 16px;
+      border: 1px solid var(--gold);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 18px 48px rgba(0,0,0,.26);
+    }
+    .analytics-consent[hidden] { display: none !important; }
+    .analytics-consent-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+    }
+    .analytics-consent-title {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 950;
+      line-height: 1.25;
+    }
+    .analytics-consent p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .86rem;
+      line-height: 1.45;
+    }
+    .analytics-consent-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .analytics-consent .legal-link {
+      font-size: .78rem;
+    }
 
     /* Paletas selecionáveis */
     body[data-palette="classic"] {
@@ -1164,6 +1274,26 @@
 
     @media (max-width: 480px) {
       .topbar { position: static; }
+      .analytics-consent {
+        top: 10px;
+        padding: 13px;
+      }
+      .analytics-consent-inner {
+        grid-template-columns: 1fr;
+      }
+      .analytics-consent-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        justify-content: stretch;
+      }
+      .analytics-consent-actions .btn {
+        width: 100%;
+        min-width: 0;
+      }
+      .analytics-consent-actions .legal-link {
+        grid-column: 1 / -1;
+        text-align: center;
+      }
       .topbar-inner { padding: 9px 10px; }
       .brand { justify-content: flex-start; }
       .brand-logo { width: 45px; height: 45px; flex-basis: 45px; }
@@ -1221,7 +1351,7 @@
     }
     @media print {
       @page { size: A4 landscape; margin: 10mm; }
-      .topbar, .hero, .course-banner, .sidebar, .toolbar, .ai-panel, .tools-button, .footer-ad, footer, .add-task, .task-actions, .modal-backdrop { display: none !important; }
+      .topbar, .hero, .course-banner, .sidebar, .toolbar, .ai-panel, .tools-button, .footer-ad, .analytics-consent, footer, .add-task, .task-actions, .modal-backdrop { display: none !important; }
       .print-title { display: block !important; margin: 0 0 14px; color: #07152b; }
       .print-title h1 { margin: 0 0 4px; font-size: 22pt; }
       .print-title p { margin: 0; color: #45546a; }
@@ -1235,6 +1365,22 @@
   </style>
 </head>
 <body data-theme="light">
+
+  <aside class="analytics-consent" id="analyticsConsent" hidden aria-label="Preferências de estatísticas">
+    <div class="analytics-consent-inner">
+      <div>
+        <strong class="analytics-consent-title" tabindex="-1">Estatísticas de acesso</strong>
+        <p>O Google Analytics ajuda o Prof. Lucas MPC a saber quantas pessoas acessam a ferramenta e quais recursos são mais utilizados. Nenhum contador aparece publicamente.</p>
+      </div>
+      <div class="analytics-consent-actions">
+        <button class="btn btn-primary btn-small" id="allowAnalyticsBtn" type="button">Permitir estatísticas</button>
+        <button class="btn btn-secondary btn-small" id="denyAnalyticsBtn" type="button">Continuar sem análise</button>
+        <button class="legal-link" id="analyticsPrivacyBtn" type="button">Consultar a política</button>
+      </div>
+    </div>
+  </aside>
+
+
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="Gerador de Cronograma MPC">
@@ -1742,14 +1888,14 @@
       <div class="modal-head">
         <div>
           <h2 id="privacyTitle">Política de Privacidade e Termos de Uso</h2>
-          <div class="legal-version">Versão 1.0 · Última atualização: 3 de agosto de 2026</div>
+          <div class="legal-version">Versão 1.1 · Última atualização: 4 de agosto de 2026</div>
         </div>
         <button class="close" data-close="privacyModal" aria-label="Fechar">×</button>
       </div>
 
       <div class="legal-summary">
         <h3>Resumo em linguagem simples</h3>
-        <p>O site solicita nome, e-mail e WhatsApp depois de cinco ações. Na versão HTML atual, esses dados e o cronograma ficam guardados somente neste navegador. O reset do planejamento não apaga o cadastro nem a liberação de acesso. Ao abrir o WhatsApp, você passa a utilizar um serviço externo. O consentimento para receber ofertas é separado e opcional.</p>
+        <p>O site solicita nome, e-mail e WhatsApp depois de cinco ações. Esses dados e o cronograma ficam guardados neste navegador. Com a autorização do usuário, o Google Analytics poderá registrar estatísticas de acesso e uso da plataforma. Nenhum contador é exibido publicamente. O consentimento para receber ofertas continua separado e opcional.</p>
       </div>
 
       <div class="legal-document" id="legalDocument" tabindex="0">
@@ -1765,7 +1911,8 @@
             <li>registro das autorizações marcadas pelo usuário;</li>
             <li>objetivo, disciplinas, horários, tarefas e demais informações inseridas no cronograma;</li>
             <li>preferências de tema, paleta, estilo de cronograma e créditos de criação;</li>
-            <li>ações necessárias ao funcionamento, como conclusão de tarefas e uso dos recursos.</li>
+            <li>ações necessárias ao funcionamento, como conclusão de tarefas e uso dos recursos;</li>
+            <li>quando autorizado, informações técnicas e estatísticas de navegação, como páginas acessadas, tipo de dispositivo, navegador, país aproximado e eventos de uso.</li>
           </ul>
           <p>Não é necessário informar dados sensíveis, como informações de saúde, religião, origem racial, biometria ou posicionamento político. Evite inserir esse tipo de dado nas observações do cronograma.</p>
         </section>
@@ -1800,8 +1947,9 @@
         </section>
 
         <section>
-          <h3>8. Compartilhamento e venda de dados</h3>
-          <p>Os dados pessoais não são vendidos. Nesta versão local, não há compartilhamento com banco de dados próprio. O uso do WhatsApp e de outras redes sociais ocorre apenas quando o usuário aciona voluntariamente os respectivos botões.</p>
+          <h3>8. Google Analytics, compartilhamento e venda de dados</h3>
+          <p>Os dados pessoais não são vendidos. Quando o usuário permite estatísticas, a plataforma utiliza o Google Analytics 4, identificado pelo código <strong>G-5ZQHHYEH86</strong>, para medir acessos e utilização dos recursos. O armazenamento para análise permanece negado até a escolha do visitante.</p>
+          <p>O usuário pode recusar ou alterar essa preferência posteriormente. O uso do WhatsApp e de outras redes sociais ocorre apenas quando o usuário aciona voluntariamente os respectivos botões.</p>
         </section>
 
         <section>
@@ -1843,6 +1991,7 @@
       </div>
 
       <div class="modal-actions">
+        <button class="btn btn-secondary" id="analyticsPreferencesBtn" type="button">Preferências de estatísticas</button>
         <button class="btn btn-secondary" data-close="privacyModal" type="button">Fechar documento</button>
         <button class="btn btn-primary" id="acknowledgePrivacyBtn" type="button">Voltar ao cadastro</button>
       </div>
@@ -2474,6 +2623,7 @@
     function updateCredits(){ el('heroCredits').textContent=state.credits; el('creditLabel').textContent=`${state.credits} crédito${state.credits===1?'':'s'}`; }
 
     function generateSchedule(mode='generate'){
+      window.trackMpcEvent?.('schedule_automation_used',{mode});
       collectSettings();
       if(!state.availableDays.length) return toast('Selecione pelo menos um dia disponível.');
       if(!state.subjects.length) return toast('Adicione pelo menos uma disciplina.');
@@ -2634,6 +2784,7 @@
     }
 
     function exportPdf(){
+      window.trackMpcEvent?.('export_selected',{format:'pdf'});
       if(!state.tasks.length) return toast('Adicione atividades antes de exportar.');
       collectSettings();
       const subtitle=[
@@ -2675,6 +2826,7 @@
     }
 
     function exportExcel(){
+      window.trackMpcEvent?.('export_selected',{format:'excel'});
       if(!state.tasks.length) return toast('Adicione atividades antes de exportar.');
       collectSettings();
 
@@ -3070,6 +3222,7 @@
     }
 
     function completeShareReward(){
+      window.trackMpcEvent?.('credit_share_confirmed');
       if(!shareRewardPending) return;
       if(state.credits>0){
         shareRewardPending=false;
@@ -3225,7 +3378,30 @@
       setTimeout(positionToolsButton,1000);
     }
 
+
+    function initializeAnalyticsConsent(){
+      const saved=localStorage.getItem(window.MPC_GA_CONSENT_KEY);
+      const panel=el('analyticsConsent');
+      if(panel) panel.hidden=Boolean(saved);
+    }
+
     function registerEvents(){
+      el('allowAnalyticsBtn').onclick=()=>{
+        window.setMpcAnalyticsConsent('granted');
+        toast('Estatísticas autorizadas.');
+      };
+      el('denyAnalyticsBtn').onclick=()=>{
+        window.setMpcAnalyticsConsent('denied');
+        toast('Você continuará usando a plataforma sem estatísticas identificáveis por cookies.');
+      };
+      el('analyticsPrivacyBtn').onclick=()=>{
+        el('analyticsConsent').hidden=true;
+        openPrivacyDocument();
+      };
+      el('analyticsPreferencesBtn').onclick=()=>{
+        closeModal('privacyModal');
+        window.openMpcAnalyticsPreferences();
+      };
       el('themeBtn').onclick=()=>{state.theme=state.theme==='dark'?'light':'dark';applyTheme();saveState();};
       el('paletteBtn').onclick=()=>{renderPaletteOptions();openModal('paletteModal');};
       document.querySelectorAll('[data-palette-choice]').forEach(option=>{
@@ -3345,6 +3521,7 @@
         state.registered=false;
         state.awaitingWhatsapp=true;
         state.whatsappOpened=false;
+        window.trackMpcEvent?.('registration_submitted');
         state.registration={
           name:el('regName').value.trim(),
           email:el('regEmail').value.trim(),
@@ -3375,6 +3552,7 @@
           return;
         }
         state.registered=true;
+        window.trackMpcEvent?.('access_unlocked');
         state.awaitingWhatsapp=false;
         state.whatsappOpened=false;
         saveState();
@@ -3496,6 +3674,7 @@
       renderAccessGate();
       renderPrivacyConsent();
       setupFloatingLayout();
+      initializeAnalyticsConsent();
 
       if(platformAccessRequired()){
         setTimeout(enforceAccessGate,120);
