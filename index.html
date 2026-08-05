@@ -992,23 +992,51 @@
       line-height: 1.5;
       font-weight: 750;
     }
-    .access-confirm-area {
+    .access-code-only-view {
       display: grid;
-      gap: 12px;
-      padding-top: 4px;
+      gap: 18px;
+      padding: 20px 2px 4px;
     }
-    .access-confirm-area[hidden] { display: none !important; }
+    .access-code-only-view[hidden],
+    .access-content[hidden] {
+      display: none !important;
+    }
     .access-code-field {
-      margin: 14px 0 12px;
+      margin: 0;
       text-align: left;
+    }
+    .access-code-field label {
+      display: block;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 1.02rem;
+      font-weight: 900;
+      color: var(--text);
     }
     .access-code-field input {
       width: 100%;
-      min-height: 56px;
+      min-height: 66px;
       text-align: center;
-      font-size: 1.35rem;
-      font-weight: 900;
-      letter-spacing: .28em;
+      font-size: 1.55rem;
+      font-weight: 950;
+      letter-spacing: .32em;
+      border: 2px solid var(--gold);
+      border-radius: 14px;
+    }
+    .access-code-field input:focus {
+      outline: 3px solid color-mix(in srgb, var(--gold) 28%, transparent);
+      outline-offset: 2px;
+    }
+    .access-release-button {
+      width: 100%;
+      min-height: 56px;
+      font-size: 1rem;
+      font-weight: 950;
+    }
+    .access-code-only-view .registration-submit-status {
+      min-height: 22px;
+      margin: 0;
+      text-align: center;
     }
     .access-number {
       margin: 0;
@@ -2047,52 +2075,53 @@
 
   <!-- Liberação obrigatória pelo WhatsApp -->
   <div class="modal-backdrop required-modal" id="accessModal" data-required="true" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="accessTitle" aria-describedby="accessDescription">
+    <div class="modal access-modal-shell" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
       <div class="modal-head">
-        <h2 id="accessTitle">Envie a mensagem para liberar seu acesso</h2>
+        <h2 id="accessTitle">Etapa 2: solicite seu código</h2>
       </div>
-      <div class="access-content">
+
+      <!-- Tela 1: solicitação do código -->
+      <div class="access-content" id="accessRequestView">
         <div class="access-icon" aria-hidden="true">✓</div>
-        <div class="notice success" id="accessDescription">
-          <strong>Cadastro realizado.</strong><br>
-          Agora envie a mensagem ao Prof. Lucas MPC pelo WhatsApp.
+        <div class="notice success">
+          <strong>Cadastro realizado corretamente.</strong><br>
+          Agora solicite seu código de liberação pelo WhatsApp.
         </div>
         <div class="access-steps">
-          <div class="access-step"><strong>1</strong><span>Clique em <strong>“Abrir WhatsApp e solicitar código”</strong>.</span></div>
-          <div class="access-step"><strong>2</strong><span>Envie a mensagem que já estará preenchida com seu código de cadastro.</span></div>
-          <div class="access-step"><strong>3</strong><span>Aguarde o Prof. Lucas MPC responder com uma senha de 6 números.</span></div>
-          <div class="access-step"><strong>4</strong><span>Retorne a esta página, digite a senha e libere seu acesso.</span></div>
+          <div class="access-step"><strong>1</strong><span>Clique no botão abaixo.</span></div>
+          <div class="access-step"><strong>2</strong><span>Envie a mensagem que já estará preenchida.</span></div>
+          <div class="access-step"><strong>3</strong><span>Aguarde o Prof. Lucas MPC responder com seu código de 6 números.</span></div>
         </div>
         <p class="access-warning">
-          O acesso permanecerá bloqueado até a senha correta ser informada.
+          Depois de receber o código, volte para esta mesma página.
         </p>
         <div class="modal-actions">
           <button class="btn btn-primary" id="accessWhatsappBtn" type="button">
-            Abrir WhatsApp e solicitar código
+            Solicitar código pelo WhatsApp
           </button>
-        </div>
-        <div class="access-confirm-area" id="accessConfirmArea" hidden>
-          <div class="notice success">
-            Depois de enviar a mensagem, aguarde a resposta do Prof. Lucas MPC com sua senha de liberação.
-          </div>
-          <div class="field access-code-field">
-            <label for="accessCodeInput">Senha de liberação</label>
-            <input
-              id="accessCodeInput"
-              type="text"
-              inputmode="numeric"
-              autocomplete="one-time-code"
-              maxlength="6"
-              pattern="[0-9]{6}"
-              placeholder="Digite os 6 números"
-            >
-          </div>
-          <button class="btn btn-dark" id="accessCodeBtn" type="button">
-            Validar senha e liberar acesso
-          </button>
-          <p class="registration-submit-status" id="accessCodeStatus" role="status" aria-live="polite"></p>
         </div>
         <p class="access-number">Prof. Lucas MPC: (11) 96018-9699</p>
+      </div>
+
+      <!-- Tela 2: apenas validação do código -->
+      <div class="access-code-only-view" id="accessCodeView" hidden>
+        <div class="field access-code-field">
+          <label for="accessCodeInput">Código de liberação</label>
+          <input
+            id="accessCodeInput"
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            aria-describedby="accessCodeStatus"
+            placeholder="Digite os 6 números"
+          >
+        </div>
+        <button class="btn btn-primary access-release-button" id="accessCodeBtn" type="button">
+          Liberar acesso gratuito
+        </button>
+        <p class="registration-submit-status" id="accessCodeStatus" role="status" aria-live="polite"></p>
       </div>
     </div>
   </div>
@@ -2101,7 +2130,7 @@
   (() => {
     'use strict';
     const STORAGE_KEY = 'geradorCronogramaMpcData';
-    const DATA_SCHEMA_VERSION = 4;
+    const DATA_SCHEMA_VERSION = 5;
     const CURRENT_PRIVACY_VERSION = '1.3-2026-08-04';
     const LEGACY_STORAGE_KEYS = ['cronogramaLucasMpcV11'];
     const TUTORIAL_SESSION_KEY = 'cronogramaTutorialAbertoNestaSessaoV2';
@@ -2233,14 +2262,29 @@
       if(!document.querySelector('.required-modal.open')) setAccessLock(false);
     }
     function renderAccessGate(){
-      const confirmArea=el('accessConfirmArea');
-      if(confirmArea) confirmArea.hidden=!state.whatsappOpened;
+      const requestView=el('accessRequestView');
+      const codeView=el('accessCodeView');
+      const title=el('accessTitle');
       const input=el('accessCodeInput');
       const status=el('accessCodeStatus');
-      if(input && !state.whatsappOpened) input.value='';
-      if(status && !state.whatsappOpened){
-        status.textContent='';
-        status.className='registration-submit-status';
+      const codeStage=Boolean(state.whatsappOpened);
+
+      if(requestView) requestView.hidden=codeStage;
+      if(codeView) codeView.hidden=!codeStage;
+      if(title){
+        title.textContent=codeStage
+          ? 'Digite o código recebido'
+          : 'Etapa 2: solicite seu código';
+      }
+
+      if(!codeStage){
+        if(input) input.value='';
+        if(status){
+          status.textContent='';
+          status.className='registration-submit-status';
+        }
+      }else{
+        setTimeout(()=>input?.focus(),120);
       }
     }
 
@@ -2320,7 +2364,7 @@
       const registration=state.registration||{};
       const lines=[
         `Olá, Prof. Lucas MPC. Meu nome é ${registration.name||'aluno(a)'}.`,
-        'Cadastrei-me no Gerador de Cronograma MPC e gostaria de receber minha senha de liberação.',
+        'Cadastrei-me no Gerador de Cronograma MPC e gostaria de receber meu código de liberação.',
         `Código do cadastro: ${registration.leadId||'não informado'}.`
       ];
       if(registration.goal) lines.push(`Meu concurso ou objetivo é: ${registration.goal}.`);
@@ -3989,10 +4033,11 @@
       el('accessWhatsappBtn').onclick=()=>{
         const msg=accessWhatsappMessage();
         state.whatsappOpened=true;
+        state.registration.whatsappRequestedAt=new Date().toISOString();
         saveState();
         renderAccessGate();
         window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
-        toast('Envie a mensagem e aguarde sua senha de liberação.');
+        toast('Envie a mensagem e aguarde seu código de liberação.');
       };
       el('accessCodeInput').addEventListener('input',event=>{
         event.target.value=event.target.value.replace(/\D/g,'').slice(0,6);
@@ -4007,14 +4052,14 @@
         }
         if(code.length!==6){
           status.className='registration-submit-status error';
-          status.textContent='Digite a senha completa de 6 números.';
+          status.textContent='Digite o código completo de 6 números.';
           input.focus();
           return;
         }
         const informedHash=await hashUnlockCode(code);
         if(!state.registration?.unlockCodeHash || informedHash!==state.registration.unlockCodeHash){
           status.className='registration-submit-status error';
-          status.textContent='Senha incorreta. Confira a resposta enviada pelo Prof. Lucas MPC.';
+          status.textContent='Código incorreto. Confira a resposta enviada pelo Prof. Lucas MPC.';
           input.select();
           return;
         }
@@ -4025,7 +4070,7 @@
         saveState();
         closeModal('accessModal', true);
         setAccessLock(false);
-        toast('Senha correta. Acesso gratuito liberado neste navegador.');
+        toast('Código correto. Acesso gratuito liberado neste navegador.');
       };
       el('toolsButton').onclick=()=>openModal('toolsModal');
       document.querySelectorAll('[data-tool-action]').forEach(item=>{
