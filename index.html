@@ -457,6 +457,8 @@
 
     .main-content { min-width: 0; display: grid; gap: 20px; }
     .toolbar { display: flex; flex-wrap: wrap; gap: 9px; }
+    #downloadPdfBtn { border-color: var(--gold); }
+    #downloadPdfBtn::before { content: "PDF"; margin-right: 6px; font-size: .68em; letter-spacing: .04em; }
     .ai-panel { border: 2px solid var(--gold); background: linear-gradient(135deg, var(--surface), var(--surface-2)); }
     .ai-grid { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
     .ai-actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1512,7 +1514,8 @@
               <div class="helper" id="scheduleViewHelper">Arraste atividades entre os dias ou use os botões para editar.</div>
             </div>
             <div class="toolbar tool-destination" id="scheduleTools">
-              <button class="btn btn-secondary btn-small" id="saveBtn">Salvar</button>
+              <button class="btn btn-secondary btn-small" id="saveBtn">Salvar no app</button>
+              <button class="btn btn-dark btn-small" id="downloadPdfBtn">Baixar cronograma</button>
               <button class="btn btn-primary btn-small" id="exportBtn">Exportar</button>
               <button class="btn btn-danger btn-small" id="clearBtn">Limpar</button>
             </div>
@@ -1658,7 +1661,7 @@
           <div class="tools-grid">
             <button class="tool-card tool-link" type="button" data-tool-action="colors" aria-label="Ir para Paletas e modo escuro"><span class="tool-icon">14</span><span class="tool-card-copy"><strong>Paletas e modo escuro</strong><p>Escolha entre diferentes combinações de cores e utilize o tema claro ou escuro.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
             <button class="tool-card tool-link" type="button" data-tool-action="autosave" aria-label="Ir para Salvamento automático"><span class="tool-icon">15</span><span class="tool-card-copy"><strong>Salvamento automático</strong><p>O cronograma, as preferências e o progresso permanecem salvos neste navegador.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
-            <button class="tool-card tool-link" type="button" data-tool-action="files" aria-label="Ir para Exportar em PDF ou Excel"><span class="tool-icon">16</span><span class="tool-card-copy"><strong>Exportar em PDF ou Excel</strong><p>Baixe uma versão para leitura e impressão ou uma planilha compatível com o Excel.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
+            <button class="tool-card tool-link" type="button" data-tool-action="files" aria-label="Ir para Exportar em PDF ou Excel"><span class="tool-icon">16</span><span class="tool-card-copy"><strong>Baixar PDF ou exportar para Excel</strong><p>Baixe diretamente um PDF de alta qualidade ou uma planilha compatível com o Excel.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
             <button class="tool-card tool-link" type="button" data-tool-action="tutorial" aria-label="Ir para Tutorial completo"><span class="tool-icon">17</span><span class="tool-card-copy"><strong>Tutorial completo</strong><p>Aprenda o funcionamento da plataforma em uma apresentação guiada.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
             <button class="tool-card tool-link" type="button" data-tool-action="privacy" aria-label="Ir para Privacidade e consentimento"><span class="tool-icon">18</span><span class="tool-card-copy"><strong>Privacidade e consentimento</strong><p>Consulte a política, os termos de uso e as regras de tratamento dos dados.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
             <button class="tool-card tool-link" type="button" data-tool-action="whatsapp" aria-label="Ir para Acesso e suporte pelo WhatsApp"><span class="tool-icon">19</span><span class="tool-card-copy"><strong>Acesso e suporte pelo WhatsApp</strong><p>Conclua a liberação gratuita e fale diretamente com o Prof. Lucas MPC.</p></span><span class="tool-arrow" aria-hidden="true">→</span></button>
@@ -1798,7 +1801,7 @@
       <div class="export-choice-grid">
         <button class="export-choice" id="exportPdfBtn" type="button">
           <span class="export-choice-icon">PDF</span>
-          <span><strong>Arquivo PDF</strong><small>Abre a tela de impressão para salvar o cronograma como PDF.</small></span>
+          <span><strong>PDF de alta qualidade</strong><small>Baixa diretamente um PDF nítido, organizado e com o botão clicável no rodapé.</small></span>
         </button>
         <button class="export-choice" id="exportExcelBtn" type="button">
           <span class="export-choice-icon">XLS</span>
@@ -2894,25 +2897,343 @@
       setTimeout(()=>URL.revokeObjectURL(url),800);
     }
 
-    function exportPdf(){
-      if(!state.tasks.length) return toast('Adicione atividades antes de exportar.');
-      collectSettings();
-      const subtitle=[
-        state.goal ? `Objetivo: ${state.goal}` : '',
-        state.examDate ? `Prova: ${new Date(state.examDate+'T12:00:00').toLocaleDateString('pt-BR')}` : ''
-      ].filter(Boolean).join(' · ') || 'Cronograma de estudos para concursos';
-      el('printSubtitle').textContent=subtitle;
-      closeModal('exportModal');
-      const oldTitle=document.title;
-      document.title='Cronograma de Estudos - Prof. Lucas MPC';
-      const restore=()=>{document.title=oldTitle;};
-      window.addEventListener('afterprint',restore,{once:true});
-      toast('Na janela seguinte, escolha “Salvar como PDF”. O botão do Gerador de Cronograma MPC ficará clicável no rodapé.');
-      setTimeout(()=>{
-        window.print();
-        setTimeout(restore,1500);
-      },180);
+    // PDF_DIRECT_START
+    const PDF_GENERATOR_URL='https://gerador-de-cronograma-mpc.netlify.app/?utm_source=pdf&utm_medium=cronograma&utm_campaign=compartilhamento_professores';
+    const PDF_PAGE={width:841.89,height:595.28,margin:32};
+    const PDF_COLORS={
+      navy:[0.027,0.082,0.169],
+      navy2:[0.055,0.122,0.231],
+      gold:[0.839,0.663,0.157],
+      goldDark:[0.541,0.408,0],
+      cyan:[0.235,0.745,0.835],
+      text:[0.055,0.102,0.18],
+      muted:[0.29,0.35,0.44],
+      line:[0.82,0.86,0.91],
+      soft:[0.965,0.976,0.989],
+      white:[1,1,1],
+      success:[0.075,0.45,0.27]
+    };
+
+    function pdfNumber(value){
+      return Number(Number(value).toFixed(2)).toString();
     }
+
+    function pdfColor(color,stroke=false){
+      return `${color.map(pdfNumber).join(' ')} ${stroke?'RG':'rg'}`;
+    }
+
+    function pdfSanitizeText(value=''){
+      return String(value)
+        .replace(/[\u0000-\u001f\u007f]/g,' ')
+        .replace(/\s+/g,' ')
+        .trim();
+    }
+
+    function pdfWinAnsiByte(character){
+      const code=character.charCodeAt(0);
+      if(code<=255) return code;
+      const extra={
+        '€':128,'‚':130,'ƒ':131,'„':132,'…':133,'†':134,'‡':135,'ˆ':136,'‰':137,
+        'Š':138,'‹':139,'Œ':140,'Ž':142,'‘':145,'’':146,'“':147,'”':148,'•':149,
+        '–':150,'—':151,'˜':152,'™':153,'š':154,'›':155,'œ':156,'ž':158,'Ÿ':159
+      };
+      return extra[character]??63;
+    }
+
+    function pdfEscapeText(value=''){
+      const clean=pdfSanitizeText(value);
+      let result='';
+      for(const character of clean){
+        const byte=pdfWinAnsiByte(character);
+        const char=String.fromCharCode(byte);
+        result+=(byte===40||byte===41||byte===92)?`\\${char}`:char;
+      }
+      return result;
+    }
+
+    function pdfBinaryBytes(binary){
+      const bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i)&255;
+      return bytes;
+    }
+
+    function pdfApproxTextWidth(text,size,bold=false){
+      const clean=pdfSanitizeText(text);
+      let units=0;
+      for(const character of clean){
+        if('ilI1.,:;!|'.includes(character)) units+=0.27;
+        else if('MW@%'.includes(character)) units+=0.9;
+        else if(character===' ') units+=0.28;
+        else units+=bold?0.57:0.52;
+      }
+      return units*size;
+    }
+
+    function pdfWrapText(value,width,size,maxLines=2,bold=false){
+      const text=pdfSanitizeText(value)||'-';
+      const words=text.split(' ');
+      const lines=[];
+      let current='';
+      const fits=line=>pdfApproxTextWidth(line,size,bold)<=width;
+
+      for(const word of words){
+        const candidate=current?`${current} ${word}`:word;
+        if(fits(candidate)){
+          current=candidate;
+          continue;
+        }
+        if(current) lines.push(current);
+        current='';
+        if(fits(word)){
+          current=word;
+        }else{
+          let fragment='';
+          for(const character of word){
+            if(fits(fragment+character)) fragment+=character;
+            else{
+              if(fragment) lines.push(fragment);
+              fragment=character;
+            }
+          }
+          current=fragment;
+        }
+        if(lines.length>=maxLines) break;
+      }
+      if(lines.length<maxLines&&current) lines.push(current);
+      if(lines.length>maxLines) lines.length=maxLines;
+
+      const reconstructed=lines.join(' ');
+      if(reconstructed.length<text.length&&lines.length){
+        let last=lines[lines.length-1];
+        while(last&& !fits(`${last}...`)) last=last.slice(0,-1);
+        lines[lines.length-1]=`${last.trimEnd()}...`;
+      }
+      return lines.length?lines:['-'];
+    }
+
+    function pdfText(commands,x,y,text,size=10,bold=false,color=PDF_COLORS.text,align='left',maxWidth=0){
+      let drawX=x;
+      if(align!=='left'){
+        const width=pdfApproxTextWidth(text,size,bold);
+        if(align==='center') drawX=x+(maxWidth-width)/2;
+        if(align==='right') drawX=x+maxWidth-width;
+      }
+      commands.push(pdfColor(color));
+      commands.push(`BT /${bold?'F2':'F1'} ${pdfNumber(size)} Tf 1 0 0 1 ${pdfNumber(drawX)} ${pdfNumber(y)} Tm (${pdfEscapeText(text)}) Tj ET`);
+    }
+
+    function pdfRect(commands,x,y,width,height,fill=null,stroke=null,lineWidth=1){
+      if(fill) commands.push(pdfColor(fill));
+      if(stroke) commands.push(pdfColor(stroke,true));
+      commands.push(`${pdfNumber(lineWidth)} w ${pdfNumber(x)} ${pdfNumber(y)} ${pdfNumber(width)} ${pdfNumber(height)} re ${fill&&stroke?'B':fill?'f':'S'}`);
+    }
+
+    function pdfLine(commands,x1,y1,x2,y2,color=PDF_COLORS.line,lineWidth=1){
+      commands.push(pdfColor(color,true));
+      commands.push(`${pdfNumber(lineWidth)} w ${pdfNumber(x1)} ${pdfNumber(y1)} m ${pdfNumber(x2)} ${pdfNumber(y2)} l S`);
+    }
+
+    function pdfDateLabel(task){
+      if(task.date){
+        const date=new Date(`${task.date}T12:00:00`);
+        if(!Number.isNaN(date.getTime())) return `${date.toLocaleDateString('pt-BR')} - ${DAYS[task.day]||''}`;
+      }
+      return DAYS[task.day]||'Sem dia';
+    }
+
+    function pdfScheduleName(){
+      const base=(state.goal||'cronograma-de-estudos')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')
+        .slice(0,54)||'cronograma-de-estudos';
+      return `${base}-prof-lucas-mpc.pdf`;
+    }
+
+    function pdfScheduleStyleLabel(){
+      return ({
+        checklist:'Checklist de estudos',
+        cycles:'Cronograma por ciclos',
+        weekly:'Cronograma semanal',
+        monthly:'Cronograma mensal'
+      })[state.scheduleStyle]||'Cronograma de estudos';
+    }
+
+    function pdfTaskRows(){
+      return [...state.tasks]
+        .sort((a,b)=>(a.date||'9999-12-31').localeCompare(b.date||'9999-12-31') || a.day-b.day || (a.start||'').localeCompare(b.start||''))
+        .map(task=>({
+          date:pdfDateLabel(task),
+          time:[task.start,task.end].filter(Boolean).join(' - ')||'-',
+          subject:task.subject||'Sem disciplina',
+          activity:task.activity||'Atividade de estudo',
+          type:task.type||'Estudo',
+          status:task.done?'Concluída':'Pendente'
+        }));
+    }
+
+    function pdfPreparePages(rows){
+      const columns=[
+        {key:'date',label:'Data / dia',width:88,maxLines:2},
+        {key:'time',label:'Horário',width:66,maxLines:1},
+        {key:'subject',label:'Disciplina',width:128,maxLines:2},
+        {key:'activity',label:'Atividade',width:310,maxLines:2},
+        {key:'type',label:'Tipo',width:94,maxLines:2},
+        {key:'status',label:'Situação',width:92,maxLines:1}
+      ];
+      const rowFont=8.4;
+      const lineHeight=10.2;
+      const prepared=rows.map(row=>{
+        const cells={};
+        let lines=1;
+        columns.forEach(column=>{
+          cells[column.key]=pdfWrapText(row[column.key],column.width-12,rowFont,column.maxLines,column.key==='subject');
+          lines=Math.max(lines,cells[column.key].length);
+        });
+        return {cells,height:Math.max(27,lines*lineHeight+9),source:row};
+      });
+
+      const pages=[];
+      const bodyTop=463;
+      const bodyBottom=68;
+      let current=[];
+      let used=0;
+      for(const row of prepared){
+        if(current.length&&used+row.height>bodyTop-bodyBottom){
+          pages.push(current);
+          current=[];
+          used=0;
+        }
+        current.push(row);
+        used+=row.height;
+      }
+      if(current.length) pages.push(current);
+      return {pages:pages.length?pages:[[]],columns,rowFont,lineHeight,bodyTop,bodyBottom};
+    }
+
+    function pdfBuildPageContent(pageRows,pageIndex,pageCount,layout){
+      const commands=[];
+      const {width,height,margin}=PDF_PAGE;
+      const contentWidth=width-margin*2;
+      const totalMinutes=state.tasks.reduce((sum,task)=>sum+taskDuration(task),0);
+      const completed=state.tasks.filter(task=>task.done).length;
+      const exam=state.examDate?new Date(`${state.examDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informada';
+      const generated=new Date().toLocaleString('pt-BR');
+
+      pdfRect(commands,0,0,width,height,PDF_COLORS.white);
+      pdfRect(commands,margin,height-45,7,27,PDF_COLORS.gold);
+      pdfText(commands,margin+17,height-32,'CRONOGRAMA DE ESTUDOS',20,true,PDF_COLORS.navy);
+      pdfText(commands,margin+17,height-49,pdfScheduleStyleLabel(),9.5,true,PDF_COLORS.cyan);
+      pdfText(commands,margin,height-69,`Objetivo: ${state.goal||'Não informado'}`,10.5,true,PDF_COLORS.text);
+      pdfText(commands,margin,height-85,`Prova: ${exam}`,8.7,false,PDF_COLORS.muted);
+      pdfText(commands,margin+185,height-85,`Atividades: ${state.tasks.length}`,8.7,false,PDF_COLORS.muted);
+      pdfText(commands,margin+300,height-85,`Carga planejada: ${formatHours(totalMinutes)}`,8.7,false,PDF_COLORS.muted);
+      pdfText(commands,margin+490,height-85,`Concluídas: ${completed}`,8.7,false,PDF_COLORS.muted);
+      pdfText(commands,margin,height-100,`Gerado em ${generated}`,7.7,false,PDF_COLORS.muted);
+      pdfLine(commands,margin,height-111,width-margin,height-111,PDF_COLORS.gold,1.6);
+
+      const headerY=layout.bodyTop+5;
+      let x=margin;
+      layout.columns.forEach(column=>{
+        pdfRect(commands,x,headerY,column.width,25,PDF_COLORS.navy,PDF_COLORS.white,.4);
+        pdfText(commands,x+6,headerY+8,column.label,8.4,true,PDF_COLORS.white);
+        x+=column.width;
+      });
+
+      let top=layout.bodyTop;
+      pageRows.forEach((row,index)=>{
+        const bottom=top-row.height;
+        pdfRect(commands,margin,bottom,contentWidth,row.height,index%2?PDF_COLORS.soft:PDF_COLORS.white,PDF_COLORS.line,.45);
+        pdfRect(commands,margin,bottom,4,row.height,PDF_COLORS.cyan);
+        let cellX=margin;
+        layout.columns.forEach(column=>{
+          if(cellX>margin) pdfLine(commands,cellX,bottom,cellX,top,PDF_COLORS.line,.35);
+          const lines=row.cells[column.key];
+          const bold=column.key==='subject';
+          const color=column.key==='status'&&row.source.status==='Concluída'?PDF_COLORS.success:PDF_COLORS.text;
+          const blockHeight=(lines.length-1)*layout.lineHeight;
+          let textY=bottom+(row.height+blockHeight)/2-3.3;
+          lines.forEach((line,lineIndex)=>{
+            pdfText(commands,cellX+7,textY-lineIndex*layout.lineHeight,line,layout.rowFont,bold,color);
+          });
+          cellX+=column.width;
+        });
+        top=bottom;
+      });
+
+      if(!pageRows.length){
+        pdfText(commands,margin,390,'Nenhuma atividade foi encontrada para este cronograma.',13,true,PDF_COLORS.muted);
+      }
+
+      pdfLine(commands,margin,57,width-margin,57,PDF_COLORS.gold,1.1);
+      pdfText(commands,margin,39,'Gerado pelo Gerador de Cronograma MPC',8.7,true,PDF_COLORS.navy);
+      pdfText(commands,margin,26,'Organize gratuitamente seus estudos para concursos.',7.5,false,PDF_COLORS.muted);
+      pdfText(commands,margin+365,28,`Página ${pageIndex+1} de ${pageCount}`,7.5,false,PDF_COLORS.muted);
+
+      const button={x:width-margin-255,y:18,width:255,height:29};
+      pdfRect(commands,button.x,button.y,button.width,button.height,PDF_COLORS.gold,PDF_COLORS.goldDark,1.1);
+      pdfText(commands,button.x,button.y+9.5,'Crie também seu cronograma gratuitamente',9.4,true,PDF_COLORS.navy,'center',button.width);
+
+      return {content:commands.join('\n'),button};
+    }
+
+    function pdfBuildBinary(pageDefinitions){
+      const objects=[null];
+      const addObject=content=>{objects.push(content);return objects.length-1;};
+      const catalogRef=addObject('');
+      const pagesRef=addObject('');
+      const fontRegularRef=addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+      const fontBoldRef=addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+      const now=new Date();
+      const pdfDate=`D:${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+      const infoRef=addObject(`<< /Title (${pdfEscapeText('Cronograma de Estudos - Prof. Lucas MPC')}) /Author (${pdfEscapeText('Prof. Lucas MPC')}) /Creator (${pdfEscapeText('Gerador de Cronograma MPC')}) /CreationDate (${pdfDate}) >>`);
+      const pageRefs=[];
+
+      pageDefinitions.forEach(definition=>{
+        const contentRef=addObject(`<< /Length ${definition.content.length} >>\nstream\n${definition.content}\nendstream`);
+        const {x,y,width,height}=definition.button;
+        const annotationRef=addObject(`<< /Type /Annot /Subtype /Link /Rect [${pdfNumber(x)} ${pdfNumber(y)} ${pdfNumber(x+width)} ${pdfNumber(y+height)}] /Border [0 0 0] /H /I /A << /S /URI /URI (${pdfEscapeText(PDF_GENERATOR_URL)}) >> >>`);
+        const pageRef=addObject(`<< /Type /Page /Parent ${pagesRef} 0 R /MediaBox [0 0 ${pdfNumber(PDF_PAGE.width)} ${pdfNumber(PDF_PAGE.height)}] /Resources << /Font << /F1 ${fontRegularRef} 0 R /F2 ${fontBoldRef} 0 R >> >> /Contents ${contentRef} 0 R /Annots [${annotationRef} 0 R] >>`);
+        pageRefs.push(pageRef);
+      });
+
+      objects[catalogRef]=`<< /Type /Catalog /Pages ${pagesRef} 0 R >>`;
+      objects[pagesRef]=`<< /Type /Pages /Kids [${pageRefs.map(ref=>`${ref} 0 R`).join(' ')}] /Count ${pageRefs.length} >>`;
+
+      let binary='%PDF-1.4\n%âãÏÓ\n';
+      const offsets=[0];
+      for(let index=1;index<objects.length;index++){
+        offsets[index]=binary.length;
+        binary+=`${index} 0 obj\n${objects[index]}\nendobj\n`;
+      }
+      const xrefOffset=binary.length;
+      binary+=`xref\n0 ${objects.length}\n0000000000 65535 f \n`;
+      for(let index=1;index<objects.length;index++) binary+=`${String(offsets[index]).padStart(10,'0')} 00000 n \n`;
+      binary+=`trailer\n<< /Size ${objects.length} /Root ${catalogRef} 0 R /Info ${infoRef} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+      return pdfBinaryBytes(binary);
+    }
+
+    function buildSchedulePdfBytes(){
+      const rows=pdfTaskRows();
+      const layout=pdfPreparePages(rows);
+      const pageDefinitions=layout.pages.map((pageRows,index)=>pdfBuildPageContent(pageRows,index,layout.pages.length,layout));
+      return pdfBuildBinary(pageDefinitions);
+    }
+
+    function exportPdf(){
+      if(!state.tasks.length) return toast('Adicione atividades antes de baixar o cronograma.');
+      collectSettings();
+      try{
+        const bytes=buildSchedulePdfBytes();
+        const blob=new Blob([bytes],{type:'application/pdf'});
+        downloadBlob(blob,pdfScheduleName());
+        closeModal('exportModal');
+        toast('PDF de alta qualidade baixado. O botão do rodapé está clicável.');
+      }catch(error){
+        console.error('Falha ao gerar PDF:',error);
+        toast('Não foi possível gerar o PDF. Tente novamente.');
+      }
+    }
+    // PDF_DIRECT_END
 
     function xmlEscape(value=''){
       return String(value)
@@ -3562,7 +3883,8 @@
         closeModal('taskModal');
         renderSchedule();
       };
-      el('saveBtn').onclick=()=>saveState(true);
+      el('saveBtn').onclick=()=>{saveState();toast('Cronograma salvo neste navegador.');};
+      el('downloadPdfBtn').onclick=exportPdf;
       el('exportBtn').onclick=()=>openModal('exportModal');
       el('exportPdfBtn').onclick=exportPdf;
       el('exportExcelBtn').onclick=exportExcel;
