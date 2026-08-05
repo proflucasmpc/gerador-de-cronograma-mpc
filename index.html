@@ -1130,6 +1130,149 @@
 
     footer { margin-top: 26px; text-align: center; color: var(--muted); font-size: .86rem; padding: 24px; }
 
+
+    .admin-entry-btn { white-space: nowrap; }
+    .admin-view-switch { display: flex; flex-wrap: wrap; gap: 7px; }
+    .admin-panel {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--gold) 13%, transparent), transparent 33%),
+        var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .admin-panel[hidden] { display: none !important; }
+    .admin-panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .admin-panel-head h2 { margin: 5px 0 7px; }
+    .admin-panel-head p { margin: 0; color: var(--muted); }
+    .admin-panel-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .admin-security-note {
+      padding: 12px 14px;
+      border: 1px solid color-mix(in srgb, var(--gold) 42%, var(--border));
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--gold) 8%, var(--surface-2));
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+    .admin-form-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; }
+    .admin-card {
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: var(--surface-2);
+    }
+    .admin-card h3 { margin: 0 0 14px; }
+    .admin-options { display: grid; gap: 10px; }
+    .admin-options label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 11px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      font-weight: 750;
+    }
+    .admin-options input { width: 18px; height: 18px; }
+    .admin-rule-box {
+      display: grid;
+      gap: 5px;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 11px;
+      background: color-mix(in srgb, var(--cyan) 10%, var(--surface));
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.45;
+    }
+    .admin-rule-box strong { color: var(--text); }
+    .admin-topics-input {
+      width: 100%;
+      min-height: 230px;
+      resize: vertical;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      line-height: 1.55;
+    }
+    .admin-topic-list { display: grid; gap: 9px; }
+    .admin-topic-row {
+      display: grid;
+      grid-template-columns: 28px minmax(0,1fr) auto;
+      align-items: center;
+      gap: 9px;
+      padding: 9px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: var(--surface);
+    }
+    .admin-topic-row > input[type="checkbox"] { width: 18px; height: 18px; justify-self: center; }
+    .admin-topic-row .admin-topic-name {
+      width: 100%;
+      min-width: 0;
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-2);
+      color: var(--text);
+      font: inherit;
+    }
+    .admin-topic-actions { display: flex; gap: 5px; }
+    .admin-topic-actions button { min-width: 34px; min-height: 34px; padding: 5px 8px; }
+    .admin-generate-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .admin-generate-card h3 { margin-bottom: 5px; }
+    .admin-generate-button {
+      min-width: 270px;
+      min-height: 54px;
+      font-size: 1rem;
+      font-weight: 900;
+    }
+    .admin-generation-status { min-height: 20px; margin: 8px 0 0; color: var(--muted); font-size: .88rem; }
+    body.admin-view .hero,
+    body.admin-view .course-banner,
+    body.admin-view .layout > aside,
+    body.admin-view #generatorCard,
+    body.admin-view #insightsCard,
+    body.admin-view .footer-ad,
+    body.admin-view .tools-button { display: none !important; }
+    body.admin-view .layout { display: block; }
+    body.admin-view .main-content { width: 100%; }
+    body.admin-view #scheduleCard { margin-top: 2px; }
+    body.admin-view footer { margin-bottom: 20px; }
+    .admin-auth-modal { z-index: 310; }
+
+    @media (max-width: 900px) {
+      .admin-panel-head, .admin-generate-card { align-items: stretch; flex-direction: column; }
+      .admin-panel-actions, .admin-generate-button { width: 100%; }
+      .admin-panel-actions .btn { flex: 1; }
+      .admin-form-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .admin-panel { padding: 14px; }
+      .admin-topic-row { grid-template-columns: 24px minmax(0,1fr); }
+      .admin-topic-actions { grid-column: 1 / -1; justify-content: flex-end; }
+      .admin-view-switch { width: 100%; }
+      .admin-view-switch .btn { flex: 1; }
+    }
+
     @media (max-width: 1100px) {
       .layout { grid-template-columns: 1fr; }
       .sidebar { position: static; grid-template-columns: 1fr 1fr; }
@@ -1367,6 +1510,12 @@
         <button class="btn btn-outline" id="paletteBtn">Cores</button>
         <button class="btn btn-outline" id="shareBtn">Compartilhar</button>
         <button class="btn btn-outline" id="themeBtn">Modo escuro</button>
+        <button class="btn btn-primary admin-entry-btn" id="adminEntryBtn" type="button" hidden>Área administrativa</button>
+        <div class="admin-view-switch" id="adminViewSwitch" hidden>
+          <button class="btn btn-outline" id="studentViewBtn" type="button">Visão do aluno</button>
+          <button class="btn btn-primary" id="adminViewBtn" type="button">Visão do administrador</button>
+          <button class="btn btn-outline" id="adminLogoutBtn" type="button">Sair</button>
+        </div>
       </div>
     </div>
   </header>
@@ -1392,6 +1541,150 @@
           <button class="btn btn-primary" id="heroGenerateBtn">Criar cronograma automaticamente</button>
         </div>
       </div>
+    </section>
+
+    <section class="admin-panel" id="adminPanel" hidden aria-labelledby="adminPanelTitle">
+      <div class="admin-panel-head">
+        <div>
+          <div class="eyebrow">Área exclusiva do Prof. Lucas MPC</div>
+          <h2 id="adminPanelTitle">Criar cronograma a partir de tópicos</h2>
+          <p>Cole o conteúdo da matéria, revise os tópicos e gere automaticamente o planejamento do aluno.</p>
+        </div>
+        <div class="admin-panel-actions">
+          <button class="btn btn-outline" id="adminPreviewStudentBtn" type="button">Ver como aluno</button>
+          <button class="btn btn-secondary" id="adminSaveDraftBtn" type="button">Salvar rascunho</button>
+        </div>
+      </div>
+
+      <div class="admin-security-note">
+        Esta versão usa uma URL administrativa e um PIN armazenado somente neste navegador.
+        Ela separa a experiência do aluno, mas não substitui autenticação de servidor para acesso seguro em vários dispositivos.
+      </div>
+
+      <div class="admin-form-grid">
+        <section class="admin-card">
+          <h3>1. Dados do aluno e do planejamento</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label for="adminStudentName">Nome do aluno</label>
+              <input id="adminStudentName" type="text" placeholder="Ex.: Carlos Pereira">
+            </div>
+            <div class="field">
+              <label for="adminGoal">Concurso ou objetivo</label>
+              <input id="adminGoal" type="text" placeholder="Ex.: Soldado PM-SP">
+            </div>
+            <div class="field">
+              <label for="adminSubject">Disciplina</label>
+              <input id="adminSubject" type="text" placeholder="Ex.: Matemática">
+            </div>
+            <div class="field">
+              <label for="adminScheduleStyle">Tipo de cronograma</label>
+              <select id="adminScheduleStyle">
+                <option value="checklist">Checklist de estudos</option>
+                <option value="cycle">Cronograma por ciclos</option>
+                <option value="weekly">Cronograma semanal</option>
+                <option value="monthly">Cronograma mensal</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="adminStartDate">Data inicial</label>
+              <input id="adminStartDate" type="date">
+            </div>
+            <div class="field">
+              <label for="adminExamDate">Data final ou prova</label>
+              <input id="adminExamDate" type="date">
+            </div>
+            <div class="field">
+              <label for="adminHoursPerDay">Horas por dia</label>
+              <input id="adminHoursPerDay" type="number" min="0.5" max="12" step="0.5" value="2">
+            </div>
+            <div class="field">
+              <label for="adminSessionMinutes">Duração da sessão</label>
+              <select id="adminSessionMinutes">
+                <option value="30">30 minutos</option>
+                <option value="45">45 minutos</option>
+                <option value="60" selected>60 minutos</option>
+                <option value="90">90 minutos</option>
+                <option value="120">120 minutos</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="adminPreferredStart">Horário inicial</label>
+              <input id="adminPreferredStart" type="time" value="19:00">
+            </div>
+            <div class="field full">
+              <label>Dias disponíveis</label>
+              <div class="days admin-days" id="adminAvailableDays">
+                <label class="day-check"><input type="checkbox" value="0" checked><span>Seg</span></label>
+                <label class="day-check"><input type="checkbox" value="1" checked><span>Ter</span></label>
+                <label class="day-check"><input type="checkbox" value="2" checked><span>Qua</span></label>
+                <label class="day-check"><input type="checkbox" value="3" checked><span>Qui</span></label>
+                <label class="day-check"><input type="checkbox" value="4" checked><span>Sex</span></label>
+                <label class="day-check"><input type="checkbox" value="5"><span>Sáb</span></label>
+                <label class="day-check"><input type="checkbox" value="6"><span>Dom</span></label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-card">
+          <h3>2. Estrutura de cada tópico</h3>
+          <div class="admin-options">
+            <label><input id="adminIncludeTheory" type="checkbox" checked> Teoria</label>
+            <label><input id="adminIncludeExercises" type="checkbox" checked> Exercícios</label>
+            <label><input id="adminIncludeReviews" type="checkbox" checked> Revisões periódicas</label>
+            <label><input id="adminIncludeSimulations" type="checkbox"> Simulados</label>
+            <label><input id="adminReplaceSchedule" type="checkbox" checked> Substituir o cronograma atual</label>
+          </div>
+          <div class="admin-rule-box">
+            <strong>Distribuição automática</strong>
+            <span>Cada tópico selecionado entra no cronograma. As atividades são distribuídas nas datas e horários disponíveis.</span>
+          </div>
+        </section>
+      </div>
+
+      <section class="admin-card admin-topics-card">
+        <div class="section-title">
+          <div>
+            <h3>3. Cole o conteúdo da matéria</h3>
+            <p class="helper">A ferramenta reconhece tópicos separados por linhas, marcadores, números ou ponto e vírgula.</p>
+          </div>
+          <div class="toolbar">
+            <button class="btn btn-primary btn-small" id="adminParseTopicsBtn" type="button">Organizar tópicos</button>
+            <button class="btn btn-secondary btn-small" id="adminClearTopicsBtn" type="button">Limpar</button>
+          </div>
+        </div>
+        <textarea
+          id="adminTopicsInput"
+          class="admin-topics-input"
+          rows="10"
+          placeholder="Exemplo:&#10;1. Operações com números inteiros&#10;2. Frações&#10;3. Razão e proporção&#10;4. Regra de três&#10;5. Porcentagem"
+        ></textarea>
+      </section>
+
+      <section class="admin-card admin-review-card">
+        <div class="section-title">
+          <div>
+            <h3>4. Revise os tópicos detectados</h3>
+            <p class="helper"><span id="adminTopicCount">0</span> tópicos selecionados.</p>
+          </div>
+          <button class="btn btn-secondary btn-small" id="adminAddTopicBtn" type="button">Adicionar tópico</button>
+        </div>
+        <div class="admin-topic-list" id="adminTopicList">
+          <div class="empty">Cole o conteúdo acima e clique em “Organizar tópicos”.</div>
+        </div>
+      </section>
+
+      <section class="admin-card admin-generate-card">
+        <div>
+          <h3>5. Gere o cronograma do aluno</h3>
+          <p class="helper">Depois da geração, use “Ver como aluno” para revisar e baixar o PDF.</p>
+          <p class="admin-generation-status" id="adminGenerationStatus" role="status" aria-live="polite"></p>
+        </div>
+        <button class="btn btn-primary admin-generate-button" id="adminGenerateScheduleBtn" type="button">
+          Gerar cronograma por tópicos
+        </button>
+      </section>
     </section>
 
     <section class="course-banner mentorship-only tool-destination" id="mentorshipSection" aria-label="Mentoria para concursos">
@@ -1603,7 +1896,7 @@
             rel="noopener noreferrer"
             aria-label="Criar gratuitamente um cronograma de estudos no Gerador de Cronograma MPC"
           >
-            Crie também seu cronograma gratuitamente
+            CLIQUE AQUI PARA USAR O GERADOR DE CRONOGRAMA MPC GRATUITAMENTE
           </a>
         </div>
       </section>
@@ -1994,6 +2287,37 @@
   </div>
 
 
+  <!-- Acesso local à área administrativa -->
+  <div class="modal-backdrop admin-auth-modal" id="adminAuthModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminAuthTitle">
+      <div class="modal-head">
+        <h2 id="adminAuthTitle">Acesso do administrador</h2>
+        <button class="modal-close" type="button" data-close="adminAuthModal" aria-label="Fechar">×</button>
+      </div>
+      <form id="adminAuthForm">
+        <div class="notice">
+          Área destinada ao Prof. Lucas MPC. O PIN fica salvo somente neste navegador.
+        </div>
+        <div class="field">
+          <label for="adminOwnerEmail">Administrador</label>
+          <input id="adminOwnerEmail" type="email" value="matematecnica@gmail.com" readonly>
+        </div>
+        <div class="field">
+          <label for="adminPinInput" id="adminPinLabel">PIN de acesso</label>
+          <input id="adminPinInput" type="password" inputmode="numeric" maxlength="8" pattern="[0-9]{4,8}" autocomplete="current-password" placeholder="Digite de 4 a 8 números" required>
+        </div>
+        <div class="field" id="adminPinConfirmField" hidden>
+          <label for="adminPinConfirm">Confirme o novo PIN</label>
+          <input id="adminPinConfirm" type="password" inputmode="numeric" maxlength="8" pattern="[0-9]{4,8}" autocomplete="new-password" placeholder="Repita o PIN">
+        </div>
+        <p class="registration-submit-status" id="adminAuthStatus" role="status" aria-live="polite"></p>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="adminAuthSubmitBtn" type="submit">Entrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Cadastro obrigatório -->
   <div class="modal-backdrop required-modal" id="registerModal" data-required="true" aria-hidden="true">
     <div class="modal registration-modal" role="dialog" aria-modal="true" aria-labelledby="registerTitle" aria-describedby="registerDescription">
@@ -2130,7 +2454,7 @@
   (() => {
     'use strict';
     const STORAGE_KEY = 'geradorCronogramaMpcData';
-    const DATA_SCHEMA_VERSION = 5;
+    const DATA_SCHEMA_VERSION = 7;
     const CURRENT_PRIVACY_VERSION = '1.3-2026-08-04';
     const LEGACY_STORAGE_KEYS = ['cronogramaLucasMpcV11'];
     const TUTORIAL_SESSION_KEY = 'cronogramaTutorialAbertoNestaSessaoV2';
@@ -2140,6 +2464,10 @@
     const MENTORSHIP_URL = 'https://wa.me/5511960189699?text=Ol%C3%A1%2C%20prof.%20Lucas%20MPC.%20Estou%20usando%20o%20Cronograma%20de%20Estudos%20para%20Concursos%20e%20gostaria%20de%20saber%20mais%20sobre%20a%20sua%20mentoria%20para%20organizar%20e%20direcionar%20meus%20estudos.';
     const WHATSAPP = '5511960189699';
     const SHARE_TEXT = 'Estou usando o Gerador de Cronograma MPC, uma ferramenta gratuita para criar cronogramas online para organizar meus estudos para concursos e estou gostando bastante. Recomendo. Você que está estudando para concursos vai gostar também. Acesse o link.';
+    const ADMIN_PIN_KEY = 'geradorCronogramaMpcAdminPinHash';
+    const ADMIN_DRAFT_KEY = 'geradorCronogramaMpcAdminDraft';
+    const ADMIN_SESSION_KEY = 'geradorCronogramaMpcAdminUnlocked';
+    const ADMIN_VIEW_KEY = 'geradorCronogramaMpcAdminView';
 
     const defaultState = () => ({
       dataSchemaVersion: DATA_SCHEMA_VERSION,
@@ -2157,6 +2485,7 @@
       privacyAcknowledged: false,
       privacyVersion: CURRENT_PRIVACY_VERSION,
       registration: null,
+      studentName: '',
       goal: '', examDate: '', hoursPerDay: 2, sessionMinutes: 60, preferredStart: '19:00',
       availableDays: [0,1,2,3,4],
       subjects: [
@@ -2188,6 +2517,372 @@
     let lastTrackedInteraction = 0;
     let monthOffset = 0;
     let taskDateContext = '';
+    let adminTopics = [];
+    let adminModeActive = false;
+
+
+    function adminRouteRequested(){
+      return new URLSearchParams(location.search).get('admin')==='1';
+    }
+
+    function adminConfigured(){
+      return Boolean(localStorage.getItem(ADMIN_PIN_KEY));
+    }
+
+    function adminUnlocked(){
+      return sessionStorage.getItem(ADMIN_SESSION_KEY)==='1';
+    }
+
+    async function adminHashPin(value){
+      const normalized=String(value||'').replace(/\D/g,'').slice(0,8);
+      const bytes=new TextEncoder().encode(`MPC-ADMIN:${normalized}`);
+      const digest=await crypto.subtle.digest('SHA-256',bytes);
+      return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+    }
+
+    function renderAdminEntry(){
+      const entry=el('adminEntryBtn');
+      const switcher=el('adminViewSwitch');
+      const visible=adminRouteRequested()||adminConfigured()||adminUnlocked();
+      if(entry) entry.hidden=!visible||adminUnlocked();
+      if(switcher) switcher.hidden=!adminUnlocked();
+    }
+
+    function setAdminView(mode){
+      if(!adminUnlocked()) return;
+      adminModeActive=mode==='admin';
+      sessionStorage.setItem(ADMIN_VIEW_KEY,adminModeActive?'admin':'student');
+      document.body.classList.toggle('admin-view',adminModeActive);
+      const panel=el('adminPanel');
+      if(panel) panel.hidden=!adminModeActive;
+
+      const adminButton=el('adminViewBtn');
+      const studentButton=el('studentViewBtn');
+      adminButton?.classList.toggle('btn-primary',adminModeActive);
+      adminButton?.classList.toggle('btn-outline',!adminModeActive);
+      studentButton?.classList.toggle('btn-primary',!adminModeActive);
+      studentButton?.classList.toggle('btn-outline',adminModeActive);
+
+      renderAdminEntry();
+
+      if(adminModeActive){
+        setAccessLock(false);
+        document.querySelectorAll('.required-modal.open').forEach(modal=>closeModal(modal.id,true));
+        hydrateAdminDraft();
+        setTimeout(()=>el('adminPanel')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
+      }else{
+        if(platformAccessRequired()) setTimeout(enforceAccessGate,100);
+        setTimeout(()=>document.querySelector('.hero')?.scrollIntoView({behavior:'smooth',block:'start'}),80);
+      }
+    }
+
+    function renderAdminAuth(){
+      const setup=!adminConfigured();
+      el('adminAuthTitle').textContent=setup?'Configurar acesso do administrador':'Acesso do administrador';
+      el('adminPinLabel').textContent=setup?'Crie um PIN de acesso':'PIN de acesso';
+      el('adminPinConfirmField').hidden=!setup;
+      el('adminPinConfirm').required=setup;
+      el('adminAuthSubmitBtn').textContent=setup?'Salvar PIN e entrar':'Entrar';
+      el('adminAuthStatus').textContent='';
+      el('adminPinInput').value='';
+      el('adminPinConfirm').value='';
+    }
+
+    function openAdminAccess(){
+      if(adminUnlocked()){
+        setAdminView('admin');
+        return;
+      }
+      renderAdminAuth();
+      openModal('adminAuthModal');
+    }
+
+    function adminDraftObject(){
+      return {
+        studentName:el('adminStudentName')?.value.trim()||'',
+        goal:el('adminGoal')?.value.trim()||'',
+        subject:el('adminSubject')?.value.trim()||'',
+        scheduleStyle:el('adminScheduleStyle')?.value||'weekly',
+        startDate:el('adminStartDate')?.value||'',
+        examDate:el('adminExamDate')?.value||'',
+        hoursPerDay:Number(el('adminHoursPerDay')?.value)||2,
+        sessionMinutes:Number(el('adminSessionMinutes')?.value)||60,
+        preferredStart:el('adminPreferredStart')?.value||'19:00',
+        availableDays:[...document.querySelectorAll('#adminAvailableDays input:checked')].map(input=>Number(input.value)),
+        includeTheory:Boolean(el('adminIncludeTheory')?.checked),
+        includeExercises:Boolean(el('adminIncludeExercises')?.checked),
+        includeReviews:Boolean(el('adminIncludeReviews')?.checked),
+        includeSimulations:Boolean(el('adminIncludeSimulations')?.checked),
+        replaceSchedule:Boolean(el('adminReplaceSchedule')?.checked),
+        topics:adminTopics.map(topic=>({...topic})),
+        rawText:el('adminTopicsInput')?.value||''
+      };
+    }
+
+    function saveAdminDraft(showMessage=false){
+      localStorage.setItem(ADMIN_DRAFT_KEY,JSON.stringify(adminDraftObject()));
+      if(showMessage) toast('Rascunho administrativo salvo neste navegador.');
+    }
+
+    function localDateKey(date){
+      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    }
+
+    function defaultAdminStartDate(){
+      return localDateKey(new Date());
+    }
+
+    function hydrateAdminDraft(){
+      let draft={};
+      try{ draft=JSON.parse(localStorage.getItem(ADMIN_DRAFT_KEY)||'{}'); }
+      catch{ draft={}; }
+
+      el('adminStudentName').value=draft.studentName||state.studentName||'';
+      el('adminGoal').value=draft.goal||state.goal||'';
+      el('adminSubject').value=draft.subject||state.subjects?.[0]?.name||'Matemática';
+      el('adminScheduleStyle').value=draft.scheduleStyle||state.scheduleStyle||'weekly';
+      el('adminStartDate').value=draft.startDate||defaultAdminStartDate();
+      el('adminExamDate').value=draft.examDate||state.examDate||'';
+      el('adminHoursPerDay').value=draft.hoursPerDay||state.hoursPerDay||2;
+      el('adminSessionMinutes').value=String(draft.sessionMinutes||state.sessionMinutes||60);
+      el('adminPreferredStart').value=draft.preferredStart||state.preferredStart||'19:00';
+      el('adminIncludeTheory').checked=draft.includeTheory!==false;
+      el('adminIncludeExercises').checked=draft.includeExercises!==false;
+      el('adminIncludeReviews').checked=draft.includeReviews!==false;
+      el('adminIncludeSimulations').checked=Boolean(draft.includeSimulations);
+      el('adminReplaceSchedule').checked=draft.replaceSchedule!==false;
+      el('adminTopicsInput').value=draft.rawText||'';
+
+      const days=Array.isArray(draft.availableDays)&&draft.availableDays.length
+        ? draft.availableDays
+        : state.availableDays||[0,1,2,3,4];
+      document.querySelectorAll('#adminAvailableDays input').forEach(input=>{
+        input.checked=days.includes(Number(input.value));
+      });
+
+      adminTopics=Array.isArray(draft.topics)
+        ? draft.topics.map(topic=>({
+            id:topic.id||cryptoId(),
+            name:String(topic.name||'').trim(),
+            selected:topic.selected!==false
+          })).filter(topic=>topic.name)
+        : [];
+      renderAdminTopics();
+    }
+
+    function normalizeAdminTopic(value){
+      return String(value||'')
+        .replace(/\r/g,' ')
+        .replace(/^\s*(?:[-–—•▪◦*]+|\(?\d+(?:[.)ºª-]|\.\d+)*\)?|[A-Za-z][.)])\s*/,'')
+        .replace(/\s+/g,' ')
+        .trim()
+        .replace(/[.;,]+$/,'')
+        .trim();
+    }
+
+    function parseAdminTopicsText(value){
+      const expanded=String(value||'')
+        .replace(/\r/g,'\n')
+        .replace(/[•▪◦]/g,'\n')
+        .replace(/\s*;\s*/g,'\n');
+
+      const unique=new Map();
+      expanded.split(/\n+/).forEach(line=>{
+        const topic=normalizeAdminTopic(line);
+        if(topic.length<2) return;
+        const key=topic.toLocaleLowerCase('pt-BR');
+        if(!unique.has(key)) unique.set(key,topic);
+      });
+      return [...unique.values()];
+    }
+
+    function renderAdminTopics(){
+      const list=el('adminTopicList');
+      if(!list) return;
+      list.innerHTML='';
+
+      if(!adminTopics.length){
+        list.innerHTML='<div class="empty">Cole o conteúdo acima e clique em “Organizar tópicos”.</div>';
+        updateAdminTopicCount();
+        return;
+      }
+
+      adminTopics.forEach((topic,index)=>{
+        const row=document.createElement('div');
+        row.className='admin-topic-row';
+        row.dataset.id=topic.id;
+        row.innerHTML=`
+          <input class="admin-topic-selected" type="checkbox" ${topic.selected!==false?'checked':''} aria-label="Usar este tópico">
+          <input class="admin-topic-name" type="text" value="${escapeHtml(topic.name)}" aria-label="Nome do tópico">
+          <div class="admin-topic-actions">
+            <button class="btn btn-secondary btn-small admin-topic-up" type="button" title="Mover para cima">↑</button>
+            <button class="btn btn-secondary btn-small admin-topic-down" type="button" title="Mover para baixo">↓</button>
+            <button class="btn btn-danger btn-small admin-topic-delete" type="button" title="Excluir">×</button>
+          </div>`;
+
+        row.querySelector('.admin-topic-selected').addEventListener('change',event=>{
+          topic.selected=event.target.checked;
+          updateAdminTopicCount();
+          saveAdminDraft();
+        });
+        row.querySelector('.admin-topic-name').addEventListener('input',event=>{
+          topic.name=event.target.value;
+          saveAdminDraft();
+        });
+        row.querySelector('.admin-topic-up').addEventListener('click',()=>{
+          if(index<=0) return;
+          [adminTopics[index-1],adminTopics[index]]=[adminTopics[index],adminTopics[index-1]];
+          renderAdminTopics();
+          saveAdminDraft();
+        });
+        row.querySelector('.admin-topic-down').addEventListener('click',()=>{
+          if(index>=adminTopics.length-1) return;
+          [adminTopics[index+1],adminTopics[index]]=[adminTopics[index],adminTopics[index+1]];
+          renderAdminTopics();
+          saveAdminDraft();
+        });
+        row.querySelector('.admin-topic-delete').addEventListener('click',()=>{
+          adminTopics=adminTopics.filter(item=>item.id!==topic.id);
+          renderAdminTopics();
+          saveAdminDraft();
+        });
+        list.appendChild(row);
+      });
+
+      updateAdminTopicCount();
+    }
+
+    function updateAdminTopicCount(){
+      const count=adminTopics.filter(topic=>topic.selected!==false&&topic.name.trim()).length;
+      if(el('adminTopicCount')) el('adminTopicCount').textContent=String(count);
+    }
+
+    function adminStudyUnits(topics,options,subject){
+      const units=[];
+      const reviewBuffer=[];
+
+      topics.forEach((topic,index)=>{
+        if(options.theory) units.push({topic,type:'Teoria',activity:`Teoria — ${topic}`});
+        if(options.exercises) units.push({topic,type:'Exercícios',activity:`Exercícios — ${topic}`});
+
+        reviewBuffer.push(topic);
+        if(options.reviews && (reviewBuffer.length===3 || index===topics.length-1)){
+          units.push({
+            topic:`Revisão de ${reviewBuffer.join(', ')}`,
+            type:'Revisão',
+            activity:`Revisão — ${reviewBuffer.join(', ')}`
+          });
+          reviewBuffer.length=0;
+        }
+
+        if(options.simulations && ((index+1)%5===0 || index===topics.length-1)){
+          units.push({
+            topic:`Simulado de ${subject}`,
+            type:'Simulado',
+            activity:`Simulado — conteúdos 1 a ${index+1}`
+          });
+        }
+      });
+
+      return units;
+    }
+
+    function nextAdminStudyDate(date,availableDays){
+      const next=new Date(date);
+      do{
+        next.setDate(next.getDate()+1);
+      }while(!availableDays.includes((next.getDay()+6)%7));
+      return next;
+    }
+
+    function generateAdminSchedule(){
+      const status=el('adminGenerationStatus');
+      const draft=adminDraftObject();
+      const topics=draft.topics
+        .filter(topic=>topic.selected!==false)
+        .map(topic=>normalizeAdminTopic(topic.name))
+        .filter(Boolean);
+
+      if(!draft.studentName) return toast('Informe o nome do aluno.');
+      if(!draft.goal) return toast('Informe o concurso ou objetivo.');
+      if(!draft.subject) return toast('Informe a disciplina.');
+      if(!topics.length) return toast('Selecione pelo menos um tópico.');
+      if(!draft.availableDays.length) return toast('Selecione pelo menos um dia disponível.');
+      if(!draft.includeTheory&&!draft.includeExercises&&!draft.includeReviews&&!draft.includeSimulations){
+        return toast('Selecione pelo menos um tipo de atividade.');
+      }
+
+      const units=adminStudyUnits(topics,{
+        theory:draft.includeTheory,
+        exercises:draft.includeExercises,
+        reviews:draft.includeReviews,
+        simulations:draft.includeSimulations
+      },draft.subject);
+
+      const session=Math.max(30,draft.sessionMinutes);
+      const sessionsPerDay=Math.max(1,Math.floor((draft.hoursPerDay*60)/session));
+      const startDate=draft.startDate ? new Date(`${draft.startDate}T12:00:00`) : new Date();
+      let date=new Date(startDate);
+      while(!draft.availableDays.includes((date.getDay()+6)%7)){
+        date=nextAdminStudyDate(date,draft.availableDays);
+      }
+
+      const generated=[];
+      let slot=0;
+      units.forEach((unit,index)=>{
+        if(slot>=sessionsPerDay){
+          date=nextAdminStudyDate(date,draft.availableDays);
+          slot=0;
+        }
+        const day=(date.getDay()+6)%7;
+        const cursor=timeToMinutes(draft.preferredStart)+slot*(session+10);
+        generated.push({
+          id:cryptoId(),
+          day,
+          date:localDateKey(date),
+          cycleOrder:index,
+          start:minutesToTime(cursor),
+          end:minutesToTime(cursor+session),
+          subject:draft.subject,
+          activity:unit.activity,
+          type:unit.type,
+          notes:`Tópico: ${unit.topic}. Cronograma preparado na área administrativa do Prof. Lucas MPC.`,
+          done:false
+        });
+        slot++;
+      });
+
+      state.studentName=draft.studentName;
+      state.goal=draft.goal;
+      state.examDate=draft.examDate;
+      state.hoursPerDay=draft.hoursPerDay;
+      state.sessionMinutes=session;
+      state.preferredStart=draft.preferredStart;
+      state.availableDays=[...draft.availableDays];
+      state.scheduleStyle=draft.scheduleStyle;
+      state.subjects=[{id:cryptoId(),name:draft.subject,priority:5,level:'intermediario'}];
+      state.tasks=draft.replaceSchedule ? generated : [...state.tasks,...generated];
+
+      hydrateSettings();
+      renderSubjects();
+      applyScheduleStyleUI();
+      renderSchedule();
+      saveState();
+      saveAdminDraft();
+
+      let dateWarning='';
+      if(draft.examDate){
+        const finalTask=generated[generated.length-1];
+        if(finalTask?.date>draft.examDate){
+          dateWarning=' A disponibilidade informada ultrapassou a data final; revise a carga horária ou os dias.';
+        }
+      }
+
+      status.className='admin-generation-status success';
+      status.textContent=`Cronograma criado com ${topics.length} tópicos e ${generated.length} atividades.${dateWarning}`;
+      toast('Cronograma do aluno criado. Use “Ver como aluno” para revisar e baixar.');
+      document.getElementById('scheduleCard')?.scrollIntoView({behavior:'smooth',block:'start'});
+    }
 
     function cryptoId(){ return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8); }
     function loadState(){
@@ -2240,7 +2935,7 @@
       }));
     }
     function el(id){ return document.getElementById(id); }
-    function platformAccessRequired(){ return state.actionCount >= 5 && !state.registered; }
+    function platformAccessRequired(){ return !adminUnlocked() && state.actionCount >= 5 && !state.registered; }
     function setAccessLock(locked){
       document.body.classList.toggle('access-locked', Boolean(locked));
     }
@@ -2943,7 +3638,8 @@
 
     // PDF_DIRECT_START
     const PDF_GENERATOR_URL='https://gerador-de-cronograma-mpc.netlify.app/?utm_source=pdf&utm_medium=cronograma&utm_campaign=compartilhamento_professores';
-    const PDF_PAGE={width:841.89,height:595.28,margin:32};
+    // A4 vertical: melhor leitura em celular e computador.
+    const PDF_PAGE={width:595.28,height:841.89,margin:34};
     const PDF_COLORS={
       navy:[0.027,0.082,0.169],
       navy2:[0.055,0.122,0.231],
@@ -2955,7 +3651,9 @@
       line:[0.82,0.86,0.91],
       soft:[0.965,0.976,0.989],
       white:[1,1,1],
-      success:[0.075,0.45,0.27]
+      success:[0.075,0.45,0.27],
+      successSoft:[0.91,0.97,0.93],
+      pendingSoft:[1,0.975,0.89]
     };
 
     function pdfNumber(value){
@@ -3043,15 +3741,17 @@
         }
         if(lines.length>=maxLines) break;
       }
+
       if(lines.length<maxLines&&current) lines.push(current);
       if(lines.length>maxLines) lines.length=maxLines;
 
       const reconstructed=lines.join(' ');
       if(reconstructed.length<text.length&&lines.length){
         let last=lines[lines.length-1];
-        while(last&& !fits(`${last}...`)) last=last.slice(0,-1);
+        while(last&&!fits(`${last}...`)) last=last.slice(0,-1);
         lines[lines.length-1]=`${last.trimEnd()}...`;
       }
+
       return lines.length?lines:['-'];
     }
 
@@ -3086,7 +3786,8 @@
     }
 
     function pdfScheduleName(){
-      const base=(state.goal||'cronograma-de-estudos')
+      const fileBase=[state.studentName,state.goal].filter(Boolean).join('-')||'cronograma-de-estudos';
+      const base=fileBase
         .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
         .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')
         .slice(0,54)||'cronograma-de-estudos';
@@ -3107,115 +3808,193 @@
         .sort((a,b)=>(a.date||'9999-12-31').localeCompare(b.date||'9999-12-31') || a.day-b.day || (a.start||'').localeCompare(b.start||''))
         .map(task=>({
           date:pdfDateLabel(task),
-          time:[task.start,task.end].filter(Boolean).join(' - ')||'-',
+          time:[task.start,task.end].filter(Boolean).join(' - ')||'Horário livre',
           subject:task.subject||'Sem disciplina',
           activity:task.activity||'Atividade de estudo',
           type:task.type||'Estudo',
+          notes:task.notes||'',
           status:task.done?'Concluída':'Pendente'
         }));
     }
 
     function pdfPreparePages(rows){
-      const columns=[
-        {key:'date',label:'Data / dia',width:88,maxLines:2},
-        {key:'time',label:'Horário',width:66,maxLines:1},
-        {key:'subject',label:'Disciplina',width:128,maxLines:2},
-        {key:'activity',label:'Atividade',width:310,maxLines:2},
-        {key:'type',label:'Tipo',width:94,maxLines:2},
-        {key:'status',label:'Situação',width:92,maxLines:1}
-      ];
-      const rowFont=8.4;
-      const lineHeight=10.2;
+      const cardWidth=PDF_PAGE.width-PDF_PAGE.margin*2;
       const prepared=rows.map(row=>{
-        const cells={};
-        let lines=1;
-        columns.forEach(column=>{
-          cells[column.key]=pdfWrapText(row[column.key],column.width-12,rowFont,column.maxLines,column.key==='subject');
-          lines=Math.max(lines,cells[column.key].length);
-        });
-        return {cells,height:Math.max(27,lines*lineHeight+9),source:row};
+        const subjectLines=pdfWrapText(row.subject,cardWidth-28,13,2,true);
+        const activityLines=pdfWrapText(row.activity,cardWidth-28,11.2,4,false);
+        const notesLines=row.notes
+          ? pdfWrapText(`Observações: ${row.notes}`,cardWidth-28,9.3,2,false)
+          : [];
+
+        const height=
+          25+
+          13+
+          subjectLines.length*15.2+
+          5+
+          activityLines.length*13.4+
+          17+
+          (notesLines.length?notesLines.length*11.2+8:0)+
+          11;
+
+        return {
+          source:row,
+          subjectLines,
+          activityLines,
+          notesLines,
+          height:Math.max(92,height)
+        };
       });
 
       const pages=[];
-      const bodyTop=463;
-      const bodyBottom=68;
+      const bodyTop=550;
+      const bodyBottom=91;
+      const gap=10;
       let current=[];
       let used=0;
+      const available=bodyTop-bodyBottom;
+
       for(const row of prepared){
-        if(current.length&&used+row.height>bodyTop-bodyBottom){
+        const needed=row.height+(current.length?gap:0);
+        if(current.length&&used+needed>available){
           pages.push(current);
           current=[];
           used=0;
         }
         current.push(row);
-        used+=row.height;
+        used+=row.height+(current.length>1?gap:0);
       }
+
       if(current.length) pages.push(current);
-      return {pages:pages.length?pages:[[]],columns,rowFont,lineHeight,bodyTop,bodyBottom};
+
+      return {
+        pages:pages.length?pages:[[]],
+        bodyTop,
+        bodyBottom,
+        gap,
+        cardWidth
+      };
+    }
+
+    function pdfSummaryBox(commands,x,y,width,label,value){
+      pdfRect(commands,x,y,width,38,PDF_COLORS.soft,PDF_COLORS.line,.7);
+      pdfText(commands,x+10,y+24,label.toUpperCase(),7.5,true,PDF_COLORS.muted);
+      const valueLines=pdfWrapText(value,width-20,11.2,1,true);
+      pdfText(commands,x+10,y+8,valueLines[0],11.2,true,PDF_COLORS.navy);
     }
 
     function pdfBuildPageContent(pageRows,pageIndex,pageCount,layout){
       const commands=[];
       const {width,height,margin}=PDF_PAGE;
-      const contentWidth=width-margin*2;
       const totalMinutes=state.tasks.reduce((sum,task)=>sum+taskDuration(task),0);
       const completed=state.tasks.filter(task=>task.done).length;
-      const exam=state.examDate?new Date(`${state.examDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informada';
+      const exam=state.examDate
+        ? new Date(`${state.examDate}T12:00:00`).toLocaleDateString('pt-BR')
+        : 'Não informada';
       const generated=new Date().toLocaleString('pt-BR');
 
       pdfRect(commands,0,0,width,height,PDF_COLORS.white);
-      pdfRect(commands,margin,height-45,7,27,PDF_COLORS.gold);
-      pdfText(commands,margin+17,height-32,'CRONOGRAMA DE ESTUDOS',20,true,PDF_COLORS.navy);
-      pdfText(commands,margin+17,height-49,pdfScheduleStyleLabel(),9.5,true,PDF_COLORS.cyan);
-      pdfText(commands,margin,height-69,`Objetivo: ${state.goal||'Não informado'}`,10.5,true,PDF_COLORS.text);
-      pdfText(commands,margin,height-85,`Prova: ${exam}`,8.7,false,PDF_COLORS.muted);
-      pdfText(commands,margin+185,height-85,`Atividades: ${state.tasks.length}`,8.7,false,PDF_COLORS.muted);
-      pdfText(commands,margin+300,height-85,`Carga planejada: ${formatHours(totalMinutes)}`,8.7,false,PDF_COLORS.muted);
-      pdfText(commands,margin+490,height-85,`Concluídas: ${completed}`,8.7,false,PDF_COLORS.muted);
-      pdfText(commands,margin,height-100,`Gerado em ${generated}`,7.7,false,PDF_COLORS.muted);
-      pdfLine(commands,margin,height-111,width-margin,height-111,PDF_COLORS.gold,1.6);
 
-      const headerY=layout.bodyTop+5;
-      let x=margin;
-      layout.columns.forEach(column=>{
-        pdfRect(commands,x,headerY,column.width,25,PDF_COLORS.navy,PDF_COLORS.white,.4);
-        pdfText(commands,x+6,headerY+8,column.label,8.4,true,PDF_COLORS.white);
-        x+=column.width;
+      // Cabeçalho principal.
+      pdfRect(commands,0,height-86,width,86,PDF_COLORS.navy);
+      pdfRect(commands,margin,height-62,7,31,PDF_COLORS.gold);
+      pdfText(commands,margin+18,height-43,'CRONOGRAMA DE ESTUDOS',22,true,PDF_COLORS.white);
+      pdfText(commands,margin+18,height-63,pdfScheduleStyleLabel(),10.5,true,PDF_COLORS.cyan);
+
+      const objectiveLines=pdfWrapText(
+        `Objetivo: ${state.goal||'Não informado'}`,
+        width-margin*2,
+        11.7,
+        2,
+        true
+      );
+      let objectiveY=height-111;
+      objectiveLines.forEach((line,index)=>{
+        pdfText(commands,margin,objectiveY-index*14,line,11.7,true,PDF_COLORS.text);
       });
 
-      let top=layout.bodyTop;
+      if(state.studentName){
+        const studentLines=pdfWrapText(`Aluno: ${state.studentName}`,width-margin*2,10.5,2,true);
+        studentLines.forEach((line,index)=>{
+          pdfText(commands,margin,694-index*13,line,10.5,true,PDF_COLORS.navy);
+        });
+      }
+
+      const summaryY=575;
+      const summaryGap=9;
+      const summaryWidth=(width-margin*2-summaryGap)/2;
+      pdfSummaryBox(commands,margin,summaryY+47,summaryWidth,'Data da prova',exam);
+      pdfSummaryBox(commands,margin+summaryWidth+summaryGap,summaryY+47,summaryWidth,'Atividades',String(state.tasks.length));
+      pdfSummaryBox(commands,margin,summaryY,summaryWidth,'Carga planejada',formatHours(totalMinutes));
+      pdfSummaryBox(commands,margin+summaryWidth+summaryGap,summaryY,summaryWidth,'Concluídas',String(completed));
+
+      pdfText(commands,margin,layout.bodyTop+12,`Gerado em ${generated}`,8,false,PDF_COLORS.muted);
+      pdfLine(commands,margin,layout.bodyTop+3,width-margin,layout.bodyTop+3,PDF_COLORS.gold,1.4);
+
+      // Cartões das atividades.
+      let top=layout.bodyTop-8;
       pageRows.forEach((row,index)=>{
         const bottom=top-row.height;
-        pdfRect(commands,margin,bottom,contentWidth,row.height,index%2?PDF_COLORS.soft:PDF_COLORS.white,PDF_COLORS.line,.45);
-        pdfRect(commands,margin,bottom,4,row.height,PDF_COLORS.cyan);
-        let cellX=margin;
-        layout.columns.forEach(column=>{
-          if(cellX>margin) pdfLine(commands,cellX,bottom,cellX,top,PDF_COLORS.line,.35);
-          const lines=row.cells[column.key];
-          const bold=column.key==='subject';
-          const color=column.key==='status'&&row.source.status==='Concluída'?PDF_COLORS.success:PDF_COLORS.text;
-          const blockHeight=(lines.length-1)*layout.lineHeight;
-          let textY=bottom+(row.height+blockHeight)/2-3.3;
-          lines.forEach((line,lineIndex)=>{
-            pdfText(commands,cellX+7,textY-lineIndex*layout.lineHeight,line,layout.rowFont,bold,color);
-          });
-          cellX+=column.width;
+        const statusDone=row.source.status==='Concluída';
+        const statusFill=statusDone?PDF_COLORS.successSoft:PDF_COLORS.pendingSoft;
+        const statusColor=statusDone?PDF_COLORS.success:PDF_COLORS.goldDark;
+
+        pdfRect(commands,margin,bottom,layout.cardWidth,row.height,PDF_COLORS.white,PDF_COLORS.line,.8);
+        pdfRect(commands,margin,bottom,6,row.height,index%2?PDF_COLORS.cyan:PDF_COLORS.gold);
+
+        // Linha superior: data, horário e situação.
+        pdfText(commands,margin+17,top-17,row.source.date,9.6,true,PDF_COLORS.navy);
+        pdfText(commands,margin+17,top-32,row.source.time,9.1,false,PDF_COLORS.muted);
+
+        const badgeWidth=statusDone?73:62;
+        const badgeX=width-margin-12-badgeWidth;
+        pdfRect(commands,badgeX,top-29,badgeWidth,19,statusFill,statusColor,.6);
+        pdfText(commands,badgeX,top-23,row.source.status,8.1,true,statusColor,'center',badgeWidth);
+
+        let textY=top-51;
+        row.subjectLines.forEach((line,lineIndex)=>{
+          pdfText(commands,margin+17,textY-lineIndex*15.2,line,13,true,PDF_COLORS.navy);
         });
-        top=bottom;
+
+        textY-=row.subjectLines.length*15.2+3;
+        row.activityLines.forEach((line,lineIndex)=>{
+          pdfText(commands,margin+17,textY-lineIndex*13.4,line,11.2,false,PDF_COLORS.text);
+        });
+
+        textY-=row.activityLines.length*13.4+4;
+        pdfText(commands,margin+17,textY,`Tipo de estudo: ${row.source.type}`,9.3,true,PDF_COLORS.muted);
+
+        if(row.notesLines.length){
+          textY-=15;
+          row.notesLines.forEach((line,lineIndex)=>{
+            pdfText(commands,margin+17,textY-lineIndex*11.2,line,9.3,false,PDF_COLORS.muted);
+          });
+        }
+
+        top=bottom-layout.gap;
       });
 
       if(!pageRows.length){
-        pdfText(commands,margin,390,'Nenhuma atividade foi encontrada para este cronograma.',13,true,PDF_COLORS.muted);
+        pdfText(commands,margin,525,'Nenhuma atividade foi encontrada para este cronograma.',13,true,PDF_COLORS.muted);
       }
 
-      pdfLine(commands,margin,57,width-margin,57,PDF_COLORS.gold,1.1);
-      pdfText(commands,margin,39,'Gerado pelo Gerador de Cronograma MPC',8.7,true,PDF_COLORS.navy);
-      pdfText(commands,margin,26,'Organize gratuitamente seus estudos para concursos.',7.5,false,PDF_COLORS.muted);
-      pdfText(commands,margin+365,28,`Página ${pageIndex+1} de ${pageCount}`,7.5,false,PDF_COLORS.muted);
+      // Rodapé fixo e legível.
+      pdfLine(commands,margin,78,width-margin,78,PDF_COLORS.gold,1.2);
+      pdfText(commands,margin,63,'Gerado pelo Gerador de Cronograma MPC',8.8,true,PDF_COLORS.navy);
+      pdfText(commands,width-margin-92,63,`Página ${pageIndex+1} de ${pageCount}`,8,false,PDF_COLORS.muted,'right',92);
 
-      const button={x:width-margin-255,y:18,width:255,height:29};
+      const button={x:margin,y:18,width:width-margin*2,height:38};
       pdfRect(commands,button.x,button.y,button.width,button.height,PDF_COLORS.gold,PDF_COLORS.goldDark,1.1);
-      pdfText(commands,button.x,button.y+9.5,'Crie também seu cronograma gratuitamente',9.4,true,PDF_COLORS.navy,'center',button.width);
+      pdfText(
+        commands,
+        button.x,
+        button.y+13,
+        'CLIQUE AQUI PARA USAR O GERADOR DE CRONOGRAMA MPC GRATUITAMENTE',
+        9.6,
+        true,
+        PDF_COLORS.navy,
+        'center',
+        button.width
+      );
 
       return {content:commands.join('\n'),button};
     }
@@ -3240,7 +4019,8 @@
         pageRefs.push(pageRef);
       });
 
-      objects[catalogRef]=`<< /Type /Catalog /Pages ${pagesRef} 0 R >>`;
+      const firstPageRef=pageRefs[0];
+      objects[catalogRef]=`<< /Type /Catalog /Pages ${pagesRef} 0 R /PageLayout /OneColumn /ViewerPreferences << /DisplayDocTitle true /FitWindow true >> /OpenAction [${firstPageRef} 0 R /FitH ${pdfNumber(PDF_PAGE.height)}] >>`;
       objects[pagesRef]=`<< /Type /Pages /Kids [${pageRefs.map(ref=>`${ref} 0 R`).join(' ')}] /Count ${pageRefs.length} >>`;
 
       let binary='%PDF-1.4\n%âãÏÓ\n';
@@ -3271,7 +4051,7 @@
         const blob=new Blob([bytes],{type:'application/pdf'});
         downloadBlob(blob,pdfScheduleName());
         closeModal('exportModal');
-        toast('PDF de alta qualidade baixado. O botão do rodapé está clicável.');
+        toast('PDF vertical baixado, com leitura otimizada para celular e computador.');
       }catch(error){
         console.error('Falha ao gerar PDF:',error);
         toast('Não foi possível gerar o PDF. Tente novamente.');
@@ -3855,6 +4635,78 @@
 
     function registerEvents(){
       el('themeBtn').onclick=()=>{state.theme=state.theme==='dark'?'light':'dark';applyTheme();saveState();};
+      el('adminEntryBtn').onclick=openAdminAccess;
+      el('adminViewBtn').onclick=()=>setAdminView('admin');
+      el('studentViewBtn').onclick=()=>setAdminView('student');
+      el('adminPreviewStudentBtn').onclick=()=>setAdminView('student');
+      el('adminLogoutBtn').onclick=()=>{
+        sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        sessionStorage.removeItem(ADMIN_VIEW_KEY);
+        adminModeActive=false;
+        document.body.classList.remove('admin-view');
+        el('adminPanel').hidden=true;
+        renderAdminEntry();
+        toast('Área administrativa bloqueada neste navegador.');
+      };
+      el('adminAuthForm').onsubmit=async event=>{
+        event.preventDefault();
+        const setup=!adminConfigured();
+        const pin=el('adminPinInput').value.replace(/\D/g,'');
+        const confirmPin=el('adminPinConfirm').value.replace(/\D/g,'');
+        const status=el('adminAuthStatus');
+
+        if(pin.length<4||pin.length>8){
+          status.className='registration-submit-status error';
+          status.textContent='Use um PIN com 4 a 8 números.';
+          return;
+        }
+        if(setup&&pin!==confirmPin){
+          status.className='registration-submit-status error';
+          status.textContent='Os dois PINs não são iguais.';
+          return;
+        }
+
+        const hash=await adminHashPin(pin);
+        if(setup){
+          localStorage.setItem(ADMIN_PIN_KEY,hash);
+        }else if(hash!==localStorage.getItem(ADMIN_PIN_KEY)){
+          status.className='registration-submit-status error';
+          status.textContent='PIN incorreto.';
+          return;
+        }
+
+        sessionStorage.setItem(ADMIN_SESSION_KEY,'1');
+        closeModal('adminAuthModal');
+        renderAdminEntry();
+        setAdminView('admin');
+        toast(setup?'Acesso administrativo configurado neste navegador.':'Área administrativa liberada.');
+      };
+      el('adminParseTopicsBtn').onclick=()=>{
+        const parsed=parseAdminTopicsText(el('adminTopicsInput').value);
+        adminTopics=parsed.map(name=>({id:cryptoId(),name,selected:true}));
+        renderAdminTopics();
+        saveAdminDraft();
+        toast(`${adminTopics.length} tópico${adminTopics.length===1?'':'s'} organizado${adminTopics.length===1?'':'s'}.`);
+      };
+      el('adminClearTopicsBtn').onclick=()=>{
+        if(!confirm('Limpar o texto e todos os tópicos da área administrativa?')) return;
+        el('adminTopicsInput').value='';
+        adminTopics=[];
+        renderAdminTopics();
+        saveAdminDraft();
+      };
+      el('adminAddTopicBtn').onclick=()=>{
+        adminTopics.push({id:cryptoId(),name:'Novo tópico',selected:true});
+        renderAdminTopics();
+        saveAdminDraft();
+        setTimeout(()=>document.querySelector('.admin-topic-row:last-child .admin-topic-name')?.select(),30);
+      };
+      el('adminSaveDraftBtn').onclick=()=>saveAdminDraft(true);
+      el('adminGenerateScheduleBtn').onclick=generateAdminSchedule;
+      document.querySelectorAll('#adminPanel input,#adminPanel select,#adminPanel textarea').forEach(field=>{
+        field.addEventListener('change',()=>saveAdminDraft());
+      });
+
       el('paletteBtn').onclick=()=>{renderPaletteOptions();openModal('paletteModal');};
       document.querySelectorAll('[data-palette-choice]').forEach(option=>{
         option.addEventListener('click',()=>setPalette(option.dataset.paletteChoice));
@@ -4039,6 +4891,12 @@
         window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
         toast('Envie a mensagem e aguarde seu código de liberação.');
       };
+      el('adminPinInput').addEventListener('input',event=>{
+        event.target.value=event.target.value.replace(/\D/g,'').slice(0,8);
+      });
+      el('adminPinConfirm').addEventListener('input',event=>{
+        event.target.value=event.target.value.replace(/\D/g,'').slice(0,8);
+      });
       el('accessCodeInput').addEventListener('input',event=>{
         event.target.value=event.target.value.replace(/\D/g,'').slice(0,6);
       });
@@ -4101,6 +4959,7 @@
         ...fresh,
         ...preserved,
         scheduleStyle:'weekly',
+        studentName:'',
         goal:'',
         examDate:'',
         hoursPerDay:2,
@@ -4186,6 +5045,18 @@
       renderAccessGate();
       renderPrivacyConsent();
       setupFloatingLayout();
+      renderAdminEntry();
+
+      if(adminUnlocked()){
+        const preferredView=sessionStorage.getItem(ADMIN_VIEW_KEY)||'admin';
+        setAdminView(preferredView);
+      }else if(adminRouteRequested()){
+        setTimeout(openAdminAccess,180);
+      }
+
+      if(adminRouteRequested()||adminUnlocked()){
+        return;
+      }
 
       if(platformAccessRequired()){
         setTimeout(enforceAccessGate,120);
