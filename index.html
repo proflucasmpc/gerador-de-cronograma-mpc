@@ -788,6 +788,17 @@
     .registration-form-grid input {
       min-height: 50px;
     }
+    .registration-submit-status {
+      min-height: 22px;
+      margin: 10px 0 0;
+      text-align: center;
+      font-size: .88rem;
+      font-weight: 800;
+      color: var(--muted);
+    }
+    .registration-submit-status.sending { color: var(--gold-strong); }
+    .registration-submit-status.error { color: var(--danger); }
+    .registration-submit-status.success { color: var(--success); }
     .consent-row {
       display: grid;
       grid-template-columns: 22px minmax(0, 1fr);
@@ -1477,7 +1488,7 @@
     </div>
 
     <footer>
-      Plataforma desenvolvida pelo <strong>Prof. Lucas MPC</strong> · Dados desta prévia ficam salvos somente neste navegador.
+      Plataforma desenvolvida pelo <strong>Prof. Lucas MPC</strong> · O cronograma fica salvo neste navegador; os dados do cadastro são enviados para a área privada da plataforma.
       <span class="footer-legal">· <button type="button" id="footerPrivacyBtn">Política de Privacidade e Termos de Uso</button></span>
     </footer>
   </main>
@@ -1748,14 +1759,14 @@
       <div class="modal-head">
         <div>
           <h2 id="privacyTitle">Política de Privacidade e Termos de Uso</h2>
-          <div class="legal-version">Versão 1.2 · Última atualização: 4 de agosto de 2026</div>
+          <div class="legal-version">Versão 1.3 · Última atualização: 4 de agosto de 2026</div>
         </div>
         <button class="close" data-close="privacyModal" aria-label="Fechar">×</button>
       </div>
 
       <div class="legal-summary">
         <h3>Resumo em linguagem simples</h3>
-        <p>O site solicita nome, e-mail e WhatsApp depois de cinco ações. Esses dados e o cronograma ficam guardados neste navegador. A plataforma utiliza o Cloudflare Web Analytics para obter estatísticas gerais de visitas e desempenho, sem exibir contador público. O consentimento para receber ofertas continua separado e opcional.</p>
+        <p>Depois de cinco ações, o site solicita nome, e-mail e WhatsApp. O cadastro é enviado para a área privada do projeto na Netlify antes do direcionamento ao WhatsApp. O cronograma continua armazenado somente neste navegador. A plataforma também utiliza o Cloudflare Web Analytics para estatísticas gerais de visitas e desempenho.</p>
       </div>
 
       <div class="legal-document" id="legalDocument" tabindex="0">
@@ -1768,6 +1779,8 @@
           <h3>2. Quais dados podem ser tratados</h3>
           <ul>
             <li>nome, e-mail e número de WhatsApp informados no cadastro;</li>
+            <li>concurso ou objetivo informado no perfil de estudos;</li>
+            <li>data e horário do cadastro, página acessada, origem aproximada, parâmetros de campanha e informações técnicas básicas do dispositivo e navegador;</li>
             <li>registro das autorizações marcadas pelo usuário;</li>
             <li>objetivo, disciplinas, horários, tarefas e demais informações inseridas no cronograma;</li>
             <li>preferências de tema, paleta, estilo de cronograma e créditos de criação;</li>
@@ -1779,19 +1792,20 @@
 
         <section>
           <h3>3. Onde os dados ficam nesta versão</h3>
-          <p>Nesta prévia em HTML, os dados do cadastro, as preferências e o cronograma são armazenados localmente no navegador do próprio usuário por meio do armazenamento local. O arquivo HTML, por si só, não envia esses dados para um banco de dados do Prof. Lucas MPC.</p>
-          <p>Ao limpar os dados do navegador, usar uma janela anônima ou trocar de dispositivo, essas informações podem ser apagadas e não poderão ser recuperadas pela plataforma. O botão “Resetar planejamento” apaga somente os dados de estudo e preserva o cadastro, a liberação de acesso e o saldo de créditos.</p>
+          <p>O cronograma, as disciplinas, as preferências, o progresso, os créditos e a liberação de acesso continuam armazenados localmente no navegador do usuário por meio do armazenamento local.</p>
+          <p>Os dados preenchidos no cadastro, o concurso ou objetivo e informações técnicas básicas da submissão são enviados pelo recurso <strong>Netlify Forms</strong> e ficam disponíveis na área privada do projeto para o Prof. Lucas MPC e membros autorizados da equipe.</p>
+          <p>Ao limpar os dados do navegador, usar uma janela anônima ou trocar de dispositivo, o cronograma local poderá ser apagado. A exclusão dos dados enviados no cadastro deve ser solicitada diretamente ao responsável pelo WhatsApp informado nesta política.</p>
         </section>
 
         <section>
           <h3>4. Finalidades</h3>
-          <p>Os dados necessários ao funcionamento são utilizados para liberar o acesso, salvar o cronograma no navegador, manter preferências e executar as funções solicitadas.</p>
-          <p>Somente quando a autorização opcional estiver marcada, nome, e-mail e WhatsApp poderão ser utilizados para envio de aulas, conteúdos, novidades, informações sobre mentoria e ofertas.</p>
+          <p>Os dados necessários ao funcionamento são utilizados para registrar o pedido de acesso, identificar o estudante, encaminhá-lo ao WhatsApp, salvar o cronograma no navegador, manter preferências e executar as funções solicitadas.</p>
+          <p>Os dados de origem e dispositivo ajudam a avaliar o funcionamento da jornada de cadastro e a corrigir falhas técnicas. Somente quando a autorização opcional estiver marcada, nome, e-mail e WhatsApp poderão ser utilizados para envio de aulas, conteúdos, novidades, informações sobre mentoria e ofertas.</p>
         </section>
 
         <section>
           <h3>5. Cadastro obrigatório e escolha do usuário</h3>
-          <p>Depois de cinco ações, o cadastro e o envio da mensagem pelo WhatsApp são apresentados como condição para continuar usando gratuitamente a plataforma. Essa condição é informada antes da coleta dos dados.</p>
+          <p>Depois de cinco ações, o cadastro e o direcionamento ao WhatsApp são apresentados como condição para continuar usando gratuitamente a plataforma. O cadastro precisa ser recebido pela plataforma antes de o usuário avançar para a etapa do WhatsApp.</p>
           <p>A autorização para comunicações promocionais é independente, opcional e não vem marcada previamente.</p>
         </section>
 
@@ -1807,20 +1821,20 @@
         </section>
 
         <section>
-          <h3>8. Cloudflare Web Analytics, compartilhamento e venda de dados</h3>
-          <p>Os dados pessoais não são vendidos. A plataforma utiliza o <strong>Cloudflare Web Analytics</strong> para medir visitas, visualizações de página e informações gerais de desempenho. Segundo a documentação da Cloudflare, esse serviço não coleta nem utiliza dados pessoais dos visitantes e não rastreia usuários individuais entre propriedades de clientes.</p>
-          <p>O uso do WhatsApp e de outras redes sociais ocorre apenas quando o usuário aciona voluntariamente os respectivos botões.</p>
+          <h3>8. Netlify Forms, Cloudflare Web Analytics e compartilhamento</h3>
+          <p>Os dados pessoais não são vendidos. O cadastro é processado e armazenado por meio do <strong>Netlify Forms</strong>, serviço utilizado para receber as submissões do formulário na área administrativa do projeto.</p>
+          <p>A plataforma utiliza o <strong>Cloudflare Web Analytics</strong> para medir visitas, visualizações de página e informações gerais de desempenho, sem exibir contador público. O uso do WhatsApp e de outras redes sociais ocorre quando o usuário aciona os respectivos botões.</p>
         </section>
 
         <section>
           <h3>9. Direitos do usuário</h3>
           <p>O usuário pode solicitar confirmação, acesso, correção, informação, revogação da autorização opcional e exclusão dos dados que estiverem sob controle do responsável, observadas as hipóteses legais aplicáveis.</p>
-          <p>Os dados de planejamento podem ser apagados pelo recurso “Resetar planejamento”. Para apagar também cadastro, aceite, acesso e créditos, é necessário limpar os dados deste site no navegador.</p>
+          <p>Os dados de planejamento podem ser apagados pelo recurso “Resetar planejamento”. Para apagar cadastro, aceitações e dados de contato armazenados na área privada do projeto, o usuário deverá solicitar a exclusão ao Prof. Lucas MPC. Para apagar acesso e créditos armazenados localmente, é necessário limpar os dados deste site no navegador.</p>
         </section>
 
         <section>
           <h3>10. Segurança e limitações</h3>
-          <p>São adotadas medidas razoáveis no desenvolvimento da plataforma. Contudo, nenhum sistema é totalmente livre de riscos. Como esta versão salva informações no navegador, pessoas que utilizem o mesmo perfil do dispositivo poderão ter acesso ao cronograma.</p>
+          <p>São adotadas medidas razoáveis no desenvolvimento da plataforma. Contudo, nenhum sistema é totalmente livre de riscos. Pessoas que utilizem o mesmo perfil do dispositivo poderão ter acesso ao cronograma local. Os cadastros recebidos ficam restritos à área administrativa do projeto e devem ser gerenciados periodicamente pelo responsável.</p>
         </section>
 
         <section>
@@ -1867,22 +1881,52 @@
       <p class="required-intro" id="registerDescription">
         Você já realizou cinco ações importantes. Preencha seus dados para seguir para a liberação gratuita pelo WhatsApp.
       </p>
-      <form id="registerForm">
+      <form
+        id="registerForm"
+        name="captura-alunos-gerador-cronograma"
+        method="POST"
+        data-netlify="true"
+        data-netlify-honeypot="bot-field"
+      >
+        <input type="hidden" name="form-name" value="captura-alunos-gerador-cronograma">
+        <input type="hidden" name="subject" value="Novo cadastro — Gerador de Cronograma MPC" data-remove-prefix>
+        <p hidden>
+          <label>Não preencha este campo: <input name="bot-field" autocomplete="off"></label>
+        </p>
+        <input type="hidden" name="lead_id" id="leadId">
+        <input type="hidden" name="concurso_objetivo" id="leadGoal">
+        <input type="hidden" name="data_prova" id="leadExamDate">
+        <input type="hidden" name="marketing_autorizado" id="leadMarketing">
+        <input type="hidden" name="politica_versao" id="leadPrivacyVersion">
+        <input type="hidden" name="politica_aceita_em" id="leadPrivacyAcceptedAt">
+        <input type="hidden" name="cadastro_em" id="leadCreatedAt">
+        <input type="hidden" name="pagina" id="leadPage">
+        <input type="hidden" name="origem" id="leadOrigin">
+        <input type="hidden" name="referencia" id="leadReferrer">
+        <input type="hidden" name="utm_source" id="leadUtmSource">
+        <input type="hidden" name="utm_medium" id="leadUtmMedium">
+        <input type="hidden" name="utm_campaign" id="leadUtmCampaign">
+        <input type="hidden" name="utm_content" id="leadUtmContent">
+        <input type="hidden" name="utm_term" id="leadUtmTerm">
+        <input type="hidden" name="dispositivo" id="leadDevice">
+        <input type="hidden" name="navegador" id="leadBrowser">
+        <input type="hidden" name="idioma" id="leadLanguage">
+        <input type="hidden" name="fuso_horario" id="leadTimezone">
         <div class="form-grid registration-form-grid">
           <div class="field full">
             <label for="regName">Nome completo</label>
-            <input id="regName" autocomplete="name" required placeholder="Digite seu nome">
+            <input id="regName" name="nome" autocomplete="name" required placeholder="Digite seu nome">
           </div>
           <div class="field">
             <label for="regEmail">E-mail</label>
-            <input id="regEmail" type="email" autocomplete="email" required placeholder="seuemail@exemplo.com">
+            <input id="regEmail" name="email" type="email" autocomplete="email" required placeholder="seuemail@exemplo.com">
           </div>
           <div class="field">
             <label for="regWhatsapp">WhatsApp</label>
-            <input id="regWhatsapp" type="tel" autocomplete="tel" inputmode="tel" required placeholder="(DDD) número">
+            <input id="regWhatsapp" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" required placeholder="(DDD) número">
           </div>
           <div class="consent-row field full">
-            <input id="privacyConsent" type="checkbox" required>
+            <input id="privacyConsent" name="politica_aceita" value="sim" type="checkbox" required>
             <div class="consent-copy">
               <label for="privacyConsent">Concordo com a Política de Privacidade, os Termos de Uso e o tratamento dos dados necessários ao funcionamento da plataforma.</label>
               <button class="legal-link" id="openPrivacyBtn" type="button">Consultar a Política de Privacidade e os Termos de Uso</button>
@@ -1890,7 +1934,7 @@
             </div>
           </div>
           <div class="consent-row field full">
-            <input id="marketingConsent" type="checkbox">
+            <input id="marketingConsent" name="marketing_opcional" value="sim" type="checkbox">
             <div class="consent-copy">
               <label for="marketingConsent">Quero receber aulas, conteúdos, novidades e ofertas por e-mail e WhatsApp.</label>
               <span class="consent-status">Esta autorização é opcional e pode ser retirada a qualquer momento pelo WhatsApp do Prof. Lucas MPC.</span>
@@ -1898,8 +1942,9 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button class="btn btn-primary" type="submit">Cadastrar e seguir para o WhatsApp</button>
+          <button class="btn btn-primary" id="registerSubmitBtn" type="submit">Cadastrar e seguir para o WhatsApp</button>
         </div>
+        <p class="registration-submit-status" id="registrationSubmitStatus" role="status" aria-live="polite"></p>
       </form>
       <p class="access-number">Esta etapa é obrigatória para continuar usando gratuitamente.</p>
     </div>
@@ -1947,7 +1992,8 @@
   (() => {
     'use strict';
     const STORAGE_KEY = 'geradorCronogramaMpcData';
-    const DATA_SCHEMA_VERSION = 2;
+    const DATA_SCHEMA_VERSION = 3;
+    const CURRENT_PRIVACY_VERSION = '1.3-2026-08-04';
     const LEGACY_STORAGE_KEYS = ['cronogramaLucasMpcV11'];
     const TUTORIAL_SESSION_KEY = 'cronogramaTutorialAbertoNestaSessaoV2';
     const DAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
@@ -1971,7 +2017,7 @@
       awaitingWhatsapp: false,
       whatsappOpened: false,
       privacyAcknowledged: false,
-      privacyVersion: '1.0-2026-08-03',
+      privacyVersion: CURRENT_PRIVACY_VERSION,
       registration: null,
       goal: '', examDate: '', hoursPerDay: 2, sessionMinutes: 60, preferredStart: '19:00',
       availableDays: [0,1,2,3,4],
@@ -2019,7 +2065,12 @@
           }
         }
         const saved = raw ? JSON.parse(raw) : {};
-        const loaded = {...defaultState(), ...saved, dataSchemaVersion: DATA_SCHEMA_VERSION};
+        const loaded = {
+          ...defaultState(),
+          ...saved,
+          dataSchemaVersion: DATA_SCHEMA_VERSION,
+          privacyVersion: CURRENT_PRIVACY_VERSION
+        };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(loaded));
         return loaded;
       } catch {
@@ -2070,6 +2121,76 @@
     function renderAccessGate(){
       const confirmArea=el('accessConfirmArea');
       if(confirmArea) confirmArea.hidden=!state.whatsappOpened;
+    }
+
+
+    function registrationDevice(){
+      const ua=navigator.userAgent||'';
+      if(/iPad|Tablet|PlayBook|Silk/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua))) return 'Tablet';
+      if(/Mobi|Android|iPhone|iPod/i.test(ua)) return 'Celular';
+      return 'Computador';
+    }
+
+    function registrationOrigin(params){
+      const source=params.get('utm_source');
+      if(source) return source;
+      if(document.referrer){
+        try { return new URL(document.referrer).hostname || 'Referência externa'; }
+        catch { return 'Referência externa'; }
+      }
+      return 'Acesso direto ou origem não informada';
+    }
+
+    function fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt,marketing}){
+      collectSettings();
+      const params=new URLSearchParams(location.search);
+      const values={
+        leadId,
+        leadGoal:state.goal||'Não informado',
+        leadExamDate:state.examDate||'Não informada',
+        leadMarketing:marketing?'Sim':'Não',
+        leadPrivacyVersion:CURRENT_PRIVACY_VERSION,
+        leadPrivacyAcceptedAt:privacyAcceptedAt,
+        leadCreatedAt:createdAt,
+        leadPage:location.href,
+        leadOrigin:registrationOrigin(params),
+        leadReferrer:document.referrer||'Não informado',
+        leadUtmSource:params.get('utm_source')||'',
+        leadUtmMedium:params.get('utm_medium')||'',
+        leadUtmCampaign:params.get('utm_campaign')||'',
+        leadUtmContent:params.get('utm_content')||'',
+        leadUtmTerm:params.get('utm_term')||'',
+        leadDevice:registrationDevice(),
+        leadBrowser:navigator.userAgent||'Não informado',
+        leadLanguage:navigator.language||'Não informado',
+        leadTimezone:Intl.DateTimeFormat().resolvedOptions().timeZone||'Não informado'
+      };
+      Object.entries(values).forEach(([id,value])=>{
+        const field=el(id);
+        if(field) field.value=value;
+      });
+    }
+
+    async function submitRegistrationToNetlify(form){
+      const formData=new FormData(form);
+      const response=await fetch('/',{
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:new URLSearchParams(formData).toString()
+      });
+      if(!response.ok) throw new Error(`Falha no envio do cadastro (${response.status}).`);
+    }
+
+    function accessWhatsappMessage(){
+      const registration=state.registration||{};
+      const lines=[
+        `Olá, Prof. Lucas MPC. Meu nome é ${registration.name||'aluno(a)'}.`,
+        'Cadastrei-me no Gerador de Cronograma MPC e gostaria de liberar meu acesso gratuito.'
+      ];
+      if(registration.goal) lines.push(`Meu concurso ou objetivo é: ${registration.goal}.`);
+      if(registration.email) lines.push(`Meu e-mail é ${registration.email}.`);
+      if(registration.whatsapp) lines.push(`Meu WhatsApp informado no cadastro é ${registration.whatsapp}.`);
+      return lines.join('\n');
     }
 
     function renderPrivacyConsent(){
@@ -3344,40 +3465,77 @@
           });
         }
       });
-      el('registerForm').onsubmit=e=>{
+      el('registerForm').onsubmit=async e=>{
         e.preventDefault();
         if(!el('privacyConsent').checked){
           toast('Marque a concordância com a Política de Privacidade e os Termos de Uso.');
           el('privacyConsent').focus();
           return;
         }
-        state.privacyAcknowledged=true;
-        state.registered=false;
-        state.awaitingWhatsapp=true;
-        state.whatsappOpened=false;
-        state.registration={
-          name:el('regName').value.trim(),
-          email:el('regEmail').value.trim(),
-          whatsapp:el('regWhatsapp').value.trim(),
-          privacyAccepted:true,
-          privacyVersion:state.privacyVersion,
-          privacyAcceptedAt:new Date().toISOString(),
-          marketing:el('marketingConsent').checked,
-          marketingAcceptedAt:el('marketingConsent').checked ? new Date().toISOString() : null,
-          createdAt:new Date().toISOString()
-        };
-        saveState();
-        closeModal('registerModal', true);
-        renderAccessGate();
-        openModal('accessModal');
+
+        const form=e.currentTarget;
+        const submitButton=el('registerSubmitBtn');
+        const status=el('registrationSubmitStatus');
+        const originalLabel=submitButton.textContent;
+        const leadId=form.dataset.leadId||cryptoId();
+        const createdAt=new Date().toISOString();
+        const privacyAcceptedAt=createdAt;
+        const marketing=el('marketingConsent').checked;
+
+        form.dataset.leadId=leadId;
+        fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt,marketing});
+
+        submitButton.disabled=true;
+        submitButton.textContent='Salvando seu cadastro...';
+        status.className='registration-submit-status sending';
+        status.textContent='Aguarde. Estamos registrando seus dados com segurança.';
+
+        try{
+          await submitRegistrationToNetlify(form);
+
+          state.privacyAcknowledged=true;
+          state.registered=false;
+          state.awaitingWhatsapp=true;
+          state.whatsappOpened=false;
+          state.registration={
+            leadId,
+            name:el('regName').value.trim(),
+            email:el('regEmail').value.trim(),
+            whatsapp:el('regWhatsapp').value.trim(),
+            goal:state.goal||'',
+            examDate:state.examDate||'',
+            privacyAccepted:true,
+            privacyVersion:CURRENT_PRIVACY_VERSION,
+            privacyAcceptedAt,
+            marketing,
+            marketingAcceptedAt:marketing ? createdAt : null,
+            createdAt,
+            netlifyCapturedAt:new Date().toISOString()
+          };
+          saveState();
+
+          status.className='registration-submit-status success';
+          status.textContent='Cadastro recebido. Abrindo a etapa do WhatsApp...';
+          closeModal('registerModal', true);
+          renderAccessGate();
+          openModal('accessModal');
+        }catch(error){
+          console.error('Falha ao salvar cadastro:',error);
+          status.className='registration-submit-status error';
+          status.textContent='Não foi possível registrar seu cadastro. Verifique sua conexão e tente novamente.';
+          toast('O cadastro não foi enviado. Tente novamente para continuar.');
+        }finally{
+          submitButton.disabled=false;
+          submitButton.textContent=originalLabel;
+        }
       };
       el('accessWhatsappBtn').onclick=()=>{
-        const msg='Olá, prof. Lucas MPC. Fiz meu cadastro na plataforma Gerador de Cronograma MPC e gostaria de liberar meu acesso gratuito.';
+        const msg=accessWhatsappMessage();
         state.whatsappOpened=true;
         saveState();
         renderAccessGate();
         window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
-        toast('Envie a mensagem e retorne para confirmar.');
+        toast('Envie a mensagem preenchida e retorne para confirmar.');
       };
       el('accessConfirmBtn').onclick=()=>{
         if(!state.whatsappOpened){
@@ -3407,7 +3565,7 @@
         whatsappOpened:false,
         registration:state.registration ? {...state.registration} : null,
         privacyAcknowledged:Boolean(state.privacyAcknowledged),
-        privacyVersion:state.privacyVersion || '1.0-2026-08-03',
+        privacyVersion:CURRENT_PRIVACY_VERSION,
         credits:Number.isFinite(state.credits) ? state.credits : 20,
         totalAiUses:Number.isFinite(state.totalAiUses) ? state.totalAiUses : 0,
         sharePackages:Number.isFinite(state.sharePackages) ? state.sharePackages : 0,
