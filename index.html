@@ -996,6 +996,18 @@
       padding-top: 4px;
     }
     .access-confirm-area[hidden] { display: none !important; }
+    .access-code-field {
+      margin: 14px 0 12px;
+      text-align: left;
+    }
+    .access-code-field input {
+      width: 100%;
+      min-height: 56px;
+      text-align: center;
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: .28em;
+    }
     .access-number {
       margin: 0;
       text-align: center;
@@ -1069,6 +1081,7 @@
     .export-choice strong { display: block; margin-bottom: 5px; }
     .export-choice small { display: block; color: var(--muted); line-height: 1.45; }
     .print-title { display: none; }
+    .print-document-footer { display: none; }
 
     .notice { padding: 13px 15px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); line-height: 1.45; }
     .notice.success { background: var(--success-bg); border-color: var(--success); }
@@ -1236,9 +1249,67 @@
     @media print {
       @page { size: A4 landscape; margin: 10mm; }
       .topbar, .hero, .course-banner, .sidebar, .toolbar, .ai-panel, .tools-button, .footer-ad, footer, .add-task, .task-actions, .modal-backdrop { display: none !important; }
-      .print-title { display: block !important; margin: 0 0 14px; color: #07152b; }
+      .print-title {
+        display: block !important;
+        margin: 0 0 14px;
+        color: #07152b;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .print-header-main {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 0 0 10px;
+        border-bottom: 2px solid #d6a928;
+      }
+      .print-heading { min-width: 0; }
       .print-title h1 { margin: 0 0 4px; font-size: 22pt; }
       .print-title p { margin: 0; color: #45546a; }
+      .print-document-footer {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        margin-top: 18px;
+        padding-top: 12px;
+        border-top: 1.5px solid #d6a928;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        color: #334155;
+      }
+      .print-document-footer-copy {
+        min-width: 0;
+        font-size: 8.5pt;
+        line-height: 1.35;
+      }
+      .print-document-footer-copy strong {
+        display: block;
+        color: #07152b;
+        font-size: 9.5pt;
+      }
+      .print-generator-cta {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        min-width: 235px;
+        min-height: 44px;
+        padding: 8px 15px;
+        border: 1.5px solid #8a6800;
+        border-radius: 9px;
+        background: #d6a928 !important;
+        color: #07152b !important;
+        text-decoration: none !important;
+        text-align: center;
+        font-size: 10.5pt;
+        font-weight: 900;
+        line-height: 1.15;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .print-generator-cta[href]::after { content: none !important; }
       body { background: #fff; color: #07152b; }
       .container { max-width: none; padding: 0; }
       .layout { display: block; }
@@ -1428,8 +1499,12 @@
 
         <section class="card tool-destination" id="scheduleCard">
           <div class="print-title">
-            <h1>Gerador de Cronograma MPC</h1>
-            <p id="printSubtitle">Cronograma de estudos para concursos</p>
+            <div class="print-header-main">
+              <div class="print-heading">
+                <h1>Gerador de Cronograma MPC</h1>
+                <p id="printSubtitle">Cronograma de estudos para concursos</p>
+              </div>
+            </div>
           </div>
           <div class="section-title">
             <div>
@@ -1484,6 +1559,22 @@
           <div class="section-title"><h2>Resumo inteligente</h2><button class="btn btn-secondary btn-small" id="refreshInsightsBtn">Atualizar</button></div>
           <div class="insights" id="insights"></div>
         </section>
+
+        <div class="print-document-footer">
+          <div class="print-document-footer-copy">
+            <strong>Gerado pelo Gerador de Cronograma MPC</strong>
+            Organize gratuitamente seus estudos para concursos em diferentes formatos.
+          </div>
+          <a
+            class="print-generator-cta"
+            href="https://gerador-de-cronograma-mpc.netlify.app/?utm_source=pdf&utm_medium=cronograma&utm_campaign=compartilhamento_professores"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Criar gratuitamente um cronograma de estudos no Gerador de Cronograma MPC"
+          >
+            Crie também seu cronograma gratuitamente
+          </a>
+        </div>
       </section>
     </div>
 
@@ -1805,7 +1896,7 @@
 
         <section>
           <h3>5. Cadastro obrigatório e escolha do usuário</h3>
-          <p>Depois de cinco ações, o cadastro e o direcionamento ao WhatsApp são apresentados como condição para continuar usando gratuitamente a plataforma. O cadastro precisa ser recebido pela plataforma antes de o usuário avançar para a etapa do WhatsApp.</p>
+          <p>Depois de cinco ações, o cadastro e o direcionamento ao WhatsApp são apresentados como condição para continuar usando gratuitamente a plataforma. O cadastro precisa ser recebido pela plataforma antes de o usuário avançar para a etapa do WhatsApp. A continuidade do acesso pode depender do recebimento e da validação de uma senha enviada pelo Prof. Lucas MPC.</p>
           <p>A autorização para comunicações promocionais é independente, opcional e não vem marcada previamente.</p>
         </section>
 
@@ -1894,6 +1985,7 @@
           <label>Não preencha este campo: <input name="bot-field" autocomplete="off"></label>
         </p>
         <input type="hidden" name="lead_id" id="leadId">
+        <input type="hidden" name="codigo_liberacao" id="leadUnlockCode">
         <input type="hidden" name="concurso_objetivo" id="leadGoal">
         <input type="hidden" name="data_prova" id="leadExamDate">
         <input type="hidden" name="marketing_autorizado" id="leadMarketing">
@@ -1963,25 +2055,39 @@
           Agora envie a mensagem ao Prof. Lucas MPC pelo WhatsApp.
         </div>
         <div class="access-steps">
-          <div class="access-step"><strong>1</strong><span>Clique no botão <strong>“Abrir WhatsApp e enviar mensagem”</strong>.</span></div>
-          <div class="access-step"><strong>2</strong><span>Envie a mensagem que já estará preenchida.</span></div>
-          <div class="access-step"><strong>3</strong><span>Retorne a esta página e confirme o envio para liberar a plataforma.</span></div>
+          <div class="access-step"><strong>1</strong><span>Clique em <strong>“Abrir WhatsApp e solicitar código”</strong>.</span></div>
+          <div class="access-step"><strong>2</strong><span>Envie a mensagem que já estará preenchida com seu código de cadastro.</span></div>
+          <div class="access-step"><strong>3</strong><span>Aguarde o Prof. Lucas MPC responder com uma senha de 6 números.</span></div>
+          <div class="access-step"><strong>4</strong><span>Retorne a esta página, digite a senha e libere seu acesso.</span></div>
         </div>
         <p class="access-warning">
-          A plataforma permanecerá bloqueada enquanto esta etapa não for concluída.
+          O acesso permanecerá bloqueado até a senha correta ser informada.
         </p>
         <div class="modal-actions">
           <button class="btn btn-primary" id="accessWhatsappBtn" type="button">
-            Abrir WhatsApp e enviar mensagem
+            Abrir WhatsApp e solicitar código
           </button>
         </div>
         <div class="access-confirm-area" id="accessConfirmArea" hidden>
           <div class="notice success">
-            Depois de enviar a mensagem no WhatsApp, confirme abaixo.
+            Depois de enviar a mensagem, aguarde a resposta do Prof. Lucas MPC com sua senha de liberação.
           </div>
-          <button class="btn btn-dark" id="accessConfirmBtn" type="button">
-            Já enviei a mensagem — liberar acesso
+          <div class="field access-code-field">
+            <label for="accessCodeInput">Senha de liberação</label>
+            <input
+              id="accessCodeInput"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              placeholder="Digite os 6 números"
+            >
+          </div>
+          <button class="btn btn-dark" id="accessCodeBtn" type="button">
+            Validar senha e liberar acesso
           </button>
+          <p class="registration-submit-status" id="accessCodeStatus" role="status" aria-live="polite"></p>
         </div>
         <p class="access-number">Prof. Lucas MPC: (11) 96018-9699</p>
       </div>
@@ -1992,7 +2098,7 @@
   (() => {
     'use strict';
     const STORAGE_KEY = 'geradorCronogramaMpcData';
-    const DATA_SCHEMA_VERSION = 3;
+    const DATA_SCHEMA_VERSION = 4;
     const CURRENT_PRIVACY_VERSION = '1.3-2026-08-04';
     const LEGACY_STORAGE_KEYS = ['cronogramaLucasMpcV11'];
     const TUTORIAL_SESSION_KEY = 'cronogramaTutorialAbertoNestaSessaoV2';
@@ -2071,6 +2177,11 @@
           dataSchemaVersion: DATA_SCHEMA_VERSION,
           privacyVersion: CURRENT_PRIVACY_VERSION
         };
+        if(loaded.awaitingWhatsapp && !loaded.registration?.unlockCodeHash){
+          loaded.awaitingWhatsapp=false;
+          loaded.whatsappOpened=false;
+          loaded.registered=false;
+        }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(loaded));
         return loaded;
       } catch {
@@ -2121,8 +2232,28 @@
     function renderAccessGate(){
       const confirmArea=el('accessConfirmArea');
       if(confirmArea) confirmArea.hidden=!state.whatsappOpened;
+      const input=el('accessCodeInput');
+      const status=el('accessCodeStatus');
+      if(input && !state.whatsappOpened) input.value='';
+      if(status && !state.whatsappOpened){
+        status.textContent='';
+        status.className='registration-submit-status';
+      }
     }
 
+
+    function createUnlockCode(){
+      const values=new Uint32Array(1);
+      crypto.getRandomValues(values);
+      return String(100000 + (values[0] % 900000));
+    }
+
+    async function hashUnlockCode(value){
+      const normalized=String(value||'').replace(/\D/g,'').slice(0,6);
+      const bytes=new TextEncoder().encode(normalized);
+      const digest=await crypto.subtle.digest('SHA-256',bytes);
+      return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
+    }
 
     function registrationDevice(){
       const ua=navigator.userAgent||'';
@@ -2141,11 +2272,12 @@
       return 'Acesso direto ou origem não informada';
     }
 
-    function fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt,marketing}){
+    function fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt,marketing,unlockCode}){
       collectSettings();
       const params=new URLSearchParams(location.search);
       const values={
         leadId,
+        leadUnlockCode:unlockCode,
         leadGoal:state.goal||'Não informado',
         leadExamDate:state.examDate||'Não informada',
         leadMarketing:marketing?'Sim':'Não',
@@ -2185,11 +2317,11 @@
       const registration=state.registration||{};
       const lines=[
         `Olá, Prof. Lucas MPC. Meu nome é ${registration.name||'aluno(a)'}.`,
-        'Cadastrei-me no Gerador de Cronograma MPC e gostaria de liberar meu acesso gratuito.'
+        'Cadastrei-me no Gerador de Cronograma MPC e gostaria de receber minha senha de liberação.',
+        `Código do cadastro: ${registration.leadId||'não informado'}.`
       ];
       if(registration.goal) lines.push(`Meu concurso ou objetivo é: ${registration.goal}.`);
       if(registration.email) lines.push(`Meu e-mail é ${registration.email}.`);
-      if(registration.whatsapp) lines.push(`Meu WhatsApp informado no cadastro é ${registration.whatsapp}.`);
       return lines.join('\n');
     }
 
@@ -2775,7 +2907,7 @@
       document.title='Cronograma de Estudos - Prof. Lucas MPC';
       const restore=()=>{document.title=oldTitle;};
       window.addEventListener('afterprint',restore,{once:true});
-      toast('Na janela seguinte, escolha “Salvar como PDF”.');
+      toast('Na janela seguinte, escolha “Salvar como PDF”. O botão do Gerador de Cronograma MPC ficará clicável no rodapé.');
       setTimeout(()=>{
         window.print();
         setTimeout(restore,1500);
@@ -3481,9 +3613,11 @@
         const createdAt=new Date().toISOString();
         const privacyAcceptedAt=createdAt;
         const marketing=el('marketingConsent').checked;
+        const unlockCode=createUnlockCode();
+        const unlockCodeHash=await hashUnlockCode(unlockCode);
 
         form.dataset.leadId=leadId;
-        fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt,marketing});
+        fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt,marketing,unlockCode});
 
         submitButton.disabled=true;
         submitButton.textContent='Salvando seu cadastro...';
@@ -3499,6 +3633,7 @@
           state.whatsappOpened=false;
           state.registration={
             leadId,
+            unlockCodeHash,
             name:el('regName').value.trim(),
             email:el('regEmail').value.trim(),
             whatsapp:el('regWhatsapp').value.trim(),
@@ -3535,20 +3670,40 @@
         saveState();
         renderAccessGate();
         window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
-        toast('Envie a mensagem preenchida e retorne para confirmar.');
+        toast('Envie a mensagem e aguarde sua senha de liberação.');
       };
-      el('accessConfirmBtn').onclick=()=>{
+      el('accessCodeInput').addEventListener('input',event=>{
+        event.target.value=event.target.value.replace(/\D/g,'').slice(0,6);
+      });
+      el('accessCodeBtn').onclick=async()=>{
+        const input=el('accessCodeInput');
+        const status=el('accessCodeStatus');
+        const code=input.value.replace(/\D/g,'');
         if(!state.whatsappOpened){
           toast('Primeiro abra o WhatsApp e envie a mensagem.');
+          return;
+        }
+        if(code.length!==6){
+          status.className='registration-submit-status error';
+          status.textContent='Digite a senha completa de 6 números.';
+          input.focus();
+          return;
+        }
+        const informedHash=await hashUnlockCode(code);
+        if(!state.registration?.unlockCodeHash || informedHash!==state.registration.unlockCodeHash){
+          status.className='registration-submit-status error';
+          status.textContent='Senha incorreta. Confira a resposta enviada pelo Prof. Lucas MPC.';
+          input.select();
           return;
         }
         state.registered=true;
         state.awaitingWhatsapp=false;
         state.whatsappOpened=false;
+        state.registration.unlockedAt=new Date().toISOString();
         saveState();
         closeModal('accessModal', true);
         setAccessLock(false);
-        toast('Acesso gratuito liberado neste navegador.');
+        toast('Senha correta. Acesso gratuito liberado neste navegador.');
       };
       el('toolsButton').onclick=()=>openModal('toolsModal');
       document.querySelectorAll('[data-tool-action]').forEach(item=>{
