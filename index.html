@@ -1273,6 +1273,66 @@
       .admin-view-switch .btn { flex: 1; }
     }
 
+
+    .admin-inline-field { display: flex; align-items: stretch; gap: 8px; }
+    .admin-inline-field input { min-width: 0; flex: 1; }
+    .admin-secondary-grid { grid-template-columns: 1fr 1fr; }
+    .admin-simulation-fields { margin-top: 14px; }
+    .admin-simulation-fields[hidden] { display: none !important; }
+    .admin-subjects-card { display: grid; gap: 14px; }
+    .admin-subjects-list { display: grid; gap: 14px; }
+    .admin-subject-card {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 8px 26px rgba(1,8,23,.06);
+    }
+    .admin-subject-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .admin-subject-head h4 { margin: 0; font-size: 1.02rem; }
+    .admin-subject-grid {
+      display: grid;
+      grid-template-columns: minmax(180px,1.25fr) minmax(160px,.8fr) minmax(160px,.8fr);
+      gap: 12px;
+    }
+    .admin-subject-topics { width: 100%; min-height: 190px; resize: vertical; }
+    .admin-subject-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: .84rem;
+    }
+    .admin-difficulty-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 27px;
+      padding: 4px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface-2);
+      font-weight: 800;
+    }
+    .admin-capacity-error { color: var(--danger); font-weight: 800; }
+    .admin-capacity-ok { color: var(--success); font-weight: 800; }
+    @media (max-width: 900px) {
+      .admin-secondary-grid { grid-template-columns: 1fr; }
+      .admin-subject-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .admin-inline-field { flex-direction: column; }
+      .admin-inline-field .btn { width: 100%; }
+      .admin-subject-head, .admin-subject-footer { align-items: stretch; flex-direction: column; }
+    }
+
     @media (max-width: 1100px) {
       .layout { grid-template-columns: 1fr; }
       .sidebar { position: static; grid-template-columns: 1fr 1fr; }
@@ -1547,8 +1607,8 @@
       <div class="admin-panel-head">
         <div>
           <div class="eyebrow">Área exclusiva do Prof. Lucas MPC</div>
-          <h2 id="adminPanelTitle">Criar cronograma a partir de tópicos</h2>
-          <p>Cole o conteúdo da matéria, revise os tópicos e gere automaticamente o planejamento do aluno.</p>
+          <h2 id="adminPanelTitle">Criar cronograma personalizado</h2>
+          <p>Cadastre as matérias, os assuntos, as dificuldades e as regras do planejamento antes de gerar o cronograma.</p>
         </div>
         <div class="admin-panel-actions">
           <button class="btn btn-outline" id="adminPreviewStudentBtn" type="button">Ver como aluno</button>
@@ -1557,25 +1617,21 @@
       </div>
 
       <div class="admin-security-note">
-        Esta versão usa uma URL administrativa e um PIN armazenado somente neste navegador.
-        Ela separa a experiência do aluno, mas não substitui autenticação de servidor para acesso seguro em vários dispositivos.
+        A área administrativa é acessada pela URL privada com <strong>?admin=1</strong> e pelo PIN deste navegador.
+        Os cronogramas criados aqui recebem uma página inicial personalizada no PDF.
       </div>
 
       <div class="admin-form-grid">
         <section class="admin-card">
-          <h3>1. Dados do aluno e do planejamento</h3>
+          <h3>1. Aluno, prova e duração do cronograma</h3>
           <div class="form-grid">
             <div class="field">
               <label for="adminStudentName">Nome do aluno</label>
-              <input id="adminStudentName" type="text" placeholder="Ex.: Carlos Pereira">
+              <input id="adminStudentName" type="text" placeholder="Ex.: Rafael Gayer Santos Martins">
             </div>
             <div class="field">
               <label for="adminGoal">Concurso ou objetivo</label>
               <input id="adminGoal" type="text" placeholder="Ex.: Soldado PM-SP">
-            </div>
-            <div class="field">
-              <label for="adminSubject">Disciplina</label>
-              <input id="adminSubject" type="text" placeholder="Ex.: Matemática">
             </div>
             <div class="field">
               <label for="adminScheduleStyle">Tipo de cronograma</label>
@@ -1583,37 +1639,40 @@
                 <option value="checklist">Checklist de estudos</option>
                 <option value="cycle">Cronograma por ciclos</option>
                 <option value="weekly">Cronograma semanal</option>
-                <option value="monthly">Cronograma mensal</option>
+                <option value="monthly">Cronograma por quantidade de dias</option>
               </select>
+            </div>
+            <div class="field">
+              <label for="adminPlanDays">Quantidade de dias do cronograma</label>
+              <div class="admin-inline-field">
+                <input id="adminPlanDays" type="number" min="1" max="730" step="1" value="40" inputmode="numeric">
+                <button class="btn btn-secondary btn-small" id="adminCalculateDaysBtn" type="button">Usar dias até a prova</button>
+              </div>
+              <span class="helper" id="adminDaysAvailable">Informe as datas para calcular o período.</span>
             </div>
             <div class="field">
               <label for="adminStartDate">Data inicial</label>
               <input id="adminStartDate" type="date">
             </div>
             <div class="field">
-              <label for="adminExamDate">Data final ou prova</label>
+              <label for="adminExamDate">Data da prova</label>
               <input id="adminExamDate" type="date">
             </div>
             <div class="field">
-              <label for="adminHoursPerDay">Horas por dia</label>
-              <input id="adminHoursPerDay" type="number" min="0.5" max="12" step="0.5" value="2">
+              <label for="adminHoursPerDay">Horas disponíveis por dia</label>
+              <input id="adminHoursPerDay" type="number" min="0.25" max="16" step="0.25" value="2">
             </div>
             <div class="field">
-              <label for="adminSessionMinutes">Duração da sessão</label>
-              <select id="adminSessionMinutes">
-                <option value="30">30 minutos</option>
-                <option value="45">45 minutos</option>
-                <option value="60" selected>60 minutos</option>
-                <option value="90">90 minutos</option>
-                <option value="120">120 minutos</option>
-              </select>
+              <label for="adminSessionMinutes">Duração-base da sessão (minutos)</label>
+              <input id="adminSessionMinutes" type="number" min="5" max="720" step="5" value="60" inputmode="numeric">
+              <span class="helper">Serve como referência ao adicionar uma matéria. Cada matéria poderá ter outro tempo.</span>
             </div>
             <div class="field">
               <label for="adminPreferredStart">Horário inicial</label>
               <input id="adminPreferredStart" type="time" value="19:00">
             </div>
             <div class="field full">
-              <label>Dias disponíveis</label>
+              <label>Dias disponíveis para estudo regular</label>
               <div class="days admin-days" id="adminAvailableDays">
                 <label class="day-check"><input type="checkbox" value="0" checked><span>Seg</span></label>
                 <label class="day-check"><input type="checkbox" value="1" checked><span>Ter</span></label>
@@ -1628,61 +1687,132 @@
         </section>
 
         <section class="admin-card">
-          <h3>2. Estrutura de cada tópico</h3>
-          <div class="admin-options">
-            <label><input id="adminIncludeTheory" type="checkbox" checked> Teoria</label>
-            <label><input id="adminIncludeExercises" type="checkbox" checked> Exercícios</label>
-            <label><input id="adminIncludeReviews" type="checkbox" checked> Revisões periódicas</label>
-            <label><input id="adminIncludeSimulations" type="checkbox"> Simulados</label>
-            <label><input id="adminReplaceSchedule" type="checkbox" checked> Substituir o cronograma atual</label>
-          </div>
-          <div class="admin-rule-box">
-            <strong>Distribuição automática</strong>
-            <span>Cada tópico selecionado entra no cronograma. As atividades são distribuídas nas datas e horários disponíveis.</span>
+          <h3>2. Critérios usados na personalização</h3>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="adminWorkSchedule">Horário de trabalho e rotina</label>
+              <input id="adminWorkSchedule" type="text" placeholder="Ex.: trabalha das 8h às 17h e chega em casa às 18h">
+            </div>
+            <div class="field full">
+              <label for="adminStudyMaterial">Material utilizado na preparação</label>
+              <input id="adminStudyMaterial" type="text" placeholder="Ex.: Academia da Matemática, PDFs e questões da Vunesp">
+            </div>
+            <div class="field">
+              <label for="adminExamLevel">Nível da prova</label>
+              <select id="adminExamLevel">
+                <option value="">Não informado</option>
+                <option value="baixo">Baixo</option>
+                <option value="medio">Médio</option>
+                <option value="alto">Alto</option>
+                <option value="muito_alto">Muito alto</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="adminCompetitionLevel">Nível de concorrência</label>
+              <select id="adminCompetitionLevel">
+                <option value="">Não informado</option>
+                <option value="baixa">Baixa</option>
+                <option value="media">Média</option>
+                <option value="alta">Alta</option>
+                <option value="muito_alta">Muito alta</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="adminSalary">Salário ou remuneração do cargo</label>
+              <input id="adminSalary" type="text" placeholder="Ex.: R$ 5.000,00">
+            </div>
+            <div class="field">
+              <label for="adminBoardStyle">Banca organizadora e estilo</label>
+              <input id="adminBoardStyle" type="text" placeholder="Ex.: Vunesp - questões objetivas e contextualizadas">
+            </div>
+            <div class="field full">
+              <label for="adminExtraCriteria">Outros critérios relevantes</label>
+              <textarea id="adminExtraCriteria" rows="3" placeholder="Ex.: tempo de deslocamento, filhos, curso presencial, necessidade de reforço em determinadas matérias"></textarea>
+            </div>
           </div>
         </section>
       </div>
 
-      <section class="admin-card admin-topics-card">
-        <div class="section-title">
-          <div>
-            <h3>3. Cole o conteúdo da matéria</h3>
-            <p class="helper">A ferramenta reconhece tópicos separados por linhas, marcadores, números ou ponto e vírgula.</p>
+      <div class="admin-form-grid admin-secondary-grid">
+        <section class="admin-card">
+          <h3>3. Estrutura das atividades</h3>
+          <div class="admin-options">
+            <label><input id="adminIncludeTheory" type="checkbox" checked> Criar sessões de teoria</label>
+            <label><input id="adminIncludeExercises" type="checkbox" checked> Criar sessões de exercícios</label>
+            <label><input id="adminIncludeReviews" type="checkbox" checked> Criar revisão após cada 3 tópicos da matéria</label>
+            <label><input id="adminReplaceSchedule" type="checkbox" checked> Substituir o cronograma atual</label>
           </div>
-          <div class="toolbar">
-            <button class="btn btn-primary btn-small" id="adminParseTopicsBtn" type="button">Organizar tópicos</button>
-            <button class="btn btn-secondary btn-small" id="adminClearTopicsBtn" type="button">Limpar</button>
+          <div class="admin-rule-box">
+            <strong>Alternância automática</strong>
+            <span>As matérias serão alternadas ao longo dos dias. A duração de cada sessão obedecerá ao tempo configurado em cada matéria.</span>
           </div>
-        </div>
-        <textarea
-          id="adminTopicsInput"
-          class="admin-topics-input"
-          rows="10"
-          placeholder="Exemplo:&#10;1. Operações com números inteiros&#10;2. Frações&#10;3. Razão e proporção&#10;4. Regra de três&#10;5. Porcentagem"
-        ></textarea>
-      </section>
+        </section>
 
-      <section class="admin-card admin-review-card">
+        <section class="admin-card">
+          <h3>4. Dias exclusivos para simulados</h3>
+          <div class="admin-options">
+            <label><input id="adminSimulationEnabled" type="checkbox"> Reservar dias somente para simulados</label>
+          </div>
+          <div class="form-grid admin-simulation-fields" id="adminSimulationFields" hidden>
+            <div class="field">
+              <label for="adminSimulationMode">Periodicidade</label>
+              <select id="adminSimulationMode">
+                <option value="interval_days">A cada determinada quantidade de dias</option>
+                <option value="weekday_occurrence">A cada determinada ocorrência de um dia da semana</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="adminSimulationInterval">Repetir a cada</label>
+              <input id="adminSimulationInterval" type="number" min="1" max="365" step="1" value="15" inputmode="numeric">
+              <span class="helper" id="adminSimulationIntervalHelp">Ex.: 15 = um simulado a cada 15 dias.</span>
+            </div>
+            <div class="field" id="adminSimulationWeekdayField" hidden>
+              <label for="adminSimulationWeekday">Dia da semana</label>
+              <select id="adminSimulationWeekday">
+                <option value="0">Segunda-feira</option>
+                <option value="1">Terça-feira</option>
+                <option value="2">Quarta-feira</option>
+                <option value="3">Quinta-feira</option>
+                <option value="4">Sexta-feira</option>
+                <option value="5">Sábado</option>
+                <option value="6" selected>Domingo</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="adminSimulationMinutes">Duração do simulado (minutos)</label>
+              <input id="adminSimulationMinutes" type="number" min="10" max="720" step="5" value="240" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="adminSimulationStart">Horário do simulado</label>
+              <input id="adminSimulationStart" type="time" value="08:00">
+            </div>
+          </div>
+          <div class="admin-rule-box">
+            <strong>Reserva integral do dia</strong>
+            <span>Nas datas escolhidas, o gerador não colocará teoria, exercícios ou revisões. O dia ficará exclusivo para o simulado.</span>
+          </div>
+        </section>
+      </div>
+
+      <section class="admin-card admin-subjects-card">
         <div class="section-title">
           <div>
-            <h3>4. Revise os tópicos detectados</h3>
-            <p class="helper"><span id="adminTopicCount">0</span> tópicos selecionados.</p>
+            <h3>5. Matérias e assuntos cobrados</h3>
+            <p class="helper">Adicione uma matéria por vez. Em seguida, cole os temas cobrados e ajuste a dificuldade e a duração da sessão.</p>
           </div>
-          <button class="btn btn-secondary btn-small" id="adminAddTopicBtn" type="button">Adicionar tópico</button>
+          <button class="btn btn-primary btn-small" id="adminAddSubjectBtn" type="button">Adicionar outra matéria</button>
         </div>
-        <div class="admin-topic-list" id="adminTopicList">
-          <div class="empty">Cole o conteúdo acima e clique em “Organizar tópicos”.</div>
-        </div>
+        <div class="admin-subjects-list" id="adminSubjectsList"></div>
       </section>
 
       <section class="admin-card admin-generate-card">
         <div>
-          <h3>5. Gere o cronograma do aluno</h3>
-          <p class="helper">Depois da geração, use “Ver como aluno” para revisar e baixar o PDF.</p>
+          <h3>6. Gere o cronograma personalizado</h3>
+          <p class="helper" id="adminCapacityPreview">Preencha os dados para verificar a capacidade do período.</p>
           <p class="admin-generation-status" id="adminGenerationStatus" role="status" aria-live="polite"></p>
         </div>
         <button class="btn btn-primary admin-generate-button" id="adminGenerateScheduleBtn" type="button">
-          Gerar cronograma por tópicos
+          Gerar cronograma personalizado
         </button>
       </section>
     </section>
@@ -1728,14 +1858,9 @@
               <input id="hoursPerDay" type="number" min="0.5" max="12" step="0.5" value="2">
             </div>
             <div class="field">
-              <label for="sessionMinutes">Sessão padrão</label>
-              <select id="sessionMinutes">
-                <option value="30">30 minutos</option>
-                <option value="45">45 minutos</option>
-                <option value="60" selected>60 minutos</option>
-                <option value="90">90 minutos</option>
-                <option value="120">120 minutos</option>
-              </select>
+              <label for="sessionMinutes">Duração da sessão (minutos)</label>
+              <input id="sessionMinutes" type="number" min="5" max="720" step="5" value="60" inputmode="numeric">
+              <span class="helper">Digite livremente a duração desejada.</span>
             </div>
             <div class="field">
               <label for="preferredStart">Início preferido</label>
@@ -2454,7 +2579,7 @@
   (() => {
     'use strict';
     const STORAGE_KEY = 'geradorCronogramaMpcData';
-    const DATA_SCHEMA_VERSION = 7;
+    const DATA_SCHEMA_VERSION = 8;
     const CURRENT_PRIVACY_VERSION = '1.3-2026-08-04';
     const LEGACY_STORAGE_KEYS = ['cronogramaLucasMpcV11'];
     const TUTORIAL_SESSION_KEY = 'cronogramaTutorialAbertoNestaSessaoV2';
@@ -2486,6 +2611,9 @@
       privacyVersion: CURRENT_PRIVACY_VERSION,
       registration: null,
       studentName: '',
+      adminGenerated: false,
+      adminPlanDays: 0,
+      adminPersonalization: null,
       goal: '', examDate: '', hoursPerDay: 2, sessionMinutes: 60, preferredStart: '19:00',
       availableDays: [0,1,2,3,4],
       subjects: [
@@ -2517,7 +2645,7 @@
     let lastTrackedInteraction = 0;
     let monthOffset = 0;
     let taskDateContext = '';
-    let adminTopics = [];
+    let adminSubjects = [];
     let adminModeActive = false;
 
 
@@ -2601,21 +2729,32 @@
       return {
         studentName:el('adminStudentName')?.value.trim()||'',
         goal:el('adminGoal')?.value.trim()||'',
-        subject:el('adminSubject')?.value.trim()||'',
         scheduleStyle:el('adminScheduleStyle')?.value||'weekly',
+        planDays:Math.max(1,Number(el('adminPlanDays')?.value)||40),
         startDate:el('adminStartDate')?.value||'',
         examDate:el('adminExamDate')?.value||'',
-        hoursPerDay:Number(el('adminHoursPerDay')?.value)||2,
-        sessionMinutes:Number(el('adminSessionMinutes')?.value)||60,
+        hoursPerDay:Math.max(.25,Number(el('adminHoursPerDay')?.value)||2),
+        sessionMinutes:Math.max(5,Number(el('adminSessionMinutes')?.value)||60),
         preferredStart:el('adminPreferredStart')?.value||'19:00',
         availableDays:[...document.querySelectorAll('#adminAvailableDays input:checked')].map(input=>Number(input.value)),
+        workSchedule:el('adminWorkSchedule')?.value.trim()||'',
+        studyMaterial:el('adminStudyMaterial')?.value.trim()||'',
+        examLevel:el('adminExamLevel')?.value||'',
+        competitionLevel:el('adminCompetitionLevel')?.value||'',
+        salary:el('adminSalary')?.value.trim()||'',
+        boardStyle:el('adminBoardStyle')?.value.trim()||'',
+        extraCriteria:el('adminExtraCriteria')?.value.trim()||'',
         includeTheory:Boolean(el('adminIncludeTheory')?.checked),
         includeExercises:Boolean(el('adminIncludeExercises')?.checked),
         includeReviews:Boolean(el('adminIncludeReviews')?.checked),
-        includeSimulations:Boolean(el('adminIncludeSimulations')?.checked),
         replaceSchedule:Boolean(el('adminReplaceSchedule')?.checked),
-        topics:adminTopics.map(topic=>({...topic})),
-        rawText:el('adminTopicsInput')?.value||''
+        simulationEnabled:Boolean(el('adminSimulationEnabled')?.checked),
+        simulationMode:el('adminSimulationMode')?.value||'interval_days',
+        simulationInterval:Math.max(1,Number(el('adminSimulationInterval')?.value)||15),
+        simulationWeekday:Number(el('adminSimulationWeekday')?.value??6),
+        simulationMinutes:Math.max(10,Number(el('adminSimulationMinutes')?.value)||240),
+        simulationStart:el('adminSimulationStart')?.value||'08:00',
+        subjects:adminSubjects.map(subject=>({...subject}))
       };
     }
 
@@ -2632,6 +2771,65 @@
       return localDateKey(new Date());
     }
 
+    function dateFromKey(value){
+      const date=value?new Date(`${value}T12:00:00`):null;
+      return date && !Number.isNaN(date.getTime()) ? date : null;
+    }
+
+    function addCalendarDays(date,amount){
+      const result=new Date(date);
+      result.setDate(result.getDate()+amount);
+      return result;
+    }
+
+    function calendarDaysBetween(start,end){
+      if(!start||!end) return 0;
+      return Math.floor((end-start)/86400000)+1;
+    }
+
+    function daysUntilExam(start,exam){
+      if(!start||!exam||exam<=start) return 0;
+      return Math.max(0,Math.round((exam-start)/86400000));
+    }
+
+    function adminDifficultyMeta(value){
+      return ({
+        muito_dificil:{label:'Muita dificuldade',multiplier:1.5,level:'iniciante'},
+        dificil:{label:'Dificuldade',multiplier:1.25,level:'iniciante'},
+        intermediario:{label:'Intermediário',multiplier:1,level:'intermediario'},
+        facil:{label:'Facilidade',multiplier:.8,level:'avancado'},
+        muito_facil:{label:'Muita facilidade',multiplier:.65,level:'avancado'}
+      })[value]||{label:'Intermediário',multiplier:1,level:'intermediario'};
+    }
+
+    function adminSuggestedSession(difficulty,baseMinutes){
+      const value=Math.round((Math.max(5,Number(baseMinutes)||60)*adminDifficultyMeta(difficulty).multiplier)/5)*5;
+      return Math.max(5,value);
+    }
+
+    function newAdminSubject(partial={}){
+      const difficulty=partial.difficulty||'intermediario';
+      const base=Math.max(5,Number(el('adminSessionMinutes')?.value)||60);
+      return {
+        id:partial.id||cryptoId(),
+        name:String(partial.name||'').trim(),
+        difficulty,
+        sessionMinutes:Math.max(5,Number(partial.sessionMinutes)||adminSuggestedSession(difficulty,base)),
+        topicsText:String(partial.topicsText||partial.rawText||'')
+      };
+    }
+
+    function migrateLegacyAdminSubjects(draft){
+      if(Array.isArray(draft.subjects)&&draft.subjects.length){
+        return draft.subjects.map(subject=>newAdminSubject(subject));
+      }
+      const legacyText=draft.rawText || (Array.isArray(draft.topics)?draft.topics.map(topic=>topic.name||topic).join('\n'):'');
+      if(draft.subject||legacyText){
+        return [newAdminSubject({name:draft.subject||'Matéria',topicsText:legacyText})];
+      }
+      return [newAdminSubject({name:'Matemática'}),newAdminSubject({name:'Português'})];
+    }
+
     function hydrateAdminDraft(){
       let draft={};
       try{ draft=JSON.parse(localStorage.getItem(ADMIN_DRAFT_KEY)||'{}'); }
@@ -2639,19 +2837,34 @@
 
       el('adminStudentName').value=draft.studentName||state.studentName||'';
       el('adminGoal').value=draft.goal||state.goal||'';
-      el('adminSubject').value=draft.subject||state.subjects?.[0]?.name||'Matemática';
       el('adminScheduleStyle').value=draft.scheduleStyle||state.scheduleStyle||'weekly';
       el('adminStartDate').value=draft.startDate||defaultAdminStartDate();
       el('adminExamDate').value=draft.examDate||state.examDate||'';
       el('adminHoursPerDay').value=draft.hoursPerDay||state.hoursPerDay||2;
-      el('adminSessionMinutes').value=String(draft.sessionMinutes||state.sessionMinutes||60);
+      el('adminSessionMinutes').value=draft.sessionMinutes||state.sessionMinutes||60;
       el('adminPreferredStart').value=draft.preferredStart||state.preferredStart||'19:00';
+      el('adminWorkSchedule').value=draft.workSchedule||'';
+      el('adminStudyMaterial').value=draft.studyMaterial||'';
+      el('adminExamLevel').value=draft.examLevel||'';
+      el('adminCompetitionLevel').value=draft.competitionLevel||'';
+      el('adminSalary').value=draft.salary||'';
+      el('adminBoardStyle').value=draft.boardStyle||'';
+      el('adminExtraCriteria').value=draft.extraCriteria||'';
       el('adminIncludeTheory').checked=draft.includeTheory!==false;
       el('adminIncludeExercises').checked=draft.includeExercises!==false;
       el('adminIncludeReviews').checked=draft.includeReviews!==false;
-      el('adminIncludeSimulations').checked=Boolean(draft.includeSimulations);
       el('adminReplaceSchedule').checked=draft.replaceSchedule!==false;
-      el('adminTopicsInput').value=draft.rawText||'';
+      el('adminSimulationEnabled').checked=Boolean(draft.simulationEnabled);
+      el('adminSimulationMode').value=draft.simulationMode||'interval_days';
+      el('adminSimulationInterval').value=draft.simulationInterval||15;
+      el('adminSimulationWeekday').value=String(draft.simulationWeekday??6);
+      el('adminSimulationMinutes').value=draft.simulationMinutes||240;
+      el('adminSimulationStart').value=draft.simulationStart||'08:00';
+
+      const start=dateFromKey(el('adminStartDate').value);
+      const exam=dateFromKey(el('adminExamDate').value);
+      const computed=daysUntilExam(start,exam);
+      el('adminPlanDays').value=draft.planDays||state.adminPlanDays||computed||40;
 
       const days=Array.isArray(draft.availableDays)&&draft.availableDays.length
         ? draft.availableDays
@@ -2660,14 +2873,11 @@
         input.checked=days.includes(Number(input.value));
       });
 
-      adminTopics=Array.isArray(draft.topics)
-        ? draft.topics.map(topic=>({
-            id:topic.id||cryptoId(),
-            name:String(topic.name||'').trim(),
-            selected:topic.selected!==false
-          })).filter(topic=>topic.name)
-        : [];
-      renderAdminTopics();
+      adminSubjects=migrateLegacyAdminSubjects(draft);
+      renderAdminSubjects();
+      updateAdminDaysAvailable();
+      renderAdminSimulationFields();
+      updateAdminCapacityPreview();
     }
 
     function normalizeAdminTopic(value){
@@ -2696,172 +2906,399 @@
       return [...unique.values()];
     }
 
-    function renderAdminTopics(){
-      const list=el('adminTopicList');
+    function renderAdminSubjects(){
+      const list=el('adminSubjectsList');
       if(!list) return;
       list.innerHTML='';
 
-      if(!adminTopics.length){
-        list.innerHTML='<div class="empty">Cole o conteúdo acima e clique em “Organizar tópicos”.</div>';
-        updateAdminTopicCount();
+      if(!adminSubjects.length){
+        list.innerHTML='<div class="empty">Adicione pelo menos uma matéria para começar.</div>';
+        updateAdminCapacityPreview();
         return;
       }
 
-      adminTopics.forEach((topic,index)=>{
-        const row=document.createElement('div');
-        row.className='admin-topic-row';
-        row.dataset.id=topic.id;
-        row.innerHTML=`
-          <input class="admin-topic-selected" type="checkbox" ${topic.selected!==false?'checked':''} aria-label="Usar este tópico">
-          <input class="admin-topic-name" type="text" value="${escapeHtml(topic.name)}" aria-label="Nome do tópico">
-          <div class="admin-topic-actions">
-            <button class="btn btn-secondary btn-small admin-topic-up" type="button" title="Mover para cima">↑</button>
-            <button class="btn btn-secondary btn-small admin-topic-down" type="button" title="Mover para baixo">↓</button>
-            <button class="btn btn-danger btn-small admin-topic-delete" type="button" title="Excluir">×</button>
+      adminSubjects.forEach((subject,index)=>{
+        const card=document.createElement('article');
+        card.className='admin-subject-card';
+        card.dataset.id=subject.id;
+        const topicCount=parseAdminTopicsText(subject.topicsText).length;
+        const difficulty=adminDifficultyMeta(subject.difficulty);
+        card.innerHTML=`
+          <div class="admin-subject-head">
+            <div>
+              <h4>Matéria ${index+1}</h4>
+              <span class="admin-difficulty-badge">${escapeHtml(difficulty.label)}</span>
+            </div>
+            <button class="btn btn-danger btn-small admin-remove-subject" type="button" ${adminSubjects.length===1?'disabled':''}>Remover matéria</button>
+          </div>
+          <div class="admin-subject-grid">
+            <div class="field">
+              <label>Nome da matéria</label>
+              <input class="admin-subject-name" type="text" value="${escapeHtml(subject.name)}" placeholder="Ex.: Matemática">
+            </div>
+            <div class="field">
+              <label>Grau de dificuldade</label>
+              <select class="admin-subject-difficulty">
+                <option value="muito_dificil" ${subject.difficulty==='muito_dificil'?'selected':''}>Muita dificuldade</option>
+                <option value="dificil" ${subject.difficulty==='dificil'?'selected':''}>Dificuldade</option>
+                <option value="intermediario" ${subject.difficulty==='intermediario'?'selected':''}>Intermediário</option>
+                <option value="facil" ${subject.difficulty==='facil'?'selected':''}>Facilidade</option>
+                <option value="muito_facil" ${subject.difficulty==='muito_facil'?'selected':''}>Muita facilidade</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Duração da sessão desta matéria</label>
+              <input class="admin-subject-minutes" type="number" min="5" max="720" step="5" value="${subject.sessionMinutes}" inputmode="numeric">
+            </div>
+          </div>
+          <div class="field">
+            <label>Temas cobrados nessa matéria</label>
+            <textarea class="admin-subject-topics" placeholder="Cole um assunto por linha ou separe os assuntos por ponto e vírgula.">${escapeHtml(subject.topicsText)}</textarea>
+          </div>
+          <div class="admin-subject-footer">
+            <span class="admin-subject-count">${topicCount} tópico${topicCount===1?'':'s'} reconhecido${topicCount===1?'':'s'}.</span>
+            <span>Quanto maior a dificuldade, maior pode ser o investimento de tempo por sessão.</span>
           </div>`;
 
-        row.querySelector('.admin-topic-selected').addEventListener('change',event=>{
-          topic.selected=event.target.checked;
-          updateAdminTopicCount();
+        const nameInput=card.querySelector('.admin-subject-name');
+        const difficultySelect=card.querySelector('.admin-subject-difficulty');
+        const minutesInput=card.querySelector('.admin-subject-minutes');
+        const topicsInput=card.querySelector('.admin-subject-topics');
+        const countLabel=card.querySelector('.admin-subject-count');
+
+        nameInput.addEventListener('input',()=>{
+          subject.name=nameInput.value;
           saveAdminDraft();
+          updateAdminCapacityPreview();
         });
-        row.querySelector('.admin-topic-name').addEventListener('input',event=>{
-          topic.name=event.target.value;
+        difficultySelect.addEventListener('change',()=>{
+          subject.difficulty=difficultySelect.value;
+          subject.sessionMinutes=adminSuggestedSession(subject.difficulty,el('adminSessionMinutes').value);
+          minutesInput.value=subject.sessionMinutes;
+          renderAdminSubjects();
           saveAdminDraft();
+          updateAdminCapacityPreview();
         });
-        row.querySelector('.admin-topic-up').addEventListener('click',()=>{
-          if(index<=0) return;
-          [adminTopics[index-1],adminTopics[index]]=[adminTopics[index],adminTopics[index-1]];
-          renderAdminTopics();
+        minutesInput.addEventListener('input',()=>{
+          subject.sessionMinutes=Math.max(5,Number(minutesInput.value)||5);
           saveAdminDraft();
+          updateAdminCapacityPreview();
         });
-        row.querySelector('.admin-topic-down').addEventListener('click',()=>{
-          if(index>=adminTopics.length-1) return;
-          [adminTopics[index+1],adminTopics[index]]=[adminTopics[index],adminTopics[index+1]];
-          renderAdminTopics();
+        topicsInput.addEventListener('input',()=>{
+          subject.topicsText=topicsInput.value;
+          const count=parseAdminTopicsText(subject.topicsText).length;
+          countLabel.textContent=`${count} tópico${count===1?'':'s'} reconhecido${count===1?'':'s'}.`;
           saveAdminDraft();
+          updateAdminCapacityPreview();
         });
-        row.querySelector('.admin-topic-delete').addEventListener('click',()=>{
-          adminTopics=adminTopics.filter(item=>item.id!==topic.id);
-          renderAdminTopics();
+        card.querySelector('.admin-remove-subject').addEventListener('click',()=>{
+          if(adminSubjects.length<=1) return;
+          adminSubjects=adminSubjects.filter(item=>item.id!==subject.id);
+          renderAdminSubjects();
           saveAdminDraft();
+          updateAdminCapacityPreview();
         });
-        list.appendChild(row);
+        list.appendChild(card);
+      });
+    }
+
+    function addAdminSubject(){
+      adminSubjects.push(newAdminSubject());
+      renderAdminSubjects();
+      saveAdminDraft();
+      setTimeout(()=>document.querySelector('.admin-subject-card:last-child .admin-subject-name')?.focus(),30);
+    }
+
+    function updateAdminDaysAvailable(){
+      const start=dateFromKey(el('adminStartDate')?.value);
+      const exam=dateFromKey(el('adminExamDate')?.value);
+      const label=el('adminDaysAvailable');
+      if(!label) return;
+      const total=daysUntilExam(start,exam);
+      if(!start||!exam){
+        label.textContent='Informe a data inicial e a data da prova para calcular o período.';
+        return;
+      }
+      if(total<=0){
+        label.textContent='A data da prova deve ser posterior à data inicial.';
+        label.className='helper admin-capacity-error';
+        return;
+      }
+      label.className='helper';
+      label.textContent=`Há ${total} dias corridos da data inicial até a véspera da prova.`;
+    }
+
+    function useDaysUntilExam(){
+      const start=dateFromKey(el('adminStartDate')?.value);
+      const exam=dateFromKey(el('adminExamDate')?.value);
+      const total=daysUntilExam(start,exam);
+      if(!total) return toast('Informe datas válidas para calcular os dias até a prova.');
+      el('adminPlanDays').value=total;
+      saveAdminDraft();
+      updateAdminCapacityPreview();
+      toast(`${total} dias definidos, encerrando o planejamento na véspera da prova.`);
+    }
+
+    function renderAdminSimulationFields(){
+      const enabled=Boolean(el('adminSimulationEnabled')?.checked);
+      const fields=el('adminSimulationFields');
+      if(fields) fields.hidden=!enabled;
+      const occurrence=el('adminSimulationMode')?.value==='weekday_occurrence';
+      if(el('adminSimulationWeekdayField')) el('adminSimulationWeekdayField').hidden=!occurrence;
+      if(el('adminSimulationIntervalHelp')){
+        el('adminSimulationIntervalHelp').textContent=occurrence
+          ? 'Ex.: 2 = a cada 2 domingos, sábados ou outro dia escolhido.'
+          : 'Ex.: 15 = um simulado a cada 15 dias corridos.';
+      }
+    }
+
+    function adminPlanWindow(draft){
+      const start=dateFromKey(draft.startDate);
+      if(!start) return {error:'Informe uma data inicial válida.'};
+      const exam=dateFromKey(draft.examDate);
+      let requestedDays=Math.max(1,draft.planDays);
+      let end=addCalendarDays(start,requestedDays-1);
+      let capped=false;
+      if(exam){
+        const examEve=addCalendarDays(exam,-1);
+        if(exam<=start) return {error:'A data da prova deve ser posterior à data inicial.'};
+        if(end>examEve){
+          end=examEve;
+          requestedDays=calendarDaysBetween(start,end);
+          capped=true;
+        }
+      }
+      return {start,end,days:requestedDays,capped,exam};
+    }
+
+    function adminDatesInWindow(window){
+      const dates=[];
+      for(let date=new Date(window.start);date<=window.end;date=addCalendarDays(date,1)) dates.push(new Date(date));
+      return dates;
+    }
+
+    function adminSimulationDates(draft,window){
+      const dates=[];
+      if(!draft.simulationEnabled) return dates;
+      const all=adminDatesInWindow(window);
+      const interval=Math.max(1,draft.simulationInterval);
+      if(draft.simulationMode==='weekday_occurrence'){
+        let occurrence=0;
+        all.forEach(date=>{
+          const day=(date.getDay()+6)%7;
+          if(day!==draft.simulationWeekday) return;
+          occurrence++;
+          if(occurrence%interval===0) dates.push(new Date(date));
+        });
+      }else{
+        all.forEach((date,index)=>{
+          if((index+1)%interval===0) dates.push(new Date(date));
+        });
+      }
+      return dates;
+    }
+
+    function adminSubjectQueues(draft){
+      return draft.subjects.map(subject=>{
+        const name=String(subject.name||'').trim();
+        const topics=parseAdminTopicsText(subject.topicsText);
+        const duration=Math.max(5,Number(subject.sessionMinutes)||draft.sessionMinutes);
+        const units=[];
+        const reviewBuffer=[];
+        topics.forEach((topic,index)=>{
+          if(draft.includeTheory) units.push({subject:name,topic,type:'Teoria',activity:`Teoria - ${topic}`,duration});
+          if(draft.includeExercises) units.push({subject:name,topic,type:'Exercícios',activity:`Exercícios - ${topic}`,duration});
+          reviewBuffer.push(topic);
+          if(draft.includeReviews && (reviewBuffer.length===3 || index===topics.length-1)){
+            units.push({
+              subject:name,
+              topic:reviewBuffer.join(', '),
+              type:'Revisão',
+              activity:`Revisão - ${reviewBuffer.join(', ')}`,
+              duration
+            });
+            reviewBuffer.length=0;
+          }
+        });
+        return {subject,topics,units};
+      });
+    }
+
+    function interleaveAdminUnits(queues){
+      const result=[];
+      let position=0;
+      while(queues.some(queue=>position<queue.units.length)){
+        queues.forEach(queue=>{
+          if(position<queue.units.length) result.push(queue.units[position]);
+        });
+        position++;
+      }
+      return result;
+    }
+
+    function adminSchedulePreview(draft=adminDraftObject()){
+      const window=adminPlanWindow(draft);
+      if(window.error) return {error:window.error};
+      const queues=adminSubjectQueues(draft);
+      const invalidSubject=queues.find(queue=>!queue.subject.name||!queue.topics.length);
+      if(invalidSubject) return {error:'Todas as matérias precisam de nome e pelo menos um tópico.'};
+      const units=interleaveAdminUnits(queues);
+      const simDates=adminSimulationDates(draft,window);
+      const simKeys=new Set(simDates.map(localDateKey));
+      const studyDates=adminDatesInWindow(window).filter(date=>{
+        const day=(date.getDay()+6)%7;
+        return draft.availableDays.includes(day)&&!simKeys.has(localDateKey(date));
+      });
+      const availableMinutes=studyDates.length*Math.round(draft.hoursPerDay*60);
+      const requiredMinutes=units.reduce((sum,unit)=>sum+unit.duration,0)+Math.max(0,units.length-studyDates.length)*10;
+      return {window,queues,units,simDates,simKeys,studyDates,availableMinutes,requiredMinutes};
+    }
+
+    function updateAdminCapacityPreview(){
+      const label=el('adminCapacityPreview');
+      if(!label) return;
+      const preview=adminSchedulePreview();
+      if(preview.error){
+        label.className='helper';
+        label.textContent=preview.error;
+        return;
+      }
+      const fits=preview.requiredMinutes<=preview.availableMinutes;
+      label.className=`helper ${fits?'admin-capacity-ok':'admin-capacity-error'}`;
+      label.textContent=`Período: ${preview.window.days} dias corridos, ${preview.studyDates.length} dias de estudo e ${preview.simDates.length} dias exclusivos de simulado. Capacidade aproximada: ${formatHours(preview.availableMinutes)}; atividades previstas: ${preview.units.length}, com cerca de ${formatHours(preview.requiredMinutes)}.${fits?' O plano cabe no período.':' O plano não cabe no período com as configurações atuais.'}`;
+    }
+
+    function adminBuildStudyTasks(draft,preview){
+      const tasks=[];
+      const remaining=[...preview.units];
+      const dailyLimit=Math.round(draft.hoursPerDay*60);
+      const startMinute=timeToMinutes(draft.preferredStart);
+
+      for(const date of preview.studyDates){
+        let used=0;
+        let cursor=startMinute;
+        let dayTasks=0;
+        while(remaining.length){
+          const unit=remaining[0];
+          const gap=dayTasks?10:0;
+          if(unit.duration>dailyLimit) return {error:`A sessão de ${unit.subject} (${unit.duration} min) é maior que o tempo diário disponível (${dailyLimit} min).`};
+          if(used+gap+unit.duration>dailyLimit) break;
+          if(gap){ cursor+=10; used+=10; }
+          remaining.shift();
+          const day=(date.getDay()+6)%7;
+          tasks.push({
+            id:cryptoId(),
+            day,
+            date:localDateKey(date),
+            cycleOrder:tasks.length,
+            start:minutesToTime(cursor),
+            end:minutesToTime(cursor+unit.duration),
+            subject:unit.subject,
+            activity:unit.activity,
+            type:unit.type,
+            notes:'',
+            done:false
+          });
+          cursor+=unit.duration;
+          used+=unit.duration;
+          dayTasks++;
+        }
+        if(!remaining.length) break;
+      }
+
+      if(remaining.length){
+        const missing=remaining.reduce((sum,unit)=>sum+unit.duration,0);
+        return {error:`O período não comporta ${remaining.length} atividades, equivalentes a aproximadamente ${formatHours(missing)}. Aumente os dias, as horas disponíveis ou reduza a duração das sessões.`};
+      }
+
+      preview.simDates.forEach(date=>{
+        const start=timeToMinutes(draft.simulationStart);
+        const day=(date.getDay()+6)%7;
+        tasks.push({
+          id:cryptoId(),
+          day,
+          date:localDateKey(date),
+          cycleOrder:tasks.length,
+          start:minutesToTime(start),
+          end:minutesToTime(start+draft.simulationMinutes),
+          subject:'Simulado',
+          activity:`Simulado completo - ${draft.goal}`,
+          type:'Simulado',
+          notes:'Dia reservado exclusivamente para a realização do simulado.',
+          done:false
+        });
       });
 
-      updateAdminTopicCount();
+      tasks.sort((a,b)=>(a.date||'').localeCompare(b.date||'')||a.start.localeCompare(b.start));
+      tasks.forEach((task,index)=>task.cycleOrder=index);
+      return {tasks};
     }
 
-    function updateAdminTopicCount(){
-      const count=adminTopics.filter(topic=>topic.selected!==false&&topic.name.trim()).length;
-      if(el('adminTopicCount')) el('adminTopicCount').textContent=String(count);
-    }
-
-    function adminStudyUnits(topics,options,subject){
-      const units=[];
-      const reviewBuffer=[];
-
-      topics.forEach((topic,index)=>{
-        if(options.theory) units.push({topic,type:'Teoria',activity:`Teoria — ${topic}`});
-        if(options.exercises) units.push({topic,type:'Exercícios',activity:`Exercícios — ${topic}`});
-
-        reviewBuffer.push(topic);
-        if(options.reviews && (reviewBuffer.length===3 || index===topics.length-1)){
-          units.push({
-            topic:`Revisão de ${reviewBuffer.join(', ')}`,
-            type:'Revisão',
-            activity:`Revisão — ${reviewBuffer.join(', ')}`
-          });
-          reviewBuffer.length=0;
-        }
-
-        if(options.simulations && ((index+1)%5===0 || index===topics.length-1)){
-          units.push({
-            topic:`Simulado de ${subject}`,
-            type:'Simulado',
-            activity:`Simulado — conteúdos 1 a ${index+1}`
-          });
-        }
-      });
-
-      return units;
-    }
-
-    function nextAdminStudyDate(date,availableDays){
-      const next=new Date(date);
-      do{
-        next.setDate(next.getDate()+1);
-      }while(!availableDays.includes((next.getDay()+6)%7));
-      return next;
+    function adminPersonalizationData(draft,preview){
+      return {
+        workSchedule:draft.workSchedule,
+        studyMaterial:draft.studyMaterial,
+        examLevel:draft.examLevel,
+        competitionLevel:draft.competitionLevel,
+        salary:draft.salary,
+        boardStyle:draft.boardStyle,
+        extraCriteria:draft.extraCriteria,
+        planDays:preview.window.days,
+        startDate:localDateKey(preview.window.start),
+        endDate:localDateKey(preview.window.end),
+        simulationEnabled:draft.simulationEnabled,
+        simulationMode:draft.simulationMode,
+        simulationInterval:draft.simulationInterval,
+        simulationWeekday:draft.simulationWeekday,
+        simulationCount:preview.simDates.length
+      };
     }
 
     function generateAdminSchedule(){
       const status=el('adminGenerationStatus');
       const draft=adminDraftObject();
-      const topics=draft.topics
-        .filter(topic=>topic.selected!==false)
-        .map(topic=>normalizeAdminTopic(topic.name))
-        .filter(Boolean);
-
       if(!draft.studentName) return toast('Informe o nome do aluno.');
       if(!draft.goal) return toast('Informe o concurso ou objetivo.');
-      if(!draft.subject) return toast('Informe a disciplina.');
-      if(!topics.length) return toast('Selecione pelo menos um tópico.');
-      if(!draft.availableDays.length) return toast('Selecione pelo menos um dia disponível.');
-      if(!draft.includeTheory&&!draft.includeExercises&&!draft.includeReviews&&!draft.includeSimulations){
-        return toast('Selecione pelo menos um tipo de atividade.');
+      if(!draft.availableDays.length) return toast('Selecione pelo menos um dia disponível para estudo.');
+      if(!draft.includeTheory&&!draft.includeExercises&&!draft.includeReviews) return toast('Selecione pelo menos um tipo de atividade.');
+      if(!draft.subjects.length) return toast('Adicione pelo menos uma matéria.');
+
+      const preview=adminSchedulePreview(draft);
+      if(preview.error){
+        status.className='admin-generation-status error';
+        status.textContent=preview.error;
+        return toast(preview.error);
       }
 
-      const units=adminStudyUnits(topics,{
-        theory:draft.includeTheory,
-        exercises:draft.includeExercises,
-        reviews:draft.includeReviews,
-        simulations:draft.includeSimulations
-      },draft.subject);
-
-      const session=Math.max(30,draft.sessionMinutes);
-      const sessionsPerDay=Math.max(1,Math.floor((draft.hoursPerDay*60)/session));
-      const startDate=draft.startDate ? new Date(`${draft.startDate}T12:00:00`) : new Date();
-      let date=new Date(startDate);
-      while(!draft.availableDays.includes((date.getDay()+6)%7)){
-        date=nextAdminStudyDate(date,draft.availableDays);
+      const planned=adminBuildStudyTasks(draft,preview);
+      if(planned.error){
+        status.className='admin-generation-status error';
+        status.textContent=planned.error;
+        return toast('O cronograma não cabe no período informado. Veja o aviso no painel.');
       }
 
-      const generated=[];
-      let slot=0;
-      units.forEach((unit,index)=>{
-        if(slot>=sessionsPerDay){
-          date=nextAdminStudyDate(date,draft.availableDays);
-          slot=0;
-        }
-        const day=(date.getDay()+6)%7;
-        const cursor=timeToMinutes(draft.preferredStart)+slot*(session+10);
-        generated.push({
-          id:cryptoId(),
-          day,
-          date:localDateKey(date),
-          cycleOrder:index,
-          start:minutesToTime(cursor),
-          end:minutesToTime(cursor+session),
-          subject:draft.subject,
-          activity:unit.activity,
-          type:unit.type,
-          notes:`Tópico: ${unit.topic}. Cronograma preparado na área administrativa do Prof. Lucas MPC.`,
-          done:false
-        });
-        slot++;
-      });
+      const subjects=draft.subjects.map(subject=>({
+        id:subject.id||cryptoId(),
+        name:subject.name.trim(),
+        priority:Math.max(1,Math.round(adminDifficultyMeta(subject.difficulty).multiplier*3)),
+        level:adminDifficultyMeta(subject.difficulty).level,
+        difficulty:subject.difficulty,
+        sessionMinutes:Math.max(5,Number(subject.sessionMinutes)||draft.sessionMinutes)
+      }));
 
       state.studentName=draft.studentName;
       state.goal=draft.goal;
       state.examDate=draft.examDate;
       state.hoursPerDay=draft.hoursPerDay;
-      state.sessionMinutes=session;
+      state.sessionMinutes=draft.sessionMinutes;
       state.preferredStart=draft.preferredStart;
       state.availableDays=[...draft.availableDays];
       state.scheduleStyle=draft.scheduleStyle;
-      state.subjects=[{id:cryptoId(),name:draft.subject,priority:5,level:'intermediario'}];
-      state.tasks=draft.replaceSchedule ? generated : [...state.tasks,...generated];
+      state.subjects=subjects;
+      state.tasks=draft.replaceSchedule ? planned.tasks : [...state.tasks,...planned.tasks];
+      state.adminGenerated=true;
+      state.adminPlanDays=preview.window.days;
+      state.adminPersonalization=adminPersonalizationData(draft,preview);
 
       hydrateSettings();
       renderSubjects();
@@ -2870,17 +3307,10 @@
       saveState();
       saveAdminDraft();
 
-      let dateWarning='';
-      if(draft.examDate){
-        const finalTask=generated[generated.length-1];
-        if(finalTask?.date>draft.examDate){
-          dateWarning=' A disponibilidade informada ultrapassou a data final; revise a carga horária ou os dias.';
-        }
-      }
-
+      const totalMinutes=planned.tasks.reduce((sum,task)=>sum+taskDuration(task),0);
       status.className='admin-generation-status success';
-      status.textContent=`Cronograma criado com ${topics.length} tópicos e ${generated.length} atividades.${dateWarning}`;
-      toast('Cronograma do aluno criado. Use “Ver como aluno” para revisar e baixar.');
+      status.textContent=`Cronograma criado para ${draft.studentName}: ${preview.window.days} dias corridos, ${preview.studyDates.length} dias de estudo, ${preview.simDates.length} dias exclusivos para simulados, ${planned.tasks.length} atividades e ${formatHours(totalMinutes)} planejadas.`;
+      toast('Cronograma personalizado criado. Use “Ver como aluno” para revisar e baixar o PDF.');
       document.getElementById('scheduleCard')?.scrollIntoView({behavior:'smooth',block:'start'});
     }
 
@@ -2924,7 +3354,7 @@
       state.goal = el('goal').value.trim();
       state.examDate = el('examDate').value;
       state.hoursPerDay = Number(el('hoursPerDay').value) || 2;
-      state.sessionMinutes = Number(el('sessionMinutes').value) || 60;
+      state.sessionMinutes = Math.max(5,Number(el('sessionMinutes').value) || 60);
       state.preferredStart = el('preferredStart').value || '19:00';
       state.availableDays = [...document.querySelectorAll('#availableDays input:checked')].map(i=>Number(i.value));
       state.subjects = [...document.querySelectorAll('.subject-row')].map(row => ({
@@ -3568,7 +3998,11 @@
           });
         }
       }
-      state.tasks=newTasks; saveState(); renderSchedule(); toast(mode==='generate'?'Cronograma criado.':'Cronograma atualizado.');
+      state.tasks=newTasks;
+      state.adminGenerated=false;
+      state.adminPlanDays=0;
+      state.adminPersonalization=null;
+      saveState(); renderSchedule(); toast(mode==='generate'?'Cronograma criado.':'Cronograma atualizado.');
     }
     function weightedSubjects(mode){
       const arr=[];
@@ -3797,9 +4231,9 @@
     function pdfScheduleStyleLabel(){
       return ({
         checklist:'Checklist de estudos',
-        cycles:'Cronograma por ciclos',
+        cycle:'Cronograma por ciclos',
         weekly:'Cronograma semanal',
-        monthly:'Cronograma mensal'
+        monthly:state.adminGenerated?'Cronograma por quantidade de dias':'Cronograma mensal'
       })[state.scheduleStyle]||'Cronograma de estudos';
     }
 
@@ -3880,6 +4314,91 @@
       pdfText(commands,x+10,y+24,label.toUpperCase(),7.5,true,PDF_COLORS.muted);
       const valueLines=pdfWrapText(value,width-20,11.2,1,true);
       pdfText(commands,x+10,y+8,valueLines[0],11.2,true,PDF_COLORS.navy);
+    }
+
+    function pdfAdminCriteriaItems(){
+      const data=state.adminPersonalization||{};
+      const labels={
+        baixo:'baixo',medio:'médio',alto:'alto',muito_alto:'muito alto',
+        baixa:'baixa',media:'média',alta:'alta',muito_alta:'muito alta'
+      };
+      const items=[];
+      items.push(`quantidade de horas disponíveis para estudar: ${state.hoursPerDay||0} hora(s) por dia`);
+      items.push(`tempo disponível até a prova: ${state.adminPlanDays||data.planDays||0} dias`);
+      if(data.workSchedule) items.push(`horário de trabalho e rotina: ${data.workSchedule}`);
+      if(state.subjects?.length){
+        const difficult=state.subjects.filter(subject=>['muito_dificil','dificil'].includes(subject.difficulty)).map(subject=>subject.name);
+        const easy=state.subjects.filter(subject=>['facil','muito_facil'].includes(subject.difficulty)).map(subject=>subject.name);
+        if(difficult.length) items.push(`matérias com maior dificuldade: ${difficult.join(', ')}`);
+        if(easy.length) items.push(`matérias com maior facilidade: ${easy.join(', ')}`);
+      }
+      if(data.studyMaterial) items.push(`material utilizado na preparação: ${data.studyMaterial}`);
+      if(data.examLevel) items.push(`nível da prova: ${labels[data.examLevel]||data.examLevel}`);
+      if(data.competitionLevel) items.push(`nível de concorrência: ${labels[data.competitionLevel]||data.competitionLevel}`);
+      if(data.salary) items.push(`salário ou remuneração do cargo: ${data.salary}`);
+      if(data.boardStyle) items.push(`banca organizadora e estilo: ${data.boardStyle}`);
+      if(data.extraCriteria) items.push(`outros critérios: ${data.extraCriteria}`);
+      return items;
+    }
+
+    function pdfDrawWrapped(commands,text,x,y,width,size=11.2,bold=false,color=PDF_COLORS.text,maxLines=20,lineHeight=14){
+      const lines=pdfWrapText(text,width,size,maxLines,bold);
+      lines.forEach((line,index)=>pdfText(commands,x,y-index*lineHeight,line,size,bold,color));
+      return y-lines.length*lineHeight;
+    }
+
+    function pdfBuildAdminIntroPageContent(pageIndex,pageCount){
+      const commands=[];
+      const {width,height,margin}=PDF_PAGE;
+      const student=state.studentName||'o aluno';
+      pdfRect(commands,0,0,width,height,PDF_COLORS.white);
+      pdfRect(commands,0,height-112,width,112,PDF_COLORS.navy);
+      pdfRect(commands,margin,height-79,7,42,PDF_COLORS.gold);
+      pdfText(commands,margin+19,height-48,'CRONOGRAMA PERSONALIZADO',21,true,PDF_COLORS.white);
+      pdfText(commands,margin+19,height-72,'Prof. Lucas MPC',11,true,PDF_COLORS.cyan);
+
+      pdfText(commands,margin,height-151,'ESTE CRONOGRAMA FOI CRIADO',18,true,PDF_COLORS.navy);
+      pdfText(commands,margin,height-176,'ESPECIFICAMENTE PARA',18,true,PDF_COLORS.navy);
+      const nameLines=pdfWrapText(student,width-margin*2,21,2,true);
+      nameLines.forEach((line,index)=>pdfText(commands,margin,height-211-index*24,line,21,true,PDF_COLORS.goldDark));
+
+      const notice=`Este cronograma foi criado especificamente para ${student}, seguindo os critérios informados na área administrativa, como quantidade de horas disponíveis para estudar, horário de trabalho, grau de dificuldade nos assuntos, tempo disponível até a data da prova, material utilizado na preparação, nível da prova, nível de concorrência, salário ou remuneração do cargo, estilo da banca organizadora e outros fatores que tornam este planejamento único e específico para ${student}.`;
+      pdfDrawWrapped(commands,notice,margin,height-278,width-margin*2,11.2,false,PDF_COLORS.text,12,15);
+
+      const data=state.adminPersonalization||{};
+      const periodStart=data.startDate?new Date(`${data.startDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informado';
+      const periodEnd=data.endDate?new Date(`${data.endDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informado';
+      const criteria=[
+        `Período planejado: ${periodStart} a ${periodEnd}`,
+        `Disponibilidade: ${state.hoursPerDay||0} hora(s) por dia`,
+        `Matérias consideradas: ${(state.subjects||[]).map(subject=>subject.name).join(', ')||'Não informadas'}`,
+        data.simulationCount?`Dias exclusivos para simulados: ${data.simulationCount}`:'Dias exclusivos para simulados: não programados'
+      ];
+      let criteriaY=height-442;
+      criteria.forEach(item=>{
+        const line=pdfWrapText(`- ${item}`,width-margin*2-14,9.8,1,false)[0];
+        pdfText(commands,margin+7,criteriaY,line,9.8,false,PDF_COLORS.muted);
+        criteriaY-=17;
+      });
+
+      const warningTop=height-525;
+      pdfRect(commands,margin,warningTop-95,width-margin*2,95,PDF_COLORS.pendingSoft,PDF_COLORS.gold,.9);
+      pdfDrawWrapped(
+        commands,
+        `Não tente utilizar este cronograma. Ele foi criado especificamente para ${student} e pode não ser adequado à sua disponibilidade, às suas dificuldades, ao seu material ou ao seu objetivo.`,
+        margin+14,warningTop-25,width-margin*2-28,11.1,true,PDF_COLORS.navy,5,15
+      );
+
+      pdfText(commands,margin,height-664,'Para obter um CRONOGRAMA PERSONALIZADO DE ACORDO COM A SUA REALIDADE,',10.6,true,PDF_COLORS.navy);
+      pdfText(commands,margin,height-681,'clique no botão abaixo e use gratuitamente o Gerador de Cronograma MPC.',10.8,false,PDF_COLORS.text);
+
+      pdfLine(commands,margin,78,width-margin,78,PDF_COLORS.gold,1.2);
+      pdfText(commands,margin,63,'Documento personalizado - Prof. Lucas MPC',8.8,true,PDF_COLORS.navy);
+      pdfText(commands,width-margin-92,63,`Página ${pageIndex+1} de ${pageCount}`,8,false,PDF_COLORS.muted,'right',92);
+      const button={x:margin,y:18,width:width-margin*2,height:38};
+      pdfRect(commands,button.x,button.y,button.width,button.height,PDF_COLORS.gold,PDF_COLORS.goldDark,1.1);
+      pdfText(commands,button.x,button.y+13,'CLIQUE AQUI PARA USAR O GERADOR DE CRONOGRAMA MPC GRATUITAMENTE',9.6,true,PDF_COLORS.navy,'center',button.width);
+      return {content:commands.join('\n'),button};
     }
 
     function pdfBuildPageContent(pageRows,pageIndex,pageCount,layout){
@@ -4039,7 +4558,13 @@
     function buildSchedulePdfBytes(){
       const rows=pdfTaskRows();
       const layout=pdfPreparePages(rows);
-      const pageDefinitions=layout.pages.map((pageRows,index)=>pdfBuildPageContent(pageRows,index,layout.pages.length,layout));
+      const hasIntro=Boolean(state.adminGenerated&&state.studentName);
+      const totalPages=layout.pages.length+(hasIntro?1:0);
+      const pageDefinitions=[];
+      if(hasIntro) pageDefinitions.push(pdfBuildAdminIntroPageContent(0,totalPages));
+      layout.pages.forEach((pageRows,index)=>{
+        pageDefinitions.push(pdfBuildPageContent(pageRows,index+(hasIntro?1:0),totalPages,layout));
+      });
       return pdfBuildBinary(pageDefinitions);
     }
 
@@ -4681,30 +5206,37 @@
         setAdminView('admin');
         toast(setup?'Acesso administrativo configurado neste navegador.':'Área administrativa liberada.');
       };
-      el('adminParseTopicsBtn').onclick=()=>{
-        const parsed=parseAdminTopicsText(el('adminTopicsInput').value);
-        adminTopics=parsed.map(name=>({id:cryptoId(),name,selected:true}));
-        renderAdminTopics();
-        saveAdminDraft();
-        toast(`${adminTopics.length} tópico${adminTopics.length===1?'':'s'} organizado${adminTopics.length===1?'':'s'}.`);
-      };
-      el('adminClearTopicsBtn').onclick=()=>{
-        if(!confirm('Limpar o texto e todos os tópicos da área administrativa?')) return;
-        el('adminTopicsInput').value='';
-        adminTopics=[];
-        renderAdminTopics();
-        saveAdminDraft();
-      };
-      el('adminAddTopicBtn').onclick=()=>{
-        adminTopics.push({id:cryptoId(),name:'Novo tópico',selected:true});
-        renderAdminTopics();
-        saveAdminDraft();
-        setTimeout(()=>document.querySelector('.admin-topic-row:last-child .admin-topic-name')?.select(),30);
-      };
+      el('adminAddSubjectBtn').onclick=addAdminSubject;
+      el('adminCalculateDaysBtn').onclick=useDaysUntilExam;
       el('adminSaveDraftBtn').onclick=()=>saveAdminDraft(true);
       el('adminGenerateScheduleBtn').onclick=generateAdminSchedule;
+      el('adminScheduleStyle').addEventListener('change',()=>{
+        const isDays=el('adminScheduleStyle').value==='monthly';
+        el('adminPlanDays').closest('.field').classList.toggle('admin-highlight-field',isDays);
+        saveAdminDraft();
+        updateAdminCapacityPreview();
+      });
+      ['adminStartDate','adminExamDate'].forEach(id=>el(id).addEventListener('change',()=>{
+        updateAdminDaysAvailable();
+        saveAdminDraft();
+        updateAdminCapacityPreview();
+      }));
+      el('adminSimulationEnabled').addEventListener('change',()=>{
+        renderAdminSimulationFields();
+        saveAdminDraft();
+        updateAdminCapacityPreview();
+      });
+      el('adminSimulationMode').addEventListener('change',()=>{
+        renderAdminSimulationFields();
+        saveAdminDraft();
+        updateAdminCapacityPreview();
+      });
       document.querySelectorAll('#adminPanel input,#adminPanel select,#adminPanel textarea').forEach(field=>{
-        field.addEventListener('change',()=>saveAdminDraft());
+        if(field.closest('.admin-subject-card')) return;
+        field.addEventListener('change',()=>{
+          saveAdminDraft();
+          updateAdminCapacityPreview();
+        });
       });
 
       el('paletteBtn').onclick=()=>{renderPaletteOptions();openModal('paletteModal');};
@@ -4960,6 +5492,9 @@
         ...preserved,
         scheduleStyle:'weekly',
         studentName:'',
+        adminGenerated:false,
+        adminPlanDays:0,
+        adminPersonalization:null,
         goal:'',
         examDate:'',
         hoursPerDay:2,
