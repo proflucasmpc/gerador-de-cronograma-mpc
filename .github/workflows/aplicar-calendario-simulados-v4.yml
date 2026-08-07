@@ -15,6 +15,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: agent/correcao-pdfs-personalizacao-v3
+      - name: Corrigir helper de substituição
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/scripts/patch-calendario-simulados-v4.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('re.subn(pattern,new,s,count=1,flags=flags)','re.subn(pattern,lambda m:new,s,count=1,flags=flags)')
+          p.write_text(s,encoding='utf-8')
+          PY
       - name: Aplicar correções
         run: python .github/scripts/patch-calendario-simulados-v4.py
       - name: Validar JavaScript principal
