@@ -15,6 +15,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: agent/correcao-pdfs-personalizacao-v3
+      - name: Reparar delimitadores do script temporário
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/scripts/patch-pdf-mobile-logo-v5.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('\\n"",\'','\\n""",\'')
+          p.write_text(s,encoding='utf-8')
+          PY
+          python -m py_compile .github/scripts/patch-pdf-mobile-logo-v5.py
       - name: Aplicar correções
         run: python .github/scripts/patch-pdf-mobile-logo-v5.py
       - name: Validar JavaScript principal
