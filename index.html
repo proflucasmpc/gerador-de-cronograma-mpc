@@ -1331,6 +1331,10 @@
       border: 1px solid var(--border); border-radius: 12px; background: var(--surface);
     }
     .admin-pdf-toggle input { width: 19px; height: 19px; margin-top: 1px; accent-color: var(--gold); }
+    .admin-logo-controls { display:grid; gap:10px; padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+    .admin-logo-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .admin-logo-row input[type=file] { flex:1 1 260px; min-width:0; }
+    .admin-logo-status { color:var(--muted); font-size:.84rem; line-height:1.45; }
     .admin-pdf-theme-note, .admin-distribution-preview {
       padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px;
       background: var(--surface); color: var(--muted); font-size: .86rem; line-height: 1.5;
@@ -1867,6 +1871,18 @@
           </div>
         </div>
         <div class="admin-pdf-theme-note" id="adminPdfThemeNote">O modelo visual é independente do tipo de cronograma. Assim, checklist, ciclo, semanal e quantidade de dias podem usar qualquer um dos 10 modelos.</div>
+
+        <div class="admin-logo-controls">
+          <label class="admin-pdf-toggle">
+            <input id="adminPdfLogoEnabled" type="checkbox">
+            <span><strong>Adicionar logo ao PDF</strong><br><span class="helper">Opcional. Sem marcar esta opção, o PDF é gerado sem logo.</span></span>
+          </label>
+          <div class="admin-logo-row">
+            <input id="adminPdfLogoUpload" type="file" accept="image/png,image/jpeg,image/webp">
+            <button class="btn btn-secondary btn-small" id="adminPdfLogoRemoveBtn" type="button">Remover logo</button>
+          </div>
+          <span class="admin-logo-status" id="adminPdfLogoStatus">Nenhuma logo selecionada. O PDF será gerado sem logo.</span>
+        </div>
 
         <label class="admin-pdf-toggle">
           <input id="adminPdfButtonEnabled" type="checkbox">
@@ -2678,7 +2694,7 @@
   (() => {
     'use strict';
     const STORAGE_KEY = 'geradorCronogramaMpcData';
-    const DATA_SCHEMA_VERSION = 10;
+    const DATA_SCHEMA_VERSION = 11;
     const CURRENT_PRIVACY_VERSION = '1.3-2026-08-04';
     const LEGACY_STORAGE_KEYS = ['cronogramaLucasMpcV11'];
     const TUTORIAL_SESSION_KEY = 'cronogramaTutorialAbertoNestaSessaoV2';
@@ -2718,6 +2734,11 @@
       adminPdfButtonText: 'Acesse aqui',
       adminPdfButtonUrl: '',
       adminPdfButtonPosition: 'footer-right',
+      adminPdfLogoEnabled: false,
+      adminPdfLogoData: '',
+      adminPdfLogoWidth: 0,
+      adminPdfLogoHeight: 0,
+      adminPdfLogoName: '',
       goal: '', examDate: '', hoursPerDay: 2, sessionMinutes: 60, preferredStart: '19:00',
       availableDays: [0,1,2,3,4],
       subjects: [
@@ -2751,6 +2772,7 @@
     let taskDateContext = '';
     let adminSubjects = [];
     let adminModeActive = false;
+    let adminPdfLogoDraft = {data:'',width:0,height:0,name:''};
 
 
     function adminRouteRequested(){
@@ -2872,6 +2894,11 @@
         simulationMinutes:Math.max(10,Number(el('adminSimulationMinutes')?.value)||240),
         simulationStart:el('adminSimulationStart')?.value||'08:00',
         pdfTheme:el('adminPdfTheme')?.value||'premium_masculino',
+        pdfLogoEnabled:Boolean(el('adminPdfLogoEnabled')?.checked),
+        pdfLogoData:adminPdfLogoDraft.data||'',
+        pdfLogoWidth:Number(adminPdfLogoDraft.width)||0,
+        pdfLogoHeight:Number(adminPdfLogoDraft.height)||0,
+        pdfLogoName:adminPdfLogoDraft.name||'',
         pdfButtonEnabled:Boolean(el('adminPdfButtonEnabled')?.checked),
         pdfButtonText:el('adminPdfButtonText')?.value.trim()||'Acesse aqui',
         pdfButtonUrl:el('adminPdfButtonUrl')?.value.trim()||'',
@@ -2990,6 +3017,13 @@
       el('adminSimulationMinutes').value=draft.simulationMinutes||240;
       el('adminSimulationStart').value=draft.simulationStart||'08:00';
       el('adminPdfTheme').value=draft.pdfTheme||state.adminPdfTheme||state.adminPersonalization?.pdfTheme||'premium_masculino';
+      adminPdfLogoDraft={
+        data:draft.pdfLogoData||state.adminPdfLogoData||state.adminPersonalization?.pdfLogoData||'',
+        width:Number(draft.pdfLogoWidth||state.adminPdfLogoWidth||state.adminPersonalization?.pdfLogoWidth)||0,
+        height:Number(draft.pdfLogoHeight||state.adminPdfLogoHeight||state.adminPersonalization?.pdfLogoHeight)||0,
+        name:draft.pdfLogoName||state.adminPdfLogoName||state.adminPersonalization?.pdfLogoName||''
+      };
+      el('adminPdfLogoEnabled').checked=Boolean(draft.pdfLogoEnabled??state.adminPdfLogoEnabled??state.adminPersonalization?.pdfLogoEnabled);
       el('adminPdfButtonEnabled').checked=Boolean(draft.pdfButtonEnabled??state.adminPdfButtonEnabled??state.adminPersonalization?.pdfButtonEnabled);
       el('adminPdfButtonText').value=draft.pdfButtonText||state.adminPdfButtonText||state.adminPersonalization?.pdfButtonText||'Acesse aqui';
       el('adminPdfButtonUrl').value=draft.pdfButtonUrl||state.adminPdfButtonUrl||state.adminPersonalization?.pdfButtonUrl||'';
@@ -3149,6 +3183,42 @@
       policial_masculino:'Policial Masculino', vestibular_masculino:'Vestibular Masculino', executivo_masculino:'Executivo Masculino', minimalista_masculino:'Minimalista Masculino', premium_masculino:'Premium Masculino'
     };
 
+    async function processAdminPdfLogo(file){
+      if(!file) return;
+      if(!String(file.type||'').startsWith('image/')) return toast('Selecione uma imagem válida para a logo.');
+      if(file.size>4*1024*1024) return toast('A imagem da logo deve ter no máximo 4 MB.');
+      const objectUrl=URL.createObjectURL(file);
+      try{
+        const image=await new Promise((resolve,reject)=>{
+          const img=new Image();
+          img.onload=()=>resolve(img);
+          img.onerror=()=>reject(new Error('Imagem inválida'));
+          img.src=objectUrl;
+        });
+        const maxWidth=520, maxHeight=180;
+        const scale=Math.min(1,maxWidth/image.naturalWidth,maxHeight/image.naturalHeight);
+        const width=Math.max(1,Math.round(image.naturalWidth*scale));
+        const height=Math.max(1,Math.round(image.naturalHeight*scale));
+        const canvas=document.createElement('canvas');
+        canvas.width=width; canvas.height=height;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#ffffff';
+        ctx.fillRect(0,0,width,height);
+        ctx.drawImage(image,0,0,width,height);
+        const data=canvas.toDataURL('image/jpeg',.82);
+        adminPdfLogoDraft={data,width,height,name:file.name||'logo'};
+        el('adminPdfLogoEnabled').checked=true;
+        renderAdminPdfSettings();
+        saveAdminDraft();
+        toast('Logo adicionada. Ela aparecerá somente se a opção estiver marcada.');
+      }catch(error){
+        console.error('Falha ao processar logo:',error);
+        toast('Não foi possível processar esta imagem. Tente PNG, JPG ou WEBP.');
+      }finally{
+        URL.revokeObjectURL(objectUrl);
+      }
+    }
+
     function renderAdminPdfSettings(){
       const note=el('adminPdfThemeNote');
       const theme=el('adminPdfTheme')?.value||'premium_masculino';
@@ -3158,6 +3228,15 @@
         const field=el(id);
         if(field) field.disabled=!enabled;
       });
+      const logoEnabled=Boolean(el('adminPdfLogoEnabled')?.checked);
+      const status=el('adminPdfLogoStatus');
+      if(status){
+        status.textContent=adminPdfLogoDraft.data
+          ? `${logoEnabled?'Logo ativada':'Logo carregada, mas desativada'}: ${adminPdfLogoDraft.name||'imagem selecionada'}.`
+          : 'Nenhuma logo selecionada. O PDF será gerado sem logo.';
+      }
+      const remove=el('adminPdfLogoRemoveBtn');
+      if(remove) remove.disabled=!adminPdfLogoDraft.data;
     }
 
     function updateAdminDaysAvailable(){
@@ -3492,6 +3571,11 @@
         simulationType:draft.simulationType,
         simulationCount:preview.simDates.length,
         pdfTheme:draft.pdfTheme,
+        pdfLogoEnabled:draft.pdfLogoEnabled,
+        pdfLogoData:draft.pdfLogoData,
+        pdfLogoWidth:draft.pdfLogoWidth,
+        pdfLogoHeight:draft.pdfLogoHeight,
+        pdfLogoName:draft.pdfLogoName,
         pdfButtonEnabled:draft.pdfButtonEnabled,
         pdfButtonText:draft.pdfButtonText,
         pdfButtonUrl:draft.pdfButtonUrl,
@@ -3545,6 +3629,11 @@
       state.adminGenerated=true;
       state.adminPlanDays=preview.window.days;
       state.adminPdfTheme=draft.pdfTheme;
+      state.adminPdfLogoEnabled=draft.pdfLogoEnabled;
+      state.adminPdfLogoData=draft.pdfLogoData;
+      state.adminPdfLogoWidth=draft.pdfLogoWidth;
+      state.adminPdfLogoHeight=draft.pdfLogoHeight;
+      state.adminPdfLogoName=draft.pdfLogoName;
       state.adminPdfButtonEnabled=draft.pdfButtonEnabled;
       state.adminPdfButtonText=draft.pdfButtonText;
       state.adminPdfButtonUrl=draft.pdfButtonUrl;
@@ -4346,6 +4435,45 @@
       return preset;
     }
 
+    function pdfLogoSettings(){
+      const data=state.adminPersonalization||{};
+      return {
+        enabled:Boolean(data.pdfLogoEnabled??state.adminPdfLogoEnabled),
+        data:data.pdfLogoData||state.adminPdfLogoData||'',
+        width:Number(data.pdfLogoWidth||state.adminPdfLogoWidth)||0,
+        height:Number(data.pdfLogoHeight||state.adminPdfLogoHeight)||0
+      };
+    }
+
+    function pdfHasLogo(){
+      const logo=pdfLogoSettings();
+      return Boolean(logo.enabled&&logo.data&&logo.width>0&&logo.height>0);
+    }
+
+    function pdfLogoAsset(){
+      const logo=pdfLogoSettings();
+      if(!logo.enabled||!logo.data||!logo.width||!logo.height) return null;
+      const match=String(logo.data).match(/^data:image\/jpeg;base64,(.+)$/);
+      if(!match) return null;
+      try{
+        const decoded=atob(match[1]);
+        return {binary:decoded,width:logo.width,height:logo.height};
+      }catch{return null;}
+    }
+
+    function pdfDrawOptionalLogo(commands){
+      if(!pdfHasLogo()) return;
+      const logo=pdfLogoSettings();
+      const {width,height,margin}=PDF_PAGE;
+      const maxWidth=92, maxHeight=42;
+      const scale=Math.min(maxWidth/logo.width,maxHeight/logo.height);
+      const drawWidth=Math.max(1,logo.width*scale);
+      const drawHeight=Math.max(1,logo.height*scale);
+      const x=width-margin-drawWidth;
+      const y=height-66+(42-drawHeight)/2;
+      commands.push(`q\n${pdfNumber(drawWidth)} 0 0 ${pdfNumber(drawHeight)} ${pdfNumber(x)} ${pdfNumber(y)} cm\n/Logo Do\nQ`);
+    }
+
     function pdfNumber(value){
       return Number(Number(value).toFixed(2)).toString();
     }
@@ -4630,6 +4758,7 @@
 
     function pdfDrawThemeIllustration(commands,variant='header'){
       if(!pdfIsPoliceTheme()) return;
+      if(variant==='header'&&pdfHasLogo()) return;
       const {width,height}=PDF_PAGE;
       const landscape=width>height;
       if(variant==='intro-body'){
@@ -4654,6 +4783,7 @@
       pdfText(commands,margin+19,height-38,'CRONOGRAMA PERSONALIZADO',21,true,PDF_COLORS.white);
       pdfText(commands,margin+19,height-60,'Prof. Lucas MPC',10.5,true,PDF_COLORS.cyan);
       pdfDrawThemeIllustration(commands,'header');
+      pdfDrawOptionalLogo(commands);
 
       const leftX=margin;
       const leftW=width*.55-margin-12;
@@ -4699,6 +4829,7 @@
       pdfText(commands,margin+19,height-48,'CRONOGRAMA PERSONALIZADO',21,true,PDF_COLORS.white);
       pdfText(commands,margin+19,height-72,'Prof. Lucas MPC',11,true,PDF_COLORS.cyan);
       pdfDrawThemeIllustration(commands,'header');
+      pdfDrawOptionalLogo(commands);
 
       pdfText(commands,margin,height-151,'ESTE CRONOGRAMA FOI CRIADO',18,true,PDF_COLORS.navy);
       pdfText(commands,margin,height-176,'ESPECIFICAMENTE PARA',18,true,PDF_COLORS.navy);
@@ -4920,8 +5051,9 @@
       pdfText(commands,margin+18,height-43,'CRONOGRAMA DE ESTUDOS',21,true,PDF_COLORS.white);
       pdfText(commands,margin+18,height-63,sectionTitle||pdfScheduleStyleLabel(),10.2,true,PDF_COLORS.cyan);
       pdfDrawThemeIllustration(commands,'header');
+      pdfDrawOptionalLogo(commands);
 
-      const objective=pdfWrapText(`Objetivo: ${state.goal||'Não informado'}`,width-margin*2,10.6,1,true)[0];
+      const objective=pdfWrapText(`Objetivo: ${state.goal||'Não informado'}`,width-margin*2,11.2,1,true)[0];
       pdfText(commands,margin,height-107,objective,10.6,true,PDF_COLORS.text);
       if(state.studentName){
         const student=pdfWrapText(`Aluno: ${state.studentName}`,width-margin*2,9.6,1,true)[0];
@@ -4952,7 +5084,7 @@
     }
 
     function pdfPrepareChecklistStyle(){
-      return pdfChunk(pdfSortedTasks(),11);
+      return pdfChunk(pdfSortedTasks(),8);
     }
 
     function pdfBuildChecklistStylePage(tasks,pageIndex,pageCount){
@@ -4963,14 +5095,14 @@
         const done=Boolean(task.done);
         pdfRect(commands,PDF_PAGE.margin,y-13,13,13,done?PDF_COLORS.successSoft:PDF_COLORS.white,done?PDF_COLORS.success:PDF_COLORS.line,1);
         if(done) pdfText(commands,PDF_PAGE.margin+2.7,y-10,'X',9,true,PDF_COLORS.success);
-        const subject=pdfWrapText(task.subject||'Disciplina',355,10.8,1,true)[0];
-        const activity=pdfWrapText(task.activity||'Atividade de estudo',355,9.4,1,false)[0];
-        pdfText(commands,PDF_PAGE.margin+24,y-2,subject,10.8,true,PDF_COLORS.navy);
-        pdfText(commands,PDF_PAGE.margin+24,y-17,activity,9.4,false,PDF_COLORS.text);
+        const subject=pdfWrapText(task.subject||'Disciplina',350,12.2,1,true)[0];
+        const activity=pdfWrapText(task.activity||'Atividade de estudo',350,10.6,2,false)[0];
+        pdfText(commands,PDF_PAGE.margin+24,y-2,subject,12.2,true,PDF_COLORS.navy);
+        pdfText(commands,PDF_PAGE.margin+24,y-19,activity,10.6,false,PDF_COLORS.text);
         const meta=task.date?pdfDateLabel(task):`${task.type||'Estudo'} · ${task.start||''}${task.end?`–${task.end}`:''}`;
-        pdfText(commands,PDF_PAGE.width-PDF_PAGE.margin-132,y-9,pdfWrapText(meta,132,7.8,2,false)[0],7.8,false,PDF_COLORS.muted,'right',132);
-        pdfLine(commands,PDF_PAGE.margin,y-31,PDF_PAGE.width-PDF_PAGE.margin,y-31,PDF_COLORS.line,.55);
-        y-=48;
+        pdfText(commands,PDF_PAGE.width-PDF_PAGE.margin-124,y-9,pdfWrapText(meta,124,8.6,2,false)[0],8.6,false,PDF_COLORS.muted,'right',124);
+        pdfLine(commands,PDF_PAGE.margin,y-42,PDF_PAGE.width-PDF_PAGE.margin,y-42,PDF_COLORS.line,.55);
+        y-=64;
       });
       if(!tasks.length) pdfText(commands,PDF_PAGE.margin,chrome.bodyTop-30,'Nenhum item cadastrado.',12,true,PDF_COLORS.muted);
       return {content:commands.join('\n'),button:chrome.button};
@@ -4978,7 +5110,7 @@
 
     function pdfPrepareCycleStyle(){
       const ordered=[...state.tasks].sort((a,b)=>(a.cycleOrder??9999)-(b.cycleOrder??9999)||a.day-b.day||(a.start||'').localeCompare(b.start||''));
-      return pdfChunk(ordered,8);
+      return pdfChunk(ordered,6);
     }
 
     function pdfBuildCycleStylePage(tasks,pageIndex,pageCount,pageOffset=0){
@@ -4990,11 +5122,11 @@
         pdfRect(commands,PDF_PAGE.margin,y-39,40,40,index===0&&pageIndex===0?PDF_COLORS.gold:PDF_COLORS.navy,null,0);
         pdfText(commands,PDF_PAGE.margin,y-25,String(number),14,true,index===0&&pageIndex===0?PDF_COLORS.navy:PDF_COLORS.white,'center',40);
         const x=PDF_PAGE.margin+54;
-        pdfText(commands,x,y-6,pdfWrapText(task.subject||'Disciplina',390,12.2,1,true)[0],12.2,true,PDF_COLORS.navy);
-        pdfText(commands,x,y-22,pdfWrapText(task.activity||'Atividade',390,9.7,1,false)[0],9.7,false,PDF_COLORS.text);
-        pdfText(commands,x,y-37,`${task.type||'Estudo'} · ${formatHours(taskDuration(task))}${task.done?' · Concluída':''}`,8.2,true,task.done?PDF_COLORS.success:PDF_COLORS.muted);
-        pdfLine(commands,PDF_PAGE.margin,y-51,PDF_PAGE.width-PDF_PAGE.margin,y-51,PDF_COLORS.line,.6);
-        y-=65;
+        pdfText(commands,x,y-6,pdfWrapText(task.subject||'Disciplina',390,13.2,1,true)[0],13.2,true,PDF_COLORS.navy);
+        pdfText(commands,x,y-24,pdfWrapText(task.activity||'Atividade',390,10.6,2,false)[0],10.6,false,PDF_COLORS.text);
+        pdfText(commands,x,y-43,`${task.type||'Estudo'} · ${formatHours(taskDuration(task))}${task.done?' · Concluída':''}`,9.1,true,task.done?PDF_COLORS.success:PDF_COLORS.muted);
+        pdfLine(commands,PDF_PAGE.margin,y-59,PDF_PAGE.width-PDF_PAGE.margin,y-59,PDF_COLORS.line,.6);
+        y-=82;
       });
       if(!tasks.length) pdfText(commands,PDF_PAGE.margin,chrome.bodyTop-30,'Nenhuma etapa cadastrada.',12,true,PDF_COLORS.muted);
       return {content:commands.join('\n'),button:chrome.button};
@@ -5030,8 +5162,8 @@
         });
         let page={weekIndex,items:[],height:0};
         byDay.forEach(day=>{
-          const h=30+day.tasks.length*31;
-          if(page.items.length&&page.height+h>510){ pages.push(page); page={weekIndex,items:[],height:0}; }
+          const h=34+day.tasks.length*38;
+          if(page.items.length&&page.height+h>500){ pages.push(page); page={weekIndex,items:[],height:0}; }
           page.items.push(day); page.height+=h;
         });
         if(page.items.length) pages.push(page);
@@ -5048,12 +5180,12 @@
         const first=day.tasks[0];
         const label=first?.date?pdfDateLabel(first):(DAYS[first?.day]||'Dia de estudo');
         pdfRect(commands,PDF_PAGE.margin,y-20,PDF_PAGE.width-PDF_PAGE.margin*2,22,PDF_COLORS.soft,PDF_COLORS.line,.6);
-        pdfText(commands,PDF_PAGE.margin+10,y-14,label,9.4,true,PDF_COLORS.navy);
-        y-=31;
+        pdfText(commands,PDF_PAGE.margin+10,y-14,label,10.4,true,PDF_COLORS.navy);
+        y-=34;
         day.tasks.forEach(task=>{
-          pdfText(commands,PDF_PAGE.margin+12,y,`${task.start||''}${task.end?`–${task.end}`:''}`,8,true,PDF_COLORS.muted);
-          pdfText(commands,PDF_PAGE.margin+82,y,pdfWrapText(`${task.subject} — ${task.activity}`,PDF_PAGE.width-PDF_PAGE.margin*2-94,9.1,1,false)[0],9.1,false,PDF_COLORS.text);
-          y-=31;
+          pdfText(commands,PDF_PAGE.margin+12,y,`${task.start||''}${task.end?`–${task.end}`:''}`,9.1,true,PDF_COLORS.muted);
+          pdfText(commands,PDF_PAGE.margin+86,y,pdfWrapText(`${task.subject} — ${task.activity}`,PDF_PAGE.width-PDF_PAGE.margin*2-98,10.2,1,false)[0],10.2,false,PDF_COLORS.text);
+          y-=38;
         });
         y-=4;
       });
@@ -5079,108 +5211,86 @@
         tasksByDate.get(task.date).push(task);
       });
       let dates=state.adminGenerated?pdfAdminCalendarDates():[];
-      if(!dates.length){
-        dates=[...tasksByDate.keys()].sort().map(dateFromKey).filter(Boolean);
-      }
-      if(!dates.length) return [{weekIndex:0,items:[]}];
-      const planIndex=new Map(dates.map((date,index)=>[localDateKey(date),index]));
-      const first=new Date(dates[0]);
-      first.setDate(first.getDate()-((first.getDay()+6)%7));
-      const last=new Date(dates.at(-1));
-      last.setDate(last.getDate()+(6-((last.getDay()+6)%7)));
+      if(!dates.length) dates=[...tasksByDate.keys()].sort().map(dateFromKey).filter(Boolean);
+      const days=dates.map((date,index)=>({
+        key:localDateKey(date),
+        date,
+        planIndex:index,
+        tasks:tasksByDate.get(localDateKey(date))||[]
+      }));
       const pages=[];
-      let cursor=new Date(first);
-      let weekIndex=0;
-      while(cursor<=last){
-        const items=[];
-        for(let col=0;col<7;col++){
-          const date=addCalendarDays(cursor,col);
-          const key=localDateKey(date);
-          items.push({
-            key,date,
-            inRange:planIndex.has(key),
-            planIndex:planIndex.has(key)?planIndex.get(key):-1,
-            tasks:tasksByDate.get(key)||[]
-          });
-        }
-        pages.push({weekIndex,items});
-        cursor=addCalendarDays(cursor,7);
-        weekIndex++;
-      }
-      return pages;
+      for(let i=0;i<days.length;i+=2) pages.push({items:days.slice(i,i+2)});
+      return pages.length?pages:[{items:[]}];
     }
 
-    function pdfCalendarTaskLabel(task){
-      const activity=String(task.activity||'').replace(/^(?:Teoria|Exercícios|Revisão)\s*-\s*/i,'');
-      return `${task.start||''} ${task.subject||'Estudo'} • ${activity}`.trim();
+    function pdfCalendarActivityText(task){
+      return String(task.activity||'Atividade de estudo').replace(/^(?:Teoria|Exercícios|Revisão)\s*-\s*/i,'');
     }
 
     function pdfBuildDaysStylePage(page,pageIndex,pageCount){
       const commands=[];
-      const chrome=pdfDrawStyleChrome(commands,pageIndex,pageCount,`CALENDÁRIO POR QUANTIDADE DE DIAS · SEMANA ${page.weekIndex+1}`);
+      const labels=page.items.map(day=>day.planIndex+1);
+      const suffix=labels.length===2?`DIAS ${labels[0]} E ${labels[1]}`:(labels.length?`DIA ${labels[0]}`:'CALENDÁRIO');
+      const chrome=pdfDrawStyleChrome(commands,pageIndex,pageCount,`CALENDÁRIO POR QUANTIDADE DE DIAS · ${suffix}`);
       const {width,margin}=PDF_PAGE;
-      const gap=5;
-      const top=chrome.bodyTop;
+      const top=chrome.bodyTop-6;
       const bottom=chrome.bodyBottom+4;
-      const cellHeight=top-bottom;
-      const cellWidth=(width-margin*2-gap*6)/7;
-      const totalDays=state.adminPlanDays||state.adminPersonalization?.planDays||0;
-      const weekStart=page.items[0]?.date;
-      const weekEnd=page.items[6]?.date;
-      if(weekStart&&weekEnd){
-        const range=`${weekStart.toLocaleDateString('pt-BR')} a ${weekEnd.toLocaleDateString('pt-BR')}`;
-        pdfText(commands,width-margin-220,top+14,range,8.3,true,PDF_COLORS.muted,'right',220);
-      }
+      const gap=12;
+      const panelHeight=(top-bottom-gap)/2;
+      const panelWidth=width-margin*2;
+      const totalDays=state.adminPlanDays||state.adminPersonalization?.planDays||page.items.length;
 
-      page.items.forEach((day,col)=>{
-        const x=margin+col*(cellWidth+gap);
+      page.items.forEach((day,index)=>{
+        const panelTop=top-index*(panelHeight+gap);
+        const panelBottom=panelTop-panelHeight;
         const simulation=day.tasks.some(task=>String(task.type||'').toLowerCase().includes('simulado'));
-        const fill=!day.inRange?PDF_COLORS.soft:(simulation?PDF_COLORS.pendingSoft:PDF_COLORS.white);
-        const border=simulation?PDF_COLORS.gold:PDF_COLORS.line;
-        pdfRect(commands,x,bottom,cellWidth,cellHeight,fill,border,simulation?1.15:.7);
-        const headFill=!day.inRange?PDF_COLORS.line:(simulation?PDF_COLORS.gold:PDF_COLORS.navy);
-        pdfRect(commands,x,top-31,cellWidth,31,headFill,null,0);
+        pdfRect(commands,margin,panelBottom,panelWidth,panelHeight,simulation?PDF_COLORS.pendingSoft:PDF_COLORS.white,simulation?PDF_COLORS.gold:PDF_COLORS.line,simulation?1.1:.8);
+        pdfRect(commands,margin,panelTop-38,panelWidth,38,simulation?PDF_COLORS.gold:PDF_COLORS.navy,null,0);
         const dayName=DAYS[(day.date.getDay()+6)%7]||'';
-        pdfText(commands,x+6,top-12,dayName.toUpperCase(),6.6,true,day.inRange?PDF_COLORS.white:PDF_COLORS.muted);
-        pdfText(commands,x+6,top-24,day.date.toLocaleDateString('pt-BR'),7.2,true,day.inRange?(simulation?PDF_COLORS.navy:PDF_COLORS.white):PDF_COLORS.muted);
-        if(day.inRange&&day.planIndex>=0){
-          pdfText(commands,x+cellWidth-52,top-12,`DIA ${day.planIndex+1}/${totalDays}`,6.1,true,day.inRange?PDF_COLORS.white:PDF_COLORS.muted,'right',46);
-        }
-        let y=top-43;
-        if(!day.inRange){
-          pdfText(commands,x+6,y,'FORA DO PERÍODO',6.4,true,PDF_COLORS.muted);
-          return;
-        }
+        pdfText(commands,margin+12,panelTop-16,`${dayName.toUpperCase()} · ${day.date.toLocaleDateString('pt-BR')}`,11.5,true,simulation?PDF_COLORS.navy:PDF_COLORS.white);
+        pdfText(commands,width-margin-100,panelTop-16,`DIA ${day.planIndex+1} DE ${totalDays}`,9.2,true,simulation?PDF_COLORS.navy:PDF_COLORS.white,'right',88);
+
+        const contentTop=panelTop-54;
         if(!day.tasks.length){
-          pdfText(commands,x+6,y,'SEM ESTUDO',7.2,true,PDF_COLORS.muted);
-          pdfText(commands,x+6,y-13,'Descanso / dia livre',6.2,false,PDF_COLORS.muted);
+          pdfText(commands,margin+16,contentTop,'SEM ESTUDO PROGRAMADO',13,true,PDF_COLORS.muted);
+          pdfText(commands,margin+16,contentTop-23,'Descanso / dia livre',10.5,false,PDF_COLORS.muted);
           return;
         }
         if(simulation){
           const task=day.tasks[0];
-          pdfText(commands,x+6,y,'SIMULADO',8,true,PDF_COLORS.goldDark);
-          const simLines=pdfWrapText(task.activity||task.subject,cellWidth-12,6.6,5,true);
-          simLines.forEach((line,index)=>pdfText(commands,x+6,y-15-index*9,line,6.6,index===0,PDF_COLORS.text));
-          if(task.start) pdfText(commands,x+6,y-15-simLines.length*9,`${task.start}${task.end?`–${task.end}`:''}`,6.4,true,PDF_COLORS.muted);
+          pdfText(commands,margin+16,contentTop,'SIMULADO',14,true,PDF_COLORS.goldDark);
+          pdfText(commands,margin+16,contentTop-24,pdfWrapText(task.activity||task.subject,panelWidth-32,12,2,true)[0],12,true,PDF_COLORS.text);
+          pdfText(commands,margin+16,contentTop-47,`${task.start||''}${task.end?`–${task.end}`:''}`,10.5,true,PDF_COLORS.muted);
+          if(task.notes) pdfText(commands,margin+16,contentTop-69,pdfWrapText(task.notes,panelWidth-32,9.5,2,false)[0],9.5,false,PDF_COLORS.muted);
           return;
         }
-        const many=day.tasks.length>11;
-        const font=many?5.15:5.65;
-        const rowHeight=many?Math.max(8.6,Math.min(12,(cellHeight-47)/day.tasks.length)):Math.max(13,Math.min(22,(cellHeight-47)/day.tasks.length));
-        const showTwoLines=!many&&rowHeight>=17;
-        for(const task of day.tasks){
-          if(y<bottom+9) break;
-          if(showTwoLines){
-            const head=`${task.start||''} ${task.subject||'Estudo'}`.trim();
-            pdfText(commands,x+5,y,pdfWrapText(head,cellWidth-10,font,1,true)[0],font,true,PDF_COLORS.navy);
-            const activity=String(task.activity||'').replace(/^(?:Teoria|Exercícios|Revisão)\s*-\s*/i,'');
-            pdfText(commands,x+5,y-7.2,pdfWrapText(activity,cellWidth-10,font-.25,1,false)[0],font-.25,false,PDF_COLORS.text);
-          }else{
-            pdfText(commands,x+5,y,pdfWrapText(pdfCalendarTaskLabel(task),cellWidth-10,font,1,false)[0],font,false,PDF_COLORS.text);
-          }
+
+        const bodyHeight=panelHeight-56;
+        const count=Math.max(1,day.tasks.length);
+        const rowHeight=Math.max(10.8,Math.min(18,bodyHeight/count));
+        const font=rowHeight<12?7.8:(rowHeight<14?8.5:9.2);
+        const timeWidth=62;
+        const subjectWidth=155;
+        const activityX=margin+16+timeWidth+subjectWidth;
+        const activityWidth=panelWidth-32-timeWidth-subjectWidth;
+        let y=contentTop;
+        day.tasks.forEach((task,taskIndex)=>{
+          if(y<panelBottom+9) return;
+          const time=`${task.start||''}${task.end?`–${task.end}`:''}`;
+          const subject=`${task.subject||'Estudo'} · ${task.type||'Estudo'}`;
+          pdfText(commands,margin+16,y,pdfWrapText(time,timeWidth-5,font,1,true)[0],font,true,PDF_COLORS.muted);
+          pdfText(commands,margin+16+timeWidth,y,pdfWrapText(subject,subjectWidth-7,font,1,true)[0],font,true,PDF_COLORS.navy);
+          pdfText(commands,activityX,y,pdfWrapText(pdfCalendarActivityText(task),activityWidth,font,1,false)[0],font,false,PDF_COLORS.text);
+          if(taskIndex<day.tasks.length-1) pdfLine(commands,margin+16,y-rowHeight+3,width-margin-16,y-rowHeight+3,PDF_COLORS.line,.35);
           y-=rowHeight;
-        }
+        });
       });
+
+      if(page.items.length===1){
+        const emptyTop=top-(panelHeight+gap);
+        pdfRect(commands,margin,emptyTop-panelHeight,panelWidth,panelHeight,PDF_COLORS.soft,PDF_COLORS.line,.5);
+        pdfText(commands,margin+16,emptyTop-34,'FIM DO PERÍODO PLANEJADO',11,true,PDF_COLORS.muted);
+      }
       return {content:commands.join('\n'),button:chrome.button};
     }
 
@@ -5205,6 +5315,8 @@
       const pagesRef=addObject('');
       const fontRegularRef=addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
       const fontBoldRef=addObject('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+      const logoAsset=pdfLogoAsset();
+      const logoRef=logoAsset?addObject(`<< /Type /XObject /Subtype /Image /Width ${Math.round(logoAsset.width)} /Height ${Math.round(logoAsset.height)} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoAsset.binary.length} >>\nstream\n${logoAsset.binary}\nendstream`):null;
       const now=new Date();
       const pdfDate=`D:${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
       const infoRef=addObject(`<< /Title (${pdfEscapeText('Cronograma de Estudos - Prof. Lucas MPC')}) /Author (${pdfEscapeText('Prof. Lucas MPC')}) /Creator (${pdfEscapeText('Gerador de Cronograma MPC')}) /CreationDate (${pdfDate}) >>`);
@@ -5215,7 +5327,8 @@
         const {x,y,width,height}=definition.button;
         const annotationUrl=definition.button?.url||PDF_GENERATOR_URL;
         const annotationRef=addObject(`<< /Type /Annot /Subtype /Link /Rect [${pdfNumber(x)} ${pdfNumber(y)} ${pdfNumber(x+width)} ${pdfNumber(y+height)}] /Border [0 0 0] /H /I /A << /S /URI /URI (${pdfEscapeText(annotationUrl)}) >> >>`);
-        const pageRef=addObject(`<< /Type /Page /Parent ${pagesRef} 0 R /MediaBox [0 0 ${pdfNumber(PDF_PAGE.width)} ${pdfNumber(PDF_PAGE.height)}] /Resources << /Font << /F1 ${fontRegularRef} 0 R /F2 ${fontBoldRef} 0 R >> >> /Contents ${contentRef} 0 R /Annots [${annotationRef} 0 R] >>`);
+        const xObject=logoRef?` /XObject << /Logo ${logoRef} 0 R >>`:'';
+        const pageRef=addObject(`<< /Type /Page /Parent ${pagesRef} 0 R /MediaBox [0 0 ${pdfNumber(PDF_PAGE.width)} ${pdfNumber(PDF_PAGE.height)}] /Resources << /Font << /F1 ${fontRegularRef} 0 R /F2 ${fontBoldRef} 0 R >>${xObject} >> /Contents ${contentRef} 0 R /Annots [${annotationRef} 0 R] >>`);
         pageRefs.push(pageRef);
       });
 
@@ -5239,12 +5352,9 @@
     function buildSchedulePdfBytes(){
       pdfApplySelectedTheme();
       const original={width:PDF_PAGE.width,height:PDF_PAGE.height,margin:PDF_PAGE.margin};
-      const calendar=state.scheduleStyle==='monthly';
-      if(calendar){
-        PDF_PAGE.width=841.89;
-        PDF_PAGE.height=595.28;
-        PDF_PAGE.margin=30;
-      }
+      PDF_PAGE.width=595.28;
+      PDF_PAGE.height=841.89;
+      PDF_PAGE.margin=34;
       try{
         const prepared=pdfPrepareByStyle();
         const hasIntro=Boolean(state.adminGenerated&&state.studentName);
@@ -5947,6 +6057,19 @@
         });
       });
       el('adminPdfTheme').addEventListener('change',()=>{ renderAdminPdfSettings(); saveAdminDraft(); });
+      el('adminPdfLogoEnabled').addEventListener('change',()=>{ renderAdminPdfSettings(); saveAdminDraft(); });
+      el('adminPdfLogoUpload').addEventListener('change',event=>{
+        const file=event.target.files?.[0];
+        if(file) processAdminPdfLogo(file);
+        event.target.value='';
+      });
+      el('adminPdfLogoRemoveBtn').addEventListener('click',()=>{
+        adminPdfLogoDraft={data:'',width:0,height:0,name:''};
+        el('adminPdfLogoEnabled').checked=false;
+        renderAdminPdfSettings();
+        saveAdminDraft();
+        toast('Logo removida. O PDF será gerado sem logo.');
+      });
       el('adminPdfButtonEnabled').addEventListener('change',()=>{ renderAdminPdfSettings(); saveAdminDraft(); });
       document.querySelectorAll('#adminPanel input,#adminPanel select,#adminPanel textarea').forEach(field=>{
         if(field.closest('.admin-subject-card')) return;
@@ -6205,7 +6328,12 @@
         adminPdfButtonEnabled:Boolean(state.adminPdfButtonEnabled),
         adminPdfButtonText:state.adminPdfButtonText||'Acesse aqui',
         adminPdfButtonUrl:state.adminPdfButtonUrl||'',
-        adminPdfButtonPosition:state.adminPdfButtonPosition||'footer-right'
+        adminPdfButtonPosition:state.adminPdfButtonPosition||'footer-right',
+        adminPdfLogoEnabled:Boolean(state.adminPdfLogoEnabled),
+        adminPdfLogoData:state.adminPdfLogoData||'',
+        adminPdfLogoWidth:Number(state.adminPdfLogoWidth)||0,
+        adminPdfLogoHeight:Number(state.adminPdfLogoHeight)||0,
+        adminPdfLogoName:state.adminPdfLogoName||''
       };
 
       const fresh=defaultState();
