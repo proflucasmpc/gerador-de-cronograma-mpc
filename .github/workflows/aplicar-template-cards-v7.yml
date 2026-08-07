@@ -1,0 +1,46 @@
+name: Aplicar seletor visual de templates v7
+on:
+  push:
+    paths:
+      - '.github/scripts/patch-template-cards-v7.py'
+      - '.github/workflows/aplicar-template-cards-v7.yml'
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/correcao-pdfs-personalizacao-v3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Aplicar patch
+        run: python .github/scripts/patch-template-cards-v7.py
+      - name: Validar JavaScript e seletor de templates
+        run: |
+          python - <<'PY'
+          import re, pathlib, subprocess, tempfile
+          s=pathlib.Path('index.html').read_text(encoding='utf-8')
+          assert s.count('class="admin-template-card') >= 10
+          assert 'data-pdf-theme="policial_feminino"' in s
+          assert 'data-pdf-theme="policial_masculino"' in s
+          assert 'data-pdf-theme="vestibular_feminino"' in s
+          assert 'data-pdf-theme="vestibular_masculino"' in s
+          assert 'data-pdf-theme="premium_masculino"' in s
+          scripts=re.findall(r'<script[^>]*>(.*?)</script>',s,re.S)
+          js='\n'.join(scripts)
+          with tempfile.NamedTemporaryFile('w',suffix='.js',delete=False,encoding='utf-8') as f:
+              f.write(js); name=f.name
+          subprocess.run(['node','--check',name],check=True)
+          print('VALIDATION_OK')
+          PY
+      - name: Limpar arquivos temporários e commitar
+        run: |
+          rm -f .github/scripts/patch-template-cards-v7.py .github/workflows/aplicar-template-cards-v7.yml
+          git config user.name 'proflucasmpc'
+          git config user.email 'matematecnica@gmail.com'
+          git add index.html .github/scripts/patch-template-cards-v7.py .github/workflows/aplicar-template-cards-v7.yml
+          git commit -m 'fix: restaurar seletor visual com 10 templates' || exit 0
+          git push origin HEAD:agent/correcao-pdfs-personalizacao-v3
