@@ -1325,6 +1325,30 @@
     .admin-capacity-ok { color: var(--success); font-weight: 800; }
     .admin-pdf-card { display: grid; gap: 14px; }
     .admin-pdf-theme-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+    .admin-template-picker { display:grid; gap:10px; }
+    .admin-template-picker-title { font-weight:800; color:var(--text); }
+    .admin-template-options { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; }
+    .admin-template-card {
+      appearance:none; border:1px solid var(--border); border-radius:13px; background:var(--surface); padding:0; overflow:hidden; cursor:pointer; text-align:left; transition:.16s ease; min-height:116px;
+    }
+    .admin-template-card:hover { transform:translateY(-1px); border-color:var(--gold); }
+    .admin-template-card.is-selected { outline:2px solid var(--gold); outline-offset:1px; border-color:var(--gold); box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 14%,transparent); }
+    .admin-template-preview { height:70px; padding:9px; display:grid; gap:5px; background:var(--tpl-bg,#eef2f7); }
+    .admin-template-preview .tpl-head { height:16px; border-radius:5px; background:var(--tpl-dark,#132039); position:relative; }
+    .admin-template-preview .tpl-head::after { content:''; position:absolute; left:8px; right:45%; top:5px; height:4px; border-radius:4px; background:var(--tpl-accent,#d4a62a); }
+    .admin-template-preview .tpl-day { height:17px; border:1px solid var(--tpl-line,#b8c3d1); border-radius:5px; background:var(--tpl-surface,#fff); position:relative; }
+    .admin-template-preview .tpl-day::before { content:''; position:absolute; left:0; top:0; bottom:0; width:23%; background:var(--tpl-soft,#edf1f6); border-radius:4px 0 0 4px; }
+    .admin-template-name { display:block; padding:9px 9px 10px; font-size:.76rem; line-height:1.2; font-weight:800; color:var(--text); }
+    .tpl-policial-f { --tpl-bg:#f7eef2; --tpl-dark:#101d3b; --tpl-accent:#e78da6; --tpl-soft:#f8dce5; --tpl-line:#d9a8b6; }
+    .tpl-vest-f { --tpl-bg:#f7f3fb; --tpl-dark:#182553; --tpl-accent:#9a78c8; --tpl-soft:#efe4f7; --tpl-line:#c7acd9; }
+    .tpl-elegante-f { --tpl-bg:#faf3f4; --tpl-dark:#542033; --tpl-accent:#c78b83; --tpl-soft:#f4e0e3; --tpl-line:#d7b0b4; }
+    .tpl-min-f { --tpl-bg:#f7f5f6; --tpl-dark:#33353a; --tpl-accent:#b87989; --tpl-soft:#eee8ea; --tpl-line:#ccc5c8; }
+    .tpl-premium-f { --tpl-bg:#f8f3f8; --tpl-dark:#35194a; --tpl-accent:#d6aa73; --tpl-soft:#eee1ef; --tpl-line:#cdb7cf; }
+    .tpl-policial-m { --tpl-bg:#121416; --tpl-dark:#071121; --tpl-accent:#d4a62a; --tpl-soft:#1d2227; --tpl-surface:#17191b; --tpl-line:#555d64; }
+    .tpl-vest-m { --tpl-bg:#eaf7fd; --tpl-dark:#082560; --tpl-accent:#f47712; --tpl-soft:#d7effb; --tpl-line:#78add3; }
+    .tpl-exec-m { --tpl-bg:#edf2f8; --tpl-dark:#151d2a; --tpl-accent:#5280b6; --tpl-soft:#dce5ef; --tpl-line:#9eafc2; }
+    .tpl-min-m { --tpl-bg:#f3f3f3; --tpl-dark:#22262b; --tpl-accent:#77818b; --tpl-soft:#e6e8ea; --tpl-line:#b7bdc2; }
+    .tpl-premium-m { --tpl-bg:#fbfaf6; --tpl-dark:#17191b; --tpl-accent:#b58222; --tpl-soft:#f0eadc; --tpl-line:#cdbd99; }
     .admin-pdf-button-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
     .admin-pdf-toggle {
       display: flex; align-items: flex-start; gap: 10px; padding: 12px;
@@ -1349,6 +1373,7 @@
     .admin-simulation-weekdays input, .admin-simulation-all input { width:17px; height:17px; accent-color:var(--gold); }
     @media (max-width: 700px) {
       .admin-pdf-theme-grid, .admin-pdf-button-grid { grid-template-columns: 1fr; }
+      .admin-template-options { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .admin-simulation-weekdays { grid-template-columns:repeat(2,minmax(0,1fr)); }
     }
     @media (max-width: 900px) {
@@ -1849,25 +1874,31 @@
           <p class="helper">O formato do PDF seguirá o tipo de cronograma escolhido acima. Aqui você escolhe apenas a identidade visual e, se desejar, um botão clicável personalizado.</p>
         </div>
 
-        <div class="admin-pdf-theme-grid">
-          <div class="field full">
-            <label for="adminPdfTheme">Modelo visual do PDF</label>
-            <select id="adminPdfTheme">
-              <optgroup label="Modelos femininos">
-                <option value="policial_feminino">Policial Feminino</option>
-                <option value="vestibular_feminino">Vestibular Feminino</option>
-                <option value="elegante_feminino">Elegante Feminino</option>
-                <option value="minimalista_feminino">Minimalista Feminino</option>
-                <option value="premium_feminino">Premium Feminino</option>
-              </optgroup>
-              <optgroup label="Modelos masculinos">
-                <option value="policial_masculino">Policial Masculino</option>
-                <option value="vestibular_masculino">Vestibular Masculino</option>
-                <option value="executivo_masculino">Executivo Masculino</option>
-                <option value="minimalista_masculino">Minimalista Masculino</option>
-                <option value="premium_masculino" selected>Premium Masculino</option>
-              </optgroup>
-            </select>
+        <div class="admin-template-picker">
+          <span class="admin-template-picker-title">Escolha o template visual do PDF</span>
+          <select id="adminPdfTheme" hidden aria-hidden="true">
+            <option value="policial_feminino">Policial Feminino</option>
+            <option value="vestibular_feminino">Vestibular Feminino</option>
+            <option value="elegante_feminino">Elegante Feminino</option>
+            <option value="minimalista_feminino">Minimalista Feminino</option>
+            <option value="premium_feminino">Premium Feminino</option>
+            <option value="policial_masculino">Policial Masculino</option>
+            <option value="vestibular_masculino">Vestibular Masculino</option>
+            <option value="executivo_masculino">Executivo Masculino</option>
+            <option value="minimalista_masculino">Minimalista Masculino</option>
+            <option value="premium_masculino" selected>Premium Masculino</option>
+          </select>
+          <div class="admin-template-options" id="adminTemplateOptions">
+            <button type="button" class="admin-template-card tpl-policial-f" data-pdf-theme="policial_feminino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Policial Feminino</span></button>
+            <button type="button" class="admin-template-card tpl-vest-f" data-pdf-theme="vestibular_feminino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Vestibular Feminino</span></button>
+            <button type="button" class="admin-template-card tpl-elegante-f" data-pdf-theme="elegante_feminino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Elegante Feminino</span></button>
+            <button type="button" class="admin-template-card tpl-min-f" data-pdf-theme="minimalista_feminino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Minimalista Feminino</span></button>
+            <button type="button" class="admin-template-card tpl-premium-f" data-pdf-theme="premium_feminino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Premium Feminino</span></button>
+            <button type="button" class="admin-template-card tpl-policial-m" data-pdf-theme="policial_masculino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Policial Masculino</span></button>
+            <button type="button" class="admin-template-card tpl-vest-m" data-pdf-theme="vestibular_masculino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Vestibular Masculino</span></button>
+            <button type="button" class="admin-template-card tpl-exec-m" data-pdf-theme="executivo_masculino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Executivo Masculino</span></button>
+            <button type="button" class="admin-template-card tpl-min-m" data-pdf-theme="minimalista_masculino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Minimalista Masculino</span></button>
+            <button type="button" class="admin-template-card tpl-premium-m" data-pdf-theme="premium_masculino"><span class="admin-template-preview"><span class="tpl-head"></span><span class="tpl-day"></span><span class="tpl-day"></span></span><span class="admin-template-name">Premium Masculino</span></button>
           </div>
         </div>
         <div class="admin-pdf-theme-note" id="adminPdfThemeNote">O modelo visual é independente do tipo de cronograma. Nos formatos Semanal e Por Dias, o PDF usa o novo padrão premium com 2 dias grandes por página, inspirado nos templates aprovados.</div>
@@ -3219,9 +3250,19 @@
       }
     }
 
+    function syncAdminPdfThemeCards(){
+      const theme=el('adminPdfTheme')?.value||'premium_masculino';
+      document.querySelectorAll('.admin-template-card[data-pdf-theme]').forEach(card=>{
+        const selected=card.dataset.pdfTheme===theme;
+        card.classList.toggle('is-selected',selected);
+        card.setAttribute('aria-pressed',selected?'true':'false');
+      });
+    }
+
     function renderAdminPdfSettings(){
       const note=el('adminPdfThemeNote');
       const theme=el('adminPdfTheme')?.value||'premium_masculino';
+      syncAdminPdfThemeCards();
       const enabled=Boolean(el('adminPdfButtonEnabled')?.checked);
       if(note) note.textContent=`Modelo selecionado: ${ADMIN_PDF_THEME_LABELS[theme]||'Premium Masculino'}. O visual é independente do formato do cronograma.`;
       ['adminPdfButtonText','adminPdfButtonUrl','adminPdfButtonPosition'].forEach(id=>{
@@ -6245,6 +6286,16 @@
         });
       });
       el('adminPdfTheme').addEventListener('change',()=>{ renderAdminPdfSettings(); saveAdminDraft(); });
+      document.querySelectorAll('.admin-template-card[data-pdf-theme]').forEach(card=>{
+        card.addEventListener('click',()=>{
+          const select=el('adminPdfTheme');
+          if(!select) return;
+          select.value=card.dataset.pdfTheme||'premium_masculino';
+          renderAdminPdfSettings();
+          saveAdminDraft();
+          toast(`Template selecionado: ${ADMIN_PDF_THEME_LABELS[select.value]||'Modelo personalizado'}.`);
+        });
+      });
       el('adminPdfLogoEnabled').addEventListener('change',()=>{ renderAdminPdfSettings(); saveAdminDraft(); });
       el('adminPdfLogoUpload').addEventListener('change',event=>{
         const file=event.target.files?.[0];
