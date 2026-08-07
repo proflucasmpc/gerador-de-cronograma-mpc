@@ -1,0 +1,70 @@
+name: Aplicar correcoes PDF v3
+
+on:
+  push:
+    branches:
+      - agent/correcao-pdfs-personalizacao-v3
+
+permissions:
+  contents: write
+
+jobs:
+  aplicar:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: agent/correcao-pdfs-personalizacao-v3
+          fetch-depth: 0
+
+      - name: Aplicar correcoes
+        run: python scripts/apply_pdf_v3.py
+
+      - name: Validar JavaScript principal
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path('index.html').read_text(encoding='utf-8')
+          blocks=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',html,re.S)
+          main=max((b for b in blocks if 'Gerador de Cronograma MPC' in b or "'use strict'" in b), key=len)
+          Path('/tmp/main.js').write_text(main,encoding='utf-8')
+          print('JavaScript extraído:',len(main),'caracteres')
+          PY
+          node --check /tmp/main.js
+
+      - name: Validar estrutura essencial
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html=Path('index.html').read_text(encoding='utf-8')
+          checks={
+            '10 temas de PDF': html.count('<option value="policial_feminino">')==1 and html.count('<option value="premium_masculino"')==1,
+            'PDF checklist': 'pdfBuildChecklistStylePage' in html,
+            'PDF ciclo': 'pdfBuildCycleStylePage' in html,
+            'PDF semanal': 'pdfBuildWeeklyStylePage' in html,
+            'PDF por dias': 'pdfBuildDaysStylePage' in html,
+            'link personalizado': 'adminPdfButtonUrl' in html and 'pdfSafeHttpUrl' in html,
+            'distribuicao equilibrada': 'adminDistributionDiagnostics' in html,
+            'calculo pela prova preservado': 'useDaysUntilExam' in html and 'adminPlanDays' in html,
+            'Netlify Forms preservado': 'data-netlify="true"' in html,
+            'visao admin preservada': 'adminViewSwitch' in html,
+          }
+          failed=[name for name,ok in checks.items() if not ok]
+          for name,ok in checks.items(): print(('OK' if ok else 'FALHOU'),name)
+          if failed: raise SystemExit('Falhas: '+', '.join(failed))
+          PY
+
+      - name: Remover arquivos temporarios
+        run: rm -f scripts/apply_pdf_v3.py .github/workflows/aplicar-pdf-v3.yml
+
+      - name: Commit da atualização
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "feat: corrigir PDFs e personalizacao administrativa"
+          git push origin HEAD:agent/correcao-pdfs-personalizacao-v3
