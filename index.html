@@ -3699,6 +3699,8 @@
       renderSubjects();
       applyScheduleStyleUI();
       renderSchedule();
+      renderInsights();
+      renderAdminInsights(false);
       saveState();
       saveAdminDraft();
 
@@ -4445,11 +4447,31 @@
     }
 
     function renderInsights(){
-      const markup=buildInsightsMarkup(state.tasks);
       const studentBox=el('insights');
-      const adminBox=el('adminInsights');
-      if(studentBox) studentBox.innerHTML=markup;
-      if(adminBox) adminBox.innerHTML=markup;
+      if(studentBox) studentBox.innerHTML=buildInsightsMarkup(state.tasks);
+    }
+
+    function renderAdminInsights(showFeedback=false){
+      const box=el('adminInsights');
+      if(!box) return;
+
+      const draft=adminDraftObject();
+      const preview=adminSchedulePreview(draft);
+      if(preview.error){
+        box.innerHTML=`<div class="insight"><strong>Resumo indisponível</strong><p>${preview.error}</p></div>`;
+        if(showFeedback) toast(preview.error);
+        return;
+      }
+
+      const planned=adminBuildStudyTasks(draft,preview);
+      if(planned.error){
+        box.innerHTML=`<div class="insight"><strong>Resumo indisponível</strong><p>${planned.error}</p></div>`;
+        if(showFeedback) toast('A configuração atual precisa ser ajustada antes de calcular o resumo.');
+        return;
+      }
+
+      box.innerHTML=buildInsightsMarkup(planned.tasks);
+      if(showFeedback) toast('Resumo inteligente atualizado com as configurações atuais.');
     }
 
     function startAdClock(){
@@ -6499,7 +6521,7 @@
       el('exportExcelBtn').onclick=exportExcel;
       el('clearBtn').onclick=()=>{if(confirm('Apagar todas as atividades do cronograma?')){state.tasks=[];saveState();renderSchedule();toast('Cronograma limpo.');}};
       el('refreshInsightsBtn').onclick=renderInsights;
-      if(el('adminRefreshInsightsBtn')) el('adminRefreshInsightsBtn').onclick=renderInsights;
+      if(el('adminRefreshInsightsBtn')) el('adminRefreshInsightsBtn').onclick=()=>renderAdminInsights(true);
       el('expandStatsBtn').onclick=updateStats;
       el('creditShareBtn').onclick=()=>{closeModal('creditModal');openShareModal(true);};
       document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{
