@@ -3642,6 +3642,30 @@
       const reviewError=distribute(reviewUnits,revisionDates);
       if(reviewError) return reviewError;
 
+      preview.simDates.forEach((date,simulationIndex)=>{
+        const start=timeToMinutes(draft.simulationStart);
+        const day=(date.getDay()+6)%7;
+        const bySubject=draft.simulationType==='subject';
+        const simulationSubject=bySubject&&draft.subjects.length
+          ? String(draft.subjects[simulationIndex%draft.subjects.length].name||'Matéria').trim()
+          : '';
+        tasks.push({
+          id:cryptoId(),
+          day,
+          date:localDateKey(date),
+          cycleOrder:tasks.length,
+          start:minutesToTime(start),
+          end:minutesToTime(start+draft.simulationMinutes),
+          subject:bySubject?`Simulado - ${simulationSubject}`:'Simulado completo',
+          activity:bySubject?`Simulado por matéria - ${simulationSubject}`:`Simulado completo - ${draft.goal}`,
+          type:bySubject?'Simulado por matéria':'Simulado completo',
+          notes:bySubject
+            ? `Dia reservado exclusivamente para simulado da matéria ${simulationSubject}.`
+            : 'Dia reservado exclusivamente para a realização do simulado completo.',
+          done:false
+        });
+      });
+
       tasks.sort((a,b)=>{
         const da=dateFromKey(a.date), db=dateFromKey(b.date);
         const diff=(da&&db)?da-db:0;
