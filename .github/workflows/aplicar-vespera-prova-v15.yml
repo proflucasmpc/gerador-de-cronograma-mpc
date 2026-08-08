@@ -27,10 +27,11 @@ jobs:
           from pathlib import Path
           import re
           s=Path('index.html').read_text(encoding='utf-8')
-          m=re.search(r'<script>([\s\S]*?)</script>\s*</body>',s)
-          if not m:
-              raise SystemExit('script principal não encontrado')
-          Path('/tmp/app.js').write_text(m.group(1),encoding='utf-8')
+          blocks=re.findall(r'<script[^>]*>([\s\S]*?)</script>',s,re.I)
+          if not blocks:
+              raise SystemExit('nenhum bloco script encontrado')
+          code='\n'.join(blocks)
+          Path('/tmp/app.js').write_text(code,encoding='utf-8')
           PY
           node --check /tmp/app.js
       - name: Validar regra da véspera
