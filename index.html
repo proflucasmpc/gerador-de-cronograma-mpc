@@ -1868,9 +1868,20 @@
         <div class="admin-subjects-list" id="adminSubjectsList"></div>
       </section>
 
+      <section class="admin-card tool-destination" id="adminInsightsCard">
+        <div class="section-title">
+          <div>
+            <h3>6. Resumo inteligente</h3>
+            <p class="helper">Mostra, com a mesma lógica da visão do aluno, a matéria com maior carga, o equilíbrio do planejamento e a disciplina com menor presença.</p>
+          </div>
+          <button class="btn btn-secondary btn-small" id="adminRefreshInsightsBtn" type="button">Atualizar</button>
+        </div>
+        <div class="insights" id="adminInsights"></div>
+      </section>
+
       <section class="admin-card admin-pdf-card">
         <div>
-          <h3>6. Personalização do PDF</h3>
+          <h3>7. Personalização do PDF</h3>
           <p class="helper">O formato do PDF seguirá o tipo de cronograma escolhido acima. Aqui você escolhe apenas a identidade visual e, se desejar, um botão clicável personalizado.</p>
         </div>
 
@@ -1953,7 +1964,7 @@
 
       <section class="admin-card admin-generate-card">
         <div>
-          <h3>7. Gere o cronograma personalizado</h3>
+          <h3>8. Gere o cronograma personalizado</h3>
           <p class="helper" id="adminCapacityPreview">Preencha os dados para verificar a capacidade do período.</p>
           <p class="admin-generation-status" id="adminGenerationStatus" role="status" aria-live="polite"></p>
         </div>
@@ -4416,16 +4427,26 @@
       el('statTasks').textContent=total; el('statDone').textContent=done; el('statHours').textContent=formatHours(minutes); el('statSubjects').textContent=subjects;
       const pct=total?Math.round(done/total*100):0; el('progressBar').style.width=pct+'%'; el('progressText').textContent=total?`${pct}% do cronograma concluído.`:'Adicione atividades para começar.';
     }
-    function renderInsights(){
-      const box=el('insights'); const totalMinutes=state.tasks.reduce((s,t)=>s+taskDuration(t),0);
-      const bySubject={}; state.tasks.forEach(t=>bySubject[t.subject]=(bySubject[t.subject]||0)+taskDuration(t));
+    function buildInsightsMarkup(tasks=state.tasks){
+      const totalMinutes=tasks.reduce((s,t)=>s+taskDuration(t),0);
+      const bySubject={};
+      tasks.forEach(t=>bySubject[t.subject]=(bySubject[t.subject]||0)+taskDuration(t));
       const entries=Object.entries(bySubject).sort((a,b)=>b[1]-a[1]);
-      const most=entries[0]?.[0]||'Nenhuma'; const least=entries.length>1?entries.at(-1)[0]:'Ainda não calculado';
-      const activeDays=new Set(state.tasks.map(t=>t.day)).size;
-      box.innerHTML=`
+      const most=entries[0]?.[0]||'Nenhuma';
+      const least=entries.length>1?entries.at(-1)[0]:'Ainda não calculado';
+      const activeDays=new Set(tasks.map(t=>t.day)).size;
+      return `
         <div class="insight"><strong>Distribuição principal</strong><p>${most} concentra mais tempo no cronograma atual.</p></div>
         <div class="insight"><strong>Equilíbrio semanal</strong><p>${activeDays} dia(s) possuem atividades e o total planejado é ${formatHours(totalMinutes)}.</p></div>
         <div class="insight"><strong>Ponto de atenção</strong><p>${least} possui menor presença. Reavalie se a disciplina também é importante para seu objetivo.</p></div>`;
+    }
+
+    function renderInsights(){
+      const markup=buildInsightsMarkup(state.tasks);
+      const studentBox=el('insights');
+      const adminBox=el('adminInsights');
+      if(studentBox) studentBox.innerHTML=markup;
+      if(adminBox) adminBox.innerHTML=markup;
     }
 
     function startAdClock(){
@@ -6396,7 +6417,9 @@
       el('exportPdfBtn').onclick=exportPdf;
       el('exportExcelBtn').onclick=exportExcel;
       el('clearBtn').onclick=()=>{if(confirm('Apagar todas as atividades do cronograma?')){state.tasks=[];saveState();renderSchedule();toast('Cronograma limpo.');}};
-      el('refreshInsightsBtn').onclick=renderInsights; el('expandStatsBtn').onclick=updateStats;
+      el('refreshInsightsBtn').onclick=renderInsights;
+      if(el('adminRefreshInsightsBtn')) el('adminRefreshInsightsBtn').onclick=renderInsights;
+      el('expandStatsBtn').onclick=updateStats;
       el('creditShareBtn').onclick=()=>{closeModal('creditModal');openShareModal(true);};
       document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{
         if(b.dataset.close==='tutorialModal') sessionStorage.setItem(TUTORIAL_SESSION_KEY,'1');
