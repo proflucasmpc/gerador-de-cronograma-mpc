@@ -9,7 +9,6 @@ def rep(old,new,label):
         raise SystemExit(f'{label}: bloco não encontrado')
     s=s.replace(old,new,1)
 
-# Adiciona o mesmo Resumo inteligente da visão do aluno à área administrativa.
 anchor='''      <section class="admin-card admin-pdf-card">\n        <div>\n          <h3>6. Personalização do PDF</h3>'''
 insert='''      <section class="admin-card tool-destination" id="adminInsightsCard">\n        <div class="section-title">\n          <div>\n            <h3>6. Resumo inteligente</h3>\n            <p class="helper">Mostra, com a mesma lógica da visão do aluno, a matéria com maior carga, o equilíbrio do planejamento e a disciplina com menor presença.</p>\n          </div>\n          <button class="btn btn-secondary btn-small" id="adminRefreshInsightsBtn" type="button">Atualizar</button>\n        </div>\n        <div class="insights" id="adminInsights"></div>\n      </section>\n\n      <section class="admin-card admin-pdf-card">\n        <div>\n          <h3>7. Personalização do PDF</h3>'''
 rep(anchor,insert,'seção administrativa')
@@ -22,11 +21,6 @@ rep(old,new,'função insights compartilhada')
 old_event="""      el('refreshInsightsBtn').onclick=renderInsights; el('expandStatsBtn').onclick=updateStats;\n"""
 new_event="""      el('refreshInsightsBtn').onclick=renderInsights;\n      if(el('adminRefreshInsightsBtn')) el('adminRefreshInsightsBtn').onclick=renderInsights;\n      el('expandStatsBtn').onclick=updateStats;\n"""
 rep(old_event,new_event,'evento atualizar admin')
-
-# Atualiza o resumo administrativo assim que um cronograma administrativo é gerado.
-old_gen='''      hydrateSettings();\n      renderSchedule();\n'''
-new_gen='''      hydrateSettings();\n      renderSchedule();\n      renderInsights();\n'''
-rep(old_gen,new_gen,'atualização após gerar')
 
 p.write_text(s,encoding='utf-8')
 print('PATCH_ADMIN_INSIGHTS_OK')
