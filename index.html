@@ -1779,8 +1779,9 @@
               <input id="adminBoardStyle" type="text" placeholder="Ex.: Vunesp - questões objetivas e contextualizadas">
             </div>
             <div class="field full">
-              <label for="adminExtraCriteria">Outros critérios relevantes</label>
-              <textarea id="adminExtraCriteria" rows="3" placeholder="Ex.: tempo de deslocamento, filhos, curso presencial, necessidade de reforço em determinadas matérias"></textarea>
+              <label for="adminGeneralGuidance">Orientações gerais</label>
+              <textarea id="adminGeneralGuidance" rows="5" placeholder="Escreva aqui as orientações personalizadas que deverão aparecer na segunda página do PDF do cliente."></textarea>
+              <span class="helper">Este texto é exclusivo da área administrativa e será inserido no PDF logo após a página de apresentação.</span>
             </div>
           </div>
         </section>
@@ -2924,7 +2925,7 @@
         competitionLevel:el('adminCompetitionLevel')?.value||'',
         salary:el('adminSalary')?.value.trim()||'',
         boardStyle:el('adminBoardStyle')?.value.trim()||'',
-        extraCriteria:el('adminExtraCriteria')?.value.trim()||'',
+        generalGuidance:el('adminGeneralGuidance')?.value.trim()||'',
         includeTheory:Boolean(el('adminIncludeTheory')?.checked),
         includeExercises:Boolean(el('adminIncludeExercises')?.checked),
         includeReviews:Boolean(el('adminIncludeReviews')?.checked),
@@ -3042,7 +3043,7 @@
       el('adminCompetitionLevel').value=draft.competitionLevel||'';
       el('adminSalary').value=draft.salary||'';
       el('adminBoardStyle').value=draft.boardStyle||'';
-      el('adminExtraCriteria').value=draft.extraCriteria||'';
+      el('adminGeneralGuidance').value=draft.generalGuidance||draft.extraCriteria||'';
       el('adminIncludeTheory').checked=draft.includeTheory!==false;
       el('adminIncludeExercises').checked=draft.includeExercises!==false;
       el('adminIncludeReviews').checked=draft.includeReviews!==false;
@@ -3613,7 +3614,7 @@
         competitionLevel:draft.competitionLevel,
         salary:draft.salary,
         boardStyle:draft.boardStyle,
-        extraCriteria:draft.extraCriteria,
+        generalGuidance:draft.generalGuidance||draft.extraCriteria||'',
         planDays:preview.window.days,
         startDate:localDateKey(preview.window.start),
         endDate:localDateKey(preview.window.end),
@@ -4785,7 +4786,6 @@
       if(data.competitionLevel) items.push(`nível de concorrência: ${labels[data.competitionLevel]||data.competitionLevel}`);
       if(data.salary) items.push(`salário ou remuneração do cargo: ${data.salary}`);
       if(data.boardStyle) items.push(`banca organizadora e estilo: ${data.boardStyle}`);
-      if(data.extraCriteria) items.push(`outros critérios: ${data.extraCriteria}`);
       return items;
     }
 
@@ -4936,6 +4936,73 @@
       const button={x:margin,y:18,width:width-margin*2,height:38};
       pdfRect(commands,button.x,button.y,button.width,button.height,PDF_COLORS.gold,PDF_COLORS.goldDark,1.1);
       pdfText(commands,button.x,button.y+13,'CLIQUE AQUI PARA USAR O GERADOR DE CRONOGRAMA MPC GRATUITAMENTE',9.6,true,PDF_COLORS.navy,'center',button.width);
+      return {content:commands.join('\n'),button};
+    }
+
+    function pdfAdminGuidanceText(){
+      const data=state.adminPersonalization||{};
+      return String(data.generalGuidance||data.extraCriteria||'').trim();
+    }
+
+    function pdfAdminGuidanceChunks(){
+      const text=pdfAdminGuidanceText();
+      if(!text) return [];
+      const maxWidth=PDF_PAGE.width-PDF_PAGE.margin*2-8;
+      const lines=[];
+      const paragraphs=text.split(/\r?\n/);
+      paragraphs.forEach((paragraph,index)=>{
+        const clean=String(paragraph||'').trim();
+        if(!clean){
+          if(lines.length&&lines.at(-1)!=='') lines.push('');
+          return;
+        }
+        const wrapped=pdfWrapText(clean,maxWidth,11.4,200,false);
+        if(index>0&&lines.length&&lines.at(-1)!=='') lines.push('');
+        lines.push(...wrapped);
+      });
+      const maxLinesPerPage=30;
+      const chunks=[];
+      for(let i=0;i<lines.length;i+=maxLinesPerPage) chunks.push(lines.slice(i,i+maxLinesPerPage));
+      return chunks.length?chunks:[[]];
+    }
+
+    function pdfBuildAdminGuidancePageContent(lines,pageIndex,pageCount,continuationIndex=0){
+      const commands=[];
+      const {width,height,margin}=PDF_PAGE;
+      const student=String(state.studentName||'CLIENTE').trim()||'CLIENTE';
+
+      pdfRect(commands,0,0,width,height,PDF_COLORS.white);
+      pdfRect(commands,0,height-112,width,112,PDF_COLORS.navy);
+      pdfRect(commands,margin,height-79,7,42,PDF_COLORS.gold);
+      pdfText(commands,margin+19,height-48,'CRONOGRAMA PERSONALIZADO',20,true,PDF_COLORS.white);
+      pdfText(commands,margin+19,height-72,'Prof. Lucas MPC',10.5,true,PDF_COLORS.cyan);
+      pdfDrawThemeIllustration(commands,'header');
+      pdfDrawOptionalLogo(commands);
+
+      const title=`ORIENTAÇÕES PARA ${student.toUpperCase()}`;
+      const titleLines=pdfWrapText(title,width-margin*2,19,3,true);
+      titleLines.forEach((line,index)=>pdfText(commands,margin,height-154-index*23,line,19,true,PDF_COLORS.navy));
+      const titleBottom=height-154-(titleLines.length-1)*23;
+      pdfLine(commands,margin,titleBottom-17,width-margin,titleBottom-17,PDF_COLORS.gold,1.4);
+
+      if(continuationIndex>0){
+        pdfText(commands,margin,titleBottom-38,`CONTINUAÇÃO ${continuationIndex+1}`,8.7,true,PDF_COLORS.goldDark);
+      }
+
+      let y=titleBottom-(continuationIndex>0?64:45);
+      (lines||[]).forEach(line=>{
+        if(line===''){
+          y-=10;
+          return;
+        }
+        pdfText(commands,margin+4,y,line,11.4,false,PDF_COLORS.text);
+        y-=16.4;
+      });
+
+      pdfLine(commands,margin,78,width-margin,78,PDF_COLORS.gold,1.1);
+      pdfText(commands,margin,63,'Orientações personalizadas - Prof. Lucas MPC',8.4,true,PDF_COLORS.navy);
+      pdfText(commands,width-margin-92,63,`Página ${pageIndex+1} de ${pageCount}`,8,false,PDF_COLORS.muted,'right',92);
+      const button=pdfDrawConfiguredButton(commands);
       return {content:commands.join('\n'),button};
     }
 
@@ -5610,12 +5677,18 @@
       try{
         const prepared=pdfPrepareByStyle();
         const hasIntro=Boolean(state.adminGenerated&&state.studentName);
-        const totalPages=prepared.pages.length+(hasIntro?1:0);
+        const guidanceChunks=hasIntro?pdfAdminGuidanceChunks():[];
+        const introCount=hasIntro?1:0;
+        const totalPages=prepared.pages.length+introCount+guidanceChunks.length;
         const pageDefinitions=[];
         if(hasIntro) pageDefinitions.push(pdfBuildAdminIntroPageContent(0,totalPages));
+        guidanceChunks.forEach((lines,index)=>{
+          pageDefinitions.push(pdfBuildAdminGuidancePageContent(lines,introCount+index,totalPages,index));
+        });
         let offset=0;
+        const contentOffset=introCount+guidanceChunks.length;
         prepared.pages.forEach((page,index)=>{
-          const pageIndex=index+(hasIntro?1:0);
+          const pageIndex=index+contentOffset;
           pageDefinitions.push(pdfBuildStyleDefinition(prepared.kind,page,pageIndex,totalPages,offset));
           if(prepared.kind==='cycle') offset+=page.length;
         });
