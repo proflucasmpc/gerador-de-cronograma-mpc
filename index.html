@@ -2464,7 +2464,7 @@
 
       <div class="legal-summary">
         <h3>Resumo em linguagem simples</h3>
-        <p>Depois de cinco ações, o site solicita nome, e-mail e WhatsApp. O cadastro é enviado para a área privada do projeto na Netlify antes do direcionamento ao WhatsApp. O cronograma continua armazenado somente neste navegador. A plataforma também utiliza o Cloudflare Web Analytics para estatísticas gerais de visitas e desempenho.</p>
+        <p>Ao entrar na plataforma pela primeira vez, o site solicita o nome para preparar um código individual de acesso. O pedido é registrado na área privada do projeto na Netlify antes do direcionamento ao WhatsApp. O cronograma continua armazenado somente neste navegador. A plataforma também utiliza o Cloudflare Web Analytics para estatísticas gerais de visitas e desempenho.</p>
       </div>
 
       <div class="legal-document" id="legalDocument" tabindex="0">
@@ -2503,7 +2503,7 @@
 
         <section>
           <h3>5. Cadastro obrigatório e escolha do usuário</h3>
-          <p>Depois de cinco ações, o cadastro e o direcionamento ao WhatsApp são apresentados como condição para continuar usando gratuitamente a plataforma. O cadastro precisa ser recebido pela plataforma antes de o usuário avançar para a etapa do WhatsApp. A continuidade do acesso pode depender do recebimento e da validação de uma senha enviada pelo Prof. Lucas MPC.</p>
+          <p>Na primeira entrada, a solicitação do código e o direcionamento ao WhatsApp são apresentados como condição para liberar gratuitamente a plataforma. O cadastro precisa ser recebido pela plataforma antes de o usuário avançar para a etapa do WhatsApp. A continuidade do acesso pode depender do recebimento e da validação de uma senha enviada pelo Prof. Lucas MPC.</p>
           <p>A autorização para comunicações promocionais é independente, opcional e não vem marcada previamente.</p>
         </section>
 
@@ -2684,29 +2684,28 @@
   <div class="modal-backdrop required-modal" id="accessModal" data-required="true" aria-hidden="true">
     <div class="modal access-modal-shell" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
       <div class="modal-head">
-        <h2 id="accessTitle">Etapa 2: solicite seu código</h2>
+        <h2 id="accessTitle">Acesso gratuito ao Gerador MPC</h2>
       </div>
 
       <!-- Tela 1: solicitação do código -->
       <div class="access-content" id="accessRequestView">
-        <div class="access-icon" aria-hidden="true">✓</div>
-        <div class="notice success">
-          <strong>Cadastro realizado corretamente.</strong><br>
-          Agora solicite seu código de liberação pelo WhatsApp.
+        <div class="access-icon" aria-hidden="true">🔐</div>
+        <div class="notice">
+          <strong>Para usar o Gerador de Cronogramas MPC GRATUITAMENTE, solicite seu código de acesso ao professor Lucas através do WhatsApp.</strong>
+        </div>
+        <div class="field">
+          <label for="accessNameInput">Seu nome</label>
+          <input id="accessNameInput" type="text" autocomplete="name" maxlength="100" placeholder="Digite seu nome">
         </div>
         <div class="access-steps">
-          <div class="access-step"><strong>1</strong><span>Clique no botão abaixo.</span></div>
-          <div class="access-step"><strong>2</strong><span>Envie a mensagem que já estará preenchida.</span></div>
-          <div class="access-step"><strong>3</strong><span>Aguarde o Prof. Lucas MPC responder com seu código de 6 números.</span></div>
+          <div class="access-step"><strong>1</strong><span>Digite seu nome.</span></div>
+          <div class="access-step"><strong>2</strong><span>Clique no botão abaixo e envie a mensagem pronta pelo WhatsApp.</span></div>
+          <div class="access-step"><strong>3</strong><span>Ao receber o código, volte a esta página e informe os 6 números.</span></div>
         </div>
-        <p class="access-warning">
-          Depois de receber o código, volte para esta mesma página.
-        </p>
         <div class="modal-actions">
-          <button class="btn btn-primary" id="accessWhatsappBtn" type="button">
-            Solicitar código pelo WhatsApp
-          </button>
+          <button class="btn btn-primary" id="accessWhatsappBtn" type="button">Solicitar código pelo WhatsApp</button>
         </div>
+        <p class="registration-submit-status" id="accessRequestStatus" role="status" aria-live="polite"></p>
         <p class="access-number">Prof. Lucas MPC: (11) 96018-9699</p>
       </div>
 
@@ -3865,7 +3864,7 @@
       }));
     }
     function el(id){ return document.getElementById(id); }
-    function platformAccessRequired(){ return !adminUnlocked() && state.actionCount >= 5 && !state.registered; }
+    function platformAccessRequired(){ return !adminUnlocked() && !state.registered; }
     function setAccessLock(locked){
       document.body.classList.toggle('access-locked', Boolean(locked));
     }
@@ -3891,23 +3890,22 @@
       const codeView=el('accessCodeView');
       const title=el('accessTitle');
       const input=el('accessCodeInput');
+      const nameInput=el('accessNameInput');
       const status=el('accessCodeStatus');
-      const codeStage=Boolean(state.whatsappOpened);
+      const codeStage=Boolean(state.awaitingWhatsapp && state.whatsappOpened && state.registration?.unlockCodeHash);
 
       if(requestView) requestView.hidden=codeStage;
       if(codeView) codeView.hidden=!codeStage;
-      if(title){
-        title.textContent=codeStage
-          ? 'Digite o código recebido'
-          : 'Etapa 2: solicite seu código';
-      }
+      if(title) title.textContent=codeStage ? 'Digite o código recebido' : 'Acesso gratuito ao Gerador MPC';
 
       if(!codeStage){
+        if(nameInput && !nameInput.value && state.registration?.name) nameInput.value=state.registration.name;
         if(input) input.value='';
         if(status){
           status.textContent='';
           status.className='registration-submit-status';
         }
+        setTimeout(()=>nameInput?.focus(),120);
       }else{
         setTimeout(()=>input?.focus(),120);
       }
@@ -3986,15 +3984,8 @@
     }
 
     function accessWhatsappMessage(){
-      const registration=state.registration||{};
-      const lines=[
-        `Olá, Prof. Lucas MPC. Meu nome é ${registration.name||'aluno(a)'}.`,
-        'Cadastrei-me no Gerador de Cronograma MPC e gostaria de receber meu código de liberação.',
-        `Código do cadastro: ${registration.leadId||'não informado'}.`
-      ];
-      if(registration.goal) lines.push(`Meu concurso ou objetivo é: ${registration.goal}.`);
-      if(registration.email) lines.push(`Meu e-mail é ${registration.email}.`);
-      return lines.join('\n');
+      const name=String(state.registration?.name||'').trim();
+      return `Olá, professor Lucas MPC. Gostaria de usar o gerador de cronogramas MPC GRATUITAMENTE. Poderia me enviar o meu código de acesso? Meu nome é: ${name}`;
     }
 
     function renderPrivacyConsent(){
@@ -4016,14 +4007,13 @@
         return;
       }
       document.querySelectorAll('.modal-backdrop.open').forEach(m=>{
-        if(m.id!=='registerModal' && m.id!=='accessModal'){
+        if(m.id!=='accessModal'){
           m.classList.remove('open');
           m.setAttribute('aria-hidden','true');
         }
       });
-      const target=state.awaitingWhatsapp?'accessModal':'registerModal';
       renderAccessGate();
-      openModal(target);
+      openModal('accessModal');
     }
     function toast(msg){
       clearTimeout(toastTimer); el('toast').textContent=msg; el('toast').classList.add('show');
@@ -6796,14 +6786,58 @@
           submitButton.textContent=originalLabel;
         }
       };
-      el('accessWhatsappBtn').onclick=()=>{
-        const msg=accessWhatsappMessage();
-        state.whatsappOpened=true;
-        state.registration.whatsappRequestedAt=new Date().toISOString();
-        saveState();
-        renderAccessGate();
-        window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
-        toast('Envie a mensagem e aguarde seu código de liberação.');
+      el('accessWhatsappBtn').onclick=async()=>{
+        const name=String(el('accessNameInput')?.value||'').trim();
+        const status=el('accessRequestStatus');
+        const button=el('accessWhatsappBtn');
+        if(name.length<2){
+          status.className='registration-submit-status error';
+          status.textContent='Digite seu nome antes de solicitar o código.';
+          el('accessNameInput')?.focus();
+          return;
+        }
+
+        const form=el('registerForm');
+        const unlockCode=createUnlockCode();
+        const unlockCodeHash=await hashUnlockCode(unlockCode);
+        const leadId=cryptoId();
+        const createdAt=new Date().toISOString();
+        if(el('regName')) el('regName').value=name;
+        if(el('regEmail')) el('regEmail').value='';
+        if(el('regWhatsapp')) el('regWhatsapp').value='';
+        if(el('privacyConsent')) el('privacyConsent').checked=false;
+        if(el('marketingConsent')) el('marketingConsent').checked=false;
+        form.dataset.leadId=leadId;
+        fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt:'',marketing:false,unlockCode});
+
+        button.disabled=true;
+        status.className='registration-submit-status sending';
+        status.textContent='Preparando seu código de acesso...';
+        try{
+          await submitRegistrationToNetlify(form);
+          state.registered=false;
+          state.awaitingWhatsapp=true;
+          state.whatsappOpened=true;
+          state.registration={
+            leadId,
+            unlockCodeHash,
+            name,
+            createdAt,
+            whatsappRequestedAt:createdAt,
+            netlifyCapturedAt:new Date().toISOString()
+          };
+          saveState();
+          const msg=accessWhatsappMessage();
+          renderAccessGate();
+          window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
+          toast('Envie a mensagem e aguarde seu código de liberação.');
+        }catch(error){
+          console.error('Falha ao preparar pedido de acesso:',error);
+          status.className='registration-submit-status error';
+          status.textContent='Não foi possível preparar seu código agora. Verifique sua conexão e tente novamente.';
+        }finally{
+          button.disabled=false;
+        }
       };
       el('adminPinInput').addEventListener('input',event=>{
         event.target.value=event.target.value.replace(/\D/g,'').slice(0,8);
@@ -6818,8 +6852,9 @@
         const input=el('accessCodeInput');
         const status=el('accessCodeStatus');
         const code=input.value.replace(/\D/g,'');
-        if(!state.whatsappOpened){
-          toast('Primeiro abra o WhatsApp e envie a mensagem.');
+        if(!state.awaitingWhatsapp || !state.registration?.unlockCodeHash){
+          toast('Primeiro solicite seu código pelo WhatsApp.');
+          renderAccessGate();
           return;
         }
         if(code.length!==6){
