@@ -1,0 +1,52 @@
+name: Aplicar proteção véspera da prova v15
+
+on:
+  push:
+    branches:
+      - agent/corrigir-resumo-inteligente-admin
+    paths:
+      - '.github/scripts/patch-vespera-prova-v15.py'
+      - '.github/workflows/aplicar-vespera-prova-v15.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/corrigir-resumo-inteligente-admin
+          fetch-depth: 0
+      - name: Aplicar patch
+        run: python .github/scripts/patch-vespera-prova-v15.py
+      - name: Validar JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          m=re.search(r'<script>([\s\S]*?)</script>\s*</body>',s)
+          if not m:
+              raise SystemExit('script principal não encontrado')
+          Path('/tmp/app.js').write_text(m.group(1),encoding='utf-8')
+          PY
+          node --check /tmp/app.js
+      - name: Validar regra da véspera
+        run: |
+          grep -q "examEveProtected" index.html
+          grep -q "Revisão leve e preparação para a prova" index.html
+          grep -q "Não faça simulado completo" index.html
+          grep -q "protectExamEve" index.html
+      - name: Limpar temporários
+        run: |
+          rm -f .github/scripts/patch-vespera-prova-v15.py
+          rm -f .github/workflows/aplicar-vespera-prova-v15.yml
+      - name: Commit final
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/scripts/patch-vespera-prova-v15.py .github/workflows/aplicar-vespera-prova-v15.yml
+          git commit -m "fix: proteger véspera da prova contra simulado completo"
+          git push origin HEAD:agent/corrigir-resumo-inteligente-admin
