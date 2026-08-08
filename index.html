@@ -2839,9 +2839,11 @@
     function renderAdminEntry(){
       const entry=el('adminEntryBtn');
       const switcher=el('adminViewSwitch');
-      const visible=adminRouteRequested()||adminConfigured()||adminUnlocked();
-      if(entry) entry.hidden=!visible||adminUnlocked();
-      if(switcher) switcher.hidden=!adminUnlocked();
+      const adminRoute=adminRouteRequested();
+      // Controles administrativos nunca aparecem na rota pública do usuário.
+      // O acesso e o alternador de visões ficam restritos a ?admin=1.
+      if(entry) entry.hidden=!adminRoute||adminUnlocked();
+      if(switcher) switcher.hidden=!adminRoute||!adminUnlocked();
     }
 
     function setAdminView(mode){
