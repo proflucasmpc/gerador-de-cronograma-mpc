@@ -4584,6 +4584,12 @@
 
     function pdfApproxTextWidth(text,size,bold=false){
       const clean=pdfSanitizeText(text);
+      if(bold && clean==='CLIQUE AQUI PARA USAR O GERADOR DE CRONOGRAMA MPC GRATUITAMENTE'){
+        const widths={A:722,B:722,C:722,D:722,E:667,F:611,G:778,H:722,I:278,J:556,K:722,L:611,M:833,N:722,O:778,P:667,Q:778,R:722,S:667,T:611,U:722,V:722,W:944,X:722,Y:722,Z:611,' ':278};
+        let total=0;
+        for(const ch of clean) total+=widths[ch]||667;
+        return (total/1000)*size;
+      }
       let units=0;
       for(const character of clean){
         if('ilI1.,:;!|'.includes(character)) units+=0.27;
@@ -4935,7 +4941,7 @@
       pdfText(commands,width-margin-92,63,`Página ${pageIndex+1} de ${pageCount}`,8,false,PDF_COLORS.muted,'right',92);
       const button={x:margin,y:18,width:width-margin*2,height:38};
       pdfRect(commands,button.x,button.y,button.width,button.height,PDF_COLORS.gold,PDF_COLORS.goldDark,1.1);
-      pdfText(commands,button.x,button.y+13,'CLIQUE AQUI PARA USAR O GERADOR DE CRONOGRAMA MPC GRATUITAMENTE',9.6,true,PDF_COLORS.navy,'center',button.width);
+      pdfText(commands,button.x,button.y+17,'CLIQUE AQUI PARA USAR O GERADOR DE CRONOGRAMA MPC GRATUITAMENTE',9.6,true,PDF_COLORS.navy,'center',button.width);
       return {content:commands.join('\n'),button};
     }
 
@@ -5111,7 +5117,7 @@
       pdfText(
         commands,
         button.x,
-        button.y+13,
+        button.y+17,
         'CLIQUE AQUI PARA USAR O GERADOR DE CRONOGRAMA MPC GRATUITAMENTE',
         9.6,
         true,
@@ -5154,7 +5160,7 @@
       if(!cfg.custom){
         const button={x:margin,y:18,width:width-margin*2,height:38,url:cfg.url};
         pdfRect(commands,button.x,button.y,button.width,button.height,PDF_COLORS.gold,PDF_COLORS.goldDark,1.1);
-        pdfText(commands,button.x,button.y+13,cfg.label,9.6,true,PDF_COLORS.navy,'center',button.width);
+        pdfText(commands,button.x,button.y+17,cfg.label,9.6,true,PDF_COLORS.navy,'center',button.width);
         return button;
       }
       const buttonWidth=190;
@@ -5192,7 +5198,7 @@
       }
 
       pdfLine(commands,margin,78,width-margin,78,PDF_COLORS.gold,1.1);
-      pdfText(commands,margin,63,`Gerado pelo Gerador de Cronograma MPC · ${PDF_THEME_PRESETS[state.adminPersonalization?.pdfTheme||state.adminPdfTheme]?.label||'Premium Masculino'}`,7.9,true,PDF_COLORS.navy);
+      pdfText(commands,margin,63,`Gerado pelo Gerador de Cronograma MPC`,7.9,true,PDF_COLORS.navy);
       pdfText(commands,width-margin-92,63,`Página ${pageIndex+1} de ${pageCount}`,8,false,PDF_COLORS.muted,'right',92);
       const button=pdfDrawConfiguredButton(commands);
       const headerButton=state.adminPersonalization?.pdfButtonEnabled&&String(state.adminPersonalization?.pdfButtonPosition||'').startsWith('header');
@@ -5409,7 +5415,7 @@
       }
 
       pdfLine(commands,margin,78,width-margin,78,p.accent,1);
-      pdfText(commands,margin,63,`Gerado pelo Gerador de Cronograma MPC · ${PDF_THEME_PRESETS[pdfSelectedThemeKey()]?.label||'Modelo personalizado'}`,7.7,true,p.dark);
+      pdfText(commands,margin,63,`Gerado pelo Gerador de Cronograma MPC`,7.7,true,p.dark);
       pdfText(commands,width-margin-92,63,`Página ${pageIndex+1} de ${pageCount}`,8,false,p.muted,'right',92);
       const button=pdfDrawConfiguredButton(commands);
       return {bodyTop:height-169,bodyBottom:92,button,palette:p};
