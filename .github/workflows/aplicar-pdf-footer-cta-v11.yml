@@ -1,0 +1,40 @@
+name: Aplicar correção rodapé e CTA PDF v11
+on:
+  push:
+    paths:
+      - '.github/workflows/aplicar-pdf-footer-cta-v11.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/correcao-pdfs-personalizacao-v3
+      - name: Aplicar patch
+        run: python .github/scripts/patch-pdf-footer-cta-v11.py
+      - name: Validar JavaScript básico
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script>(.*?)</script>',s,re.S)
+          Path('/tmp/app.js').write_text('\n'.join(scripts),encoding='utf-8')
+          PY
+          node --check /tmp/app.js
+      - name: Validar correções
+        run: |
+          ! grep -q "Gerado pelo Gerador de Cronograma MPC ·" index.html
+          grep -q "Gerado pelo Gerador de Cronograma MPC" index.html
+          grep -q "button.y+17" index.html
+      - name: Limpar arquivos temporários
+        run: rm -f .github/scripts/patch-pdf-footer-cta-v11.py .github/workflows/aplicar-pdf-footer-cta-v11.yml
+      - name: Commit final
+        run: |
+          git config user.name "proflucasmpc"
+          git config user.email "matematecnica@gmail.com"
+          git add index.html .github/scripts/patch-pdf-footer-cta-v11.py .github/workflows/aplicar-pdf-footer-cta-v11.yml
+          git commit -m "fix: remover nome do template e centralizar CTA do PDF"
+          git push origin agent/correcao-pdfs-personalizacao-v3
