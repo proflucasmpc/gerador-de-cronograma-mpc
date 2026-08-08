@@ -1781,7 +1781,7 @@
             <div class="field full">
               <label for="adminGeneralGuidance">Orientações gerais</label>
               <textarea id="adminGeneralGuidance" rows="5" placeholder="Escreva aqui as orientações personalizadas que deverão aparecer na segunda página do PDF do cliente."></textarea>
-              <span class="helper">Este texto é exclusivo da área administrativa e será inserido no PDF logo após a página de apresentação.</span>
+              <span class="helper">Este texto é exclusivo da área administrativa e será inserido no PDF logo após a página de apresentação. Use {tipo_cronograma} se quiser que o nome do formato (Checklist, Por Ciclos, Semanal ou Por Dias) seja preenchido automaticamente.</span>
             </div>
           </div>
         </section>
@@ -3372,7 +3372,7 @@
     function adminSimulationDates(draft,window){
       const dates=[];
       if(!draft.simulationEnabled) return dates;
-      const all=adminDatesInWindow(window);
+      const all=adminDatesInWindow(window).filter(date=>!window.exam||localDateKey(date)!==localDateKey(window.exam));
       const interval=Math.max(1,draft.simulationInterval);
       if(draft.simulationMode==='weekday_occurrence'){
         const chosen=new Set((Array.isArray(draft.simulationWeekdays)&&draft.simulationWeekdays.length
@@ -3547,7 +3547,8 @@
       const simKeys=new Set(simDates.map(localDateKey));
       const studyDates=adminDatesInWindow(window).filter(date=>{
         const day=(date.getDay()+6)%7;
-        return draft.availableDays.includes(day)&&!simKeys.has(localDateKey(date));
+        const key=localDateKey(date);
+        return draft.availableDays.includes(day)&&!simKeys.has(key)&&(!window.exam||key!==localDateKey(window.exam));
       });
       const availableMinutes=studyDates.length*Math.round(draft.hoursPerDay*60);
       const requiredMinutes=units.reduce((sum,unit)=>sum+unit.duration,0)+Math.max(0,units.length-studyDates.length)*10;
@@ -3558,7 +3559,8 @@
     function updateAdminCapacityPreview(){
       const label=el('adminCapacityPreview');
       if(!label) return;
-      const preview=adminSchedulePreview();
+      const draft=adminDraftObject();
+      const preview=adminSchedulePreview(draft);
       if(preview.error){
         label.className='helper';
         label.textContent=preview.error;
@@ -3643,6 +3645,7 @@
       if(reviewError) return reviewError;
 
       preview.simDates.forEach((date,simulationIndex)=>{
+        if(draft.examDate&&localDateKey(date)===draft.examDate) return;
         const start=timeToMinutes(draft.simulationStart);
         const day=(date.getDay()+6)%7;
         const bySubject=draft.simulationType==='subject';
@@ -3687,6 +3690,7 @@
         boardStyle:draft.boardStyle,
         generalGuidance:draft.generalGuidance||draft.extraCriteria||'',
         planDays:preview.window.days,
+        examDate:draft.examDate||'',
         startDate:localDateKey(preview.window.start),
         endDate:localDateKey(preview.window.end),
         simulationEnabled:draft.simulationEnabled,
@@ -5007,6 +5011,7 @@
       const periodEnd=data.endDate?new Date(`${data.endDate}T12:00:00`).toLocaleDateString('pt-BR'):'Não informado';
       const criteria=[
         `Período planejado: ${periodStart} a ${periodEnd}`,
+        ...(data.examDate?[`Data da prova: ${new Date(`${data.examDate}T12:00:00`).toLocaleDateString('pt-BR')}`]:[]),
         `Disponibilidade: ${state.hoursPerDay||0} hora(s) por dia`,
         `Matérias consideradas: ${(state.subjects||[]).map(subject=>subject.name).join(', ')||'Não informadas'}`,
         data.simulationCount?`Dias exclusivos para simulados: ${data.simulationCount}`:'Dias exclusivos para simulados: não programados'
@@ -5040,7 +5045,11 @@
 
     function pdfAdminGuidanceText(){
       const data=state.adminPersonalization||{};
-      return String(data.generalGuidance||data.extraCriteria||'').trim();
+      const styleLabels={checklist:'Checklist',cycle:'Por Ciclos',weekly:'Semanal',monthly:'Por Dias'};
+      const styleLabel=styleLabels[state.scheduleStyle]||'Cronograma';
+      return String(data.generalGuidance||data.extraCriteria||'')
+        .replace(/\{tipo_cronograma\}/gi,styleLabel)
+        .trim();
     }
 
     function pdfAdminGuidanceChunks(){
@@ -5313,34 +5322,62 @@
       );
     }
 
+    function pdfExamDate(){
+      const key=state.adminPersonalization?.examDate||state.examDate||'';
+      return dateFromKey(key);
+    }
+
+    function pdfExamDateLabel(){
+      const exam=pdfExamDate();
+      if(!exam) return '';
+      const name=DAYS[(exam.getDay()+6)%7]||'Dia';
+      return `${exam.toLocaleDateString('pt-BR')} · ${name}`;
+    }
+
+    function pdfDrawExamCallout(commands,y){
+      const exam=pdfExamDate();
+      if(!exam) return y;
+      const {width,margin}=PDF_PAGE;
+      const boxHeight=58;
+      pdfRect(commands,margin,y-boxHeight,width-margin*2,boxHeight,PDF_COLORS.pendingSoft,PDF_COLORS.gold,1);
+      pdfText(commands,margin+14,y-20,'DIA DA PROVA',12.5,true,PDF_COLORS.goldDark);
+      pdfText(commands,margin+14,y-39,`${pdfExamDateLabel()} · Não há estudo ou simulado programado nesta data.`,9.4,true,PDF_COLORS.navy);
+      return y-boxHeight-10;
+    }
+
     function pdfPrepareChecklistStyle(){
-      return pdfChunk(pdfSortedTasks(),8);
+      return pdfChunk(pdfSortedTasks(),6);
     }
 
     function pdfBuildChecklistStylePage(tasks,pageIndex,pageCount){
       const commands=[];
       const chrome=pdfDrawStyleChrome(commands,pageIndex,pageCount,'CHECKLIST DE ESTUDOS');
       let y=chrome.bodyTop;
-      tasks.forEach((task,index)=>{
+      tasks.forEach(task=>{
         const done=Boolean(task.done);
         pdfRect(commands,PDF_PAGE.margin,y-13,13,13,done?PDF_COLORS.successSoft:PDF_COLORS.white,done?PDF_COLORS.success:PDF_COLORS.line,1);
         if(done) pdfText(commands,PDF_PAGE.margin+2.7,y-10,'X',9,true,PDF_COLORS.success);
-        const subject=pdfWrapText(task.subject||'Disciplina',350,12.2,1,true)[0];
-        const activity=pdfWrapText(task.activity||'Atividade de estudo',350,10.6,2,false)[0];
-        pdfText(commands,PDF_PAGE.margin+24,y-2,subject,12.2,true,PDF_COLORS.navy);
-        pdfText(commands,PDF_PAGE.margin+24,y-19,activity,10.6,false,PDF_COLORS.text);
+        const subjectLines=pdfWrapText(task.subject||'Disciplina',350,12.0,2,true);
+        const activityLines=pdfWrapText(task.activity||'Atividade de estudo',350,10.3,4,false);
+        subjectLines.forEach((line,index)=>pdfText(commands,PDF_PAGE.margin+24,y-2-index*13.8,line,12.0,true,PDF_COLORS.navy));
+        const activityY=y-19-(subjectLines.length-1)*13.8;
+        activityLines.forEach((line,index)=>pdfText(commands,PDF_PAGE.margin+24,activityY-index*12.2,line,10.3,false,PDF_COLORS.text));
         const meta=task.date?pdfDateLabel(task):`${task.type||'Estudo'} · ${task.start||''}${task.end?`–${task.end}`:''}`;
-        pdfText(commands,PDF_PAGE.width-PDF_PAGE.margin-124,y-9,pdfWrapText(meta,124,8.6,2,false)[0],8.6,false,PDF_COLORS.muted,'right',124);
-        pdfLine(commands,PDF_PAGE.margin,y-42,PDF_PAGE.width-PDF_PAGE.margin,y-42,PDF_COLORS.line,.55);
-        y-=64;
+        const metaLines=pdfWrapText(meta,124,8.6,2,false);
+        metaLines.forEach((line,index)=>pdfText(commands,PDF_PAGE.width-PDF_PAGE.margin-124,y-9-index*11,line,8.6,false,PDF_COLORS.muted,'right',124));
+        const contentLines=Math.max(subjectLines.length,1)+Math.max(activityLines.length,1);
+        const rowHeight=Math.max(72,44+(contentLines-2)*12.2);
+        pdfLine(commands,PDF_PAGE.margin,y-rowHeight+12,PDF_PAGE.width-PDF_PAGE.margin,y-rowHeight+12,PDF_COLORS.line,.55);
+        y-=rowHeight;
       });
       if(!tasks.length) pdfText(commands,PDF_PAGE.margin,chrome.bodyTop-30,'Nenhum item cadastrado.',12,true,PDF_COLORS.muted);
+      if(pageIndex===pageCount-1&&pdfExamDate()) pdfDrawExamCallout(commands,Math.max(chrome.bodyBottom+72,y-4));
       return {content:commands.join('\n'),button:chrome.button};
     }
 
     function pdfPrepareCycleStyle(){
       const ordered=[...state.tasks].sort((a,b)=>(a.cycleOrder??9999)-(b.cycleOrder??9999)||a.day-b.day||(a.start||'').localeCompare(b.start||''));
-      return pdfChunk(ordered,6);
+      return pdfChunk(ordered,5);
     }
 
     function pdfBuildCycleStylePage(tasks,pageIndex,pageCount,pageOffset=0){
@@ -5349,16 +5386,25 @@
       let y=chrome.bodyTop;
       tasks.forEach((task,index)=>{
         const number=pageOffset+index+1;
-        pdfRect(commands,PDF_PAGE.margin,y-39,40,40,index===0&&pageIndex===0?PDF_COLORS.gold:PDF_COLORS.navy,null,0);
-        pdfText(commands,PDF_PAGE.margin,y-25,String(number),14,true,index===0&&pageIndex===0?PDF_COLORS.navy:PDF_COLORS.white,'center',40);
+        pdfRect(commands,PDF_PAGE.margin,y-39,40,40,PDF_COLORS.navy,null,0);
+        pdfText(commands,PDF_PAGE.margin,y-25,String(number),14,true,PDF_COLORS.white,'center',40);
         const x=PDF_PAGE.margin+54;
-        pdfText(commands,x,y-6,pdfWrapText(task.subject||'Disciplina',390,13.2,1,true)[0],13.2,true,PDF_COLORS.navy);
-        pdfText(commands,x,y-24,pdfWrapText(task.activity||'Atividade',390,10.6,2,false)[0],10.6,false,PDF_COLORS.text);
-        pdfText(commands,x,y-43,`${task.type||'Estudo'} · ${formatHours(taskDuration(task))}${task.done?' · Concluída':''}`,9.1,true,task.done?PDF_COLORS.success:PDF_COLORS.muted);
-        pdfLine(commands,PDF_PAGE.margin,y-59,PDF_PAGE.width-PDF_PAGE.margin,y-59,PDF_COLORS.line,.6);
-        y-=82;
+        const subjectLines=pdfWrapText(task.subject||'Disciplina',390,13.0,2,true);
+        const activityLines=pdfWrapText(task.activity||'Atividade',390,10.4,4,false);
+        subjectLines.forEach((line,lineIndex)=>pdfText(commands,x,y-5-lineIndex*14,line,13.0,true,PDF_COLORS.navy));
+        let textY=y-25-(subjectLines.length-1)*14;
+        activityLines.forEach((line,lineIndex)=>pdfText(commands,x,textY-lineIndex*12.1,line,10.4,false,PDF_COLORS.text));
+        textY-=activityLines.length*12.1+5;
+        pdfText(commands,x,textY,`${task.type||'Estudo'} · ${formatHours(taskDuration(task))}${task.done?' · Concluída':''}`,9.1,true,task.done?PDF_COLORS.success:PDF_COLORS.muted);
+        if(task.date){
+          pdfText(commands,x,textY-15,`Data sugerida: ${pdfDateLabel(task)}`,8.9,true,PDF_COLORS.goldDark);
+        }
+        const rowHeight=Math.max(96,78+(activityLines.length-1)*12.1+(subjectLines.length-1)*14);
+        pdfLine(commands,PDF_PAGE.margin,y-rowHeight+10,PDF_PAGE.width-PDF_PAGE.margin,y-rowHeight+10,PDF_COLORS.line,.6);
+        y-=rowHeight;
       });
       if(!tasks.length) pdfText(commands,PDF_PAGE.margin,chrome.bodyTop-30,'Nenhuma etapa cadastrada.',12,true,PDF_COLORS.muted);
+      if(pageIndex===pageCount-1&&pdfExamDate()) pdfDrawExamCallout(commands,Math.max(chrome.bodyBottom+72,y-4));
       return {content:commands.join('\n'),button:chrome.button};
     }
 
@@ -5533,22 +5579,30 @@
       const panelWidth=width-margin*2;
       const panelBottom=panelTop-panelHeight;
       const family=p.family;
-      const simulation=(day.tasks||[]).some(task=>String(task.type||'').toLowerCase().includes('simulado'));
+      const examDay=Boolean(day.isExamDay);
+      const simulation=!examDay&&(day.tasks||[]).some(task=>String(task.type||'').toLowerCase().includes('simulado'));
       const bodyFill=p.bodyDark?p.soft:p.white;
-      const bodyText=p.bodyDark?p.text:p.text;
-      const titleFill=family==='premium_minimalista'?p.white:(simulation?p.accent2:p.dark);
-      const titleText=family==='premium_minimalista'?p.dark:(simulation&&family!=='policial_masculino'?p.dark:p.white);
-      const border=family==='premium_minimalista'?p.accent:(simulation?p.accent2:p.accent);
+      const bodyText=p.text;
+      const titleFill=examDay?p.accent2:(family==='premium_minimalista'?p.white:(simulation?p.accent2:p.dark));
+      const titleText=examDay?p.dark:(family==='premium_minimalista'?p.dark:(simulation&&family!=='policial_masculino'?p.dark:p.white));
+      const border=examDay?p.accent2:(family==='premium_minimalista'?p.accent:(simulation?p.accent2:p.accent));
 
       pdfRect(commands,margin,panelBottom,panelWidth,panelHeight,bodyFill,border,.9);
       pdfRect(commands,margin,panelTop-38,panelWidth,38,titleFill,border,.8);
-      pdfDrawCalendarGlyph(commands,margin+12,panelTop-28,16,family==='premium_minimalista'?p.accent:(simulation&&family!=='policial_masculino'?p.dark:p.accent2));
+      pdfDrawCalendarGlyph(commands,margin+12,panelTop-28,16,examDay?p.dark:(family==='premium_minimalista'?p.accent:(simulation&&family!=='policial_masculino'?p.dark:p.accent2)));
       pdfText(commands,margin+38,panelTop-24,pdfTemplateDayLabel(day),12.1,true,titleText);
 
       let rightLabel='';
-      if(options.weekIndex!=null) rightLabel=`SEMANA ${options.weekIndex+1}`;
+      if(examDay) rightLabel='DIA DA PROVA';
+      else if(options.weekIndex!=null) rightLabel=`SEMANA ${options.weekIndex+1}`;
       else if(day.planIndex!=null) rightLabel=`DIA ${day.planIndex+1} DE ${options.totalDays||''}`;
       if(rightLabel) pdfText(commands,width-margin-12-112,panelTop-24,rightLabel,9.4,true,titleText,'right',112);
+
+      if(examDay){
+        pdfText(commands,margin+18,panelTop-82,'DIA DA PROVA',15,true,p.accent2);
+        pdfDrawWrapped(commands,'Não há estudo ou simulado programado nesta data. Priorize descanso, alimentação, documentos e deslocamento para a prova.',margin+18,panelTop-110,panelWidth-36,10.5,false,p.bodyDark?p.white:p.text,5,14);
+        return;
+      }
 
       const columnsTop=panelTop-38;
       const columnsHeight=25;
@@ -5556,22 +5610,22 @@
       const columnsText=family==='policial_masculino'||family==='vestibular_masculino'?p.white:(family==='premium_minimalista'?p.accent:p.dark);
       pdfRect(commands,margin,columnsTop-columnsHeight,panelWidth,columnsHeight,columnsFill,p.line,.45);
 
-      const timeW=92;
-      const subjectW=188;
+      const timeW=80;
+      const subjectW=170;
       const contentW=panelWidth-timeW-subjectW;
       const x1=margin+timeW;
       const x2=x1+subjectW;
       pdfLine(commands,x1,panelBottom,x1,columnsTop,p.line,.45);
       pdfLine(commands,x2,panelBottom,x2,columnsTop,p.line,.45);
-      pdfDrawClockGlyph(commands,margin+12,columnsTop-19,10,columnsText);
-      pdfText(commands,margin+28,columnsTop-17,'HORÁRIO',8.1,true,columnsText);
-      pdfDrawBookGlyph(commands,x1+12,columnsTop-19,11,columnsText);
-      pdfText(commands,x1+29,columnsTop-17,'MATÉRIA + TIPO',8.1,true,columnsText);
-      pdfDrawDocGlyph(commands,x2+12,columnsTop-19,10,columnsText);
-      pdfText(commands,x2+28,columnsTop-17,'CONTEÚDO / TEMA',8.1,true,columnsText);
+      pdfDrawClockGlyph(commands,margin+10,columnsTop-19,10,columnsText);
+      pdfText(commands,margin+26,columnsTop-17,'HORÁRIO',8.0,true,columnsText);
+      pdfDrawBookGlyph(commands,x1+10,columnsTop-19,11,columnsText);
+      pdfText(commands,x1+27,columnsTop-17,'MATÉRIA + TIPO',8.0,true,columnsText);
+      pdfDrawDocGlyph(commands,x2+10,columnsTop-19,10,columnsText);
+      pdfText(commands,x2+26,columnsTop-17,'CONTEÚDO / TEMA',8.0,true,columnsText);
 
       const tasks=day.tasks||[];
-      const contentTop=columnsTop-columnsHeight-10;
+      const contentTop=columnsTop-columnsHeight-9;
       if(!tasks.length){
         pdfText(commands,margin+18,contentTop-8,'SEM ESTUDO PROGRAMADO',12,true,p.muted);
         pdfText(commands,margin+18,contentTop-30,'Descanso / dia livre',9.6,false,p.muted);
@@ -5580,25 +5634,38 @@
       if(simulation){
         const task=tasks[0];
         pdfText(commands,margin+18,contentTop-2,'SIMULADO',13,true,p.accent2);
-        pdfDrawWrapped(commands,task.activity||task.subject,margin+18,contentTop-27,panelWidth-36,11,true,bodyText,2,14);
-        pdfText(commands,margin+18,contentTop-62,`${task.start||''}${task.end?`–${task.end}`:''}`,10,true,p.muted);
+        pdfDrawWrapped(commands,task.activity||task.subject,margin+18,contentTop-27,panelWidth-36,11,true,bodyText,4,14);
+        pdfText(commands,margin+18,contentTop-82,`${task.start||''}${task.end?`–${task.end}`:''}`,10,true,p.muted);
         return;
       }
 
       const available=contentTop-(panelBottom+8);
-      const rowH=Math.max(10.4,Math.min(20,available/Math.max(1,tasks.length)));
-      const font=rowH<11.5?7.25:(rowH<14?8.0:(rowH<17?8.8:9.5));
+      let font=9.0;
+      let rows=[];
+      for(let attempt=0;attempt<7;attempt++){
+        const lineHeight=font+1.7;
+        rows=tasks.map(task=>{
+          const time=`${task.start||''}${task.end?`–${task.end}`:''}`;
+          const subject=`${task.subject||'Estudo'} · ${task.type||'Estudo'}`;
+          const activity=pdfCalendarActivityText(task);
+          const subjectLines=pdfWrapText(subject,subjectW-18,font,6,true);
+          const activityLines=pdfWrapText(activity,contentW-18,font,8,false);
+          const lines=Math.max(1,subjectLines.length,activityLines.length);
+          return {time,subjectLines,activityLines,height:Math.max(18,lines*lineHeight+5)};
+        });
+        const needed=rows.reduce((sum,row)=>sum+row.height,0);
+        if(needed<=available||font<=6.6) break;
+        font-=0.4;
+      }
+      const lineHeight=font+1.7;
       let y=contentTop;
-      tasks.forEach((task,index)=>{
+      rows.forEach((row,index)=>{
         if(y<panelBottom+7) return;
-        const time=`${task.start||''}${task.end?`–${task.end}`:''}`;
-        const subject=`${task.subject||'Estudo'} · ${task.type||'Estudo'}`;
-        const activity=pdfCalendarActivityText(task);
-        pdfText(commands,margin+10,y,pdfWrapText(time,timeW-18,font,1,true)[0],font,true,p.bodyDark?p.white:p.muted);
-        pdfText(commands,x1+10,y,pdfWrapText(subject,subjectW-18,font,1,true)[0],font,true,p.bodyDark?p.white:p.dark);
-        pdfText(commands,x2+10,y,pdfWrapText(activity,contentW-18,font,1,false)[0],font,false,p.bodyDark?p.white:bodyText);
-        if(index<tasks.length-1) pdfLine(commands,margin+8,y-rowH+3,width-margin-8,y-rowH+3,p.line,.32);
-        y-=rowH;
+        pdfText(commands,margin+9,y,row.time,font,true,p.bodyDark?p.white:p.muted);
+        row.subjectLines.forEach((line,lineIndex)=>pdfText(commands,x1+9,y-lineIndex*lineHeight,line,font,true,p.bodyDark?p.white:p.dark));
+        row.activityLines.forEach((line,lineIndex)=>pdfText(commands,x2+9,y-lineIndex*lineHeight,line,font,false,p.bodyDark?p.white:bodyText));
+        if(index<rows.length-1) pdfLine(commands,margin+8,y-row.height+3,width-margin-8,y-row.height+3,p.line,.32);
+        y-=row.height;
       });
     }
 
@@ -5676,12 +5743,22 @@
       });
       let dates=state.adminGenerated?pdfAdminCalendarDates():[];
       if(!dates.length) dates=[...tasksByDate.keys()].sort().map(dateFromKey).filter(Boolean);
-      const days=dates.map((date,index)=>({
-        key:localDateKey(date),
-        date,
-        planIndex:index,
-        tasks:tasksByDate.get(localDateKey(date))||[]
-      }));
+      const exam=pdfExamDate();
+      const examKey=exam?localDateKey(exam):'';
+      if(exam&&!dates.some(date=>localDateKey(date)===examKey)) dates.push(new Date(exam));
+      dates.sort((a,b)=>a-b);
+      let studyIndex=0;
+      const days=dates.map(date=>{
+        const key=localDateKey(date);
+        const isExamDay=Boolean(examKey&&key===examKey);
+        return {
+          key,
+          date,
+          isExamDay,
+          planIndex:isExamDay?null:studyIndex++,
+          tasks:isExamDay?[]:(tasksByDate.get(key)||[])
+        };
+      });
       const pages=[];
       for(let i=0;i<days.length;i+=2) pages.push({items:days.slice(i,i+2)});
       return pages.length?pages:[{items:[]}];
@@ -5692,8 +5769,9 @@
     }
 
     function pdfBuildDaysStylePage(page,pageIndex,pageCount){
-      const labels=page.items.map(day=>day.planIndex+1);
-      const suffix=labels.length===2?`DIAS ${labels[0]} E ${labels[1]}`:(labels.length?`DIA ${labels[0]}`:'CALENDÁRIO');
+      const numbered=page.items.filter(day=>!day.isExamDay&&day.planIndex!=null).map(day=>day.planIndex+1);
+      const hasExam=page.items.some(day=>day.isExamDay);
+      const suffix=hasExam&&!numbered.length?'DIA DA PROVA':(hasExam?`DIA ${numbered[0]} + PROVA`:(numbered.length===2?`DIAS ${numbered[0]} E ${numbered[1]}`:(numbered.length?`DIA ${numbered[0]}`:'CALENDÁRIO')));
       const commands=[];
       const chrome=pdfDrawTemplateHeader(commands,`CALENDÁRIO POR QUANTIDADE DE DIAS · ${suffix}`,pageIndex,pageCount);
       const {bodyTop,bodyBottom,palette}=chrome;
