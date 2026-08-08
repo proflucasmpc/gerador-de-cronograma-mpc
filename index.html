@@ -3369,9 +3369,10 @@
       return dates;
     }
 
-    function adminSimulationDates(draft,window){
+    function adminSimulationDates(draft,window,options={}){
       const dates=[];
       if(!draft.simulationEnabled) return dates;
+      const protectExamEve=options.protectExamEve!==false;
       const all=adminDatesInWindow(window).filter(date=>!window.exam||localDateKey(date)!==localDateKey(window.exam));
       const interval=Math.max(1,draft.simulationInterval);
       if(draft.simulationMode==='weekday_occurrence'){
@@ -3390,6 +3391,10 @@
         all.forEach((date,index)=>{
           if((index+1)%interval===0) dates.push(new Date(date));
         });
+      }
+      if(protectExamEve&&window.exam&&draft.simulationType!=='subject'){
+        const eveKey=localDateKey(addCalendarDays(window.exam,-1));
+        return dates.filter(date=>localDateKey(date)!==eveKey);
       }
       return dates;
     }
@@ -3543,7 +3548,12 @@
       const invalidSubject=queues.find(queue=>!queue.subject.name||!queue.topics.length);
       if(invalidSubject) return {error:'Todas as matérias precisam de nome e pelo menos um tópico.'};
       const units=interleaveAdminUnits(queues);
+      const rawSimDates=adminSimulationDates(draft,window,{protectExamEve:false});
       const simDates=adminSimulationDates(draft,window);
+      const examEveKey=window.exam?localDateKey(addCalendarDays(window.exam,-1)):'';
+      const examEveProtected=Boolean(
+        examEveKey&&draft.simulationType!=='subject'&&rawSimDates.some(date=>localDateKey(date)===examEveKey)
+      );
       const simKeys=new Set(simDates.map(localDateKey));
       const studyDates=adminDatesInWindow(window).filter(date=>{
         const day=(date.getDay()+6)%7;
@@ -3553,7 +3563,7 @@
       const availableMinutes=studyDates.length*Math.round(draft.hoursPerDay*60);
       const requiredMinutes=units.reduce((sum,unit)=>sum+unit.duration,0)+Math.max(0,units.length-studyDates.length)*10;
       const diagnostics=adminDistributionDiagnostics(units);
-      return {window,queues,units,simDates,simKeys,studyDates,availableMinutes,requiredMinutes,diagnostics};
+      return {window,queues,units,simDates,simKeys,studyDates,availableMinutes,requiredMinutes,diagnostics,examEveProtected,examEveKey};
     }
 
     function updateAdminCapacityPreview(){
@@ -3570,7 +3580,7 @@
       const fits=preview.requiredMinutes<=preview.availableMinutes;
       label.className=`helper ${fits?'admin-capacity-ok':'admin-capacity-error'}`;
       const reserved=adminReservedReviewDays(draft,preview.window);
-      label.textContent=`Período: ${preview.window.days} dias corridos, ${preview.studyDates.length} dias de estudo e ${preview.simDates.length} dias exclusivos de simulado. Capacidade aproximada: ${formatHours(preview.availableMinutes)}; atividades previstas: ${preview.units.length}, com cerca de ${formatHours(preview.requiredMinutes)}.${reserved?` Os últimos ${reserved} dia(s) do período serão priorizados para revisões, questões e simulados.`:''}${fits?' O plano cabe no período e será distribuído ao longo das datas disponíveis.':' O plano não cabe no período com as configurações atuais.'}`;
+      label.textContent=`Período: ${preview.window.days} dias corridos, ${preview.studyDates.length} dias de estudo e ${preview.simDates.length} dias exclusivos de simulado. Capacidade aproximada: ${formatHours(preview.availableMinutes)}; atividades previstas: ${preview.units.length}, com cerca de ${formatHours(preview.requiredMinutes)}.${reserved?` Os últimos ${reserved} dia(s) do período serão priorizados para revisões, questões e simulados.`:''}${preview.examEveProtected?' O simulado completo que cairia na véspera da prova será substituído automaticamente por preparação leve.':''}${fits?' O plano cabe no período e será distribuído ao longo das datas disponíveis.':' O plano não cabe no período com as configurações atuais.'}`;
       renderAdminDistributionPreview(preview);
     }
 
@@ -3668,6 +3678,24 @@
           done:false
         });
       });
+
+      if(preview.examEveProtected&&preview.examEveKey){
+        const eve=dateFromKey(preview.examEveKey);
+        const day=eve?(eve.getDay()+6)%7:5;
+        tasks.push({
+          id:cryptoId(),
+          day,
+          date:preview.examEveKey,
+          cycleOrder:tasks.length,
+          start:'18:00',
+          end:'18:30',
+          subject:'Véspera da prova',
+          activity:'Revisão leve e preparação para a prova',
+          type:'Preparação',
+          notes:'Não faça simulado completo. Revise apenas pontos-chave, separe documentos, organize o deslocamento, alimentação e priorize descanso e sono.',
+          done:false
+        });
+      }
 
       tasks.sort((a,b)=>{
         const da=dateFromKey(a.date), db=dateFromKey(b.date);
