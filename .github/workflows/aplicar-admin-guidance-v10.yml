@@ -1,0 +1,36 @@
+name: Aplicar orientações gerais admin v10
+on:
+  push:
+    paths:
+      - '.github/workflows/aplicar-admin-guidance-v10.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/correcao-pdfs-personalizacao-v3
+      - name: Aplicar patch
+        run: python .github/scripts/patch-admin-guidance-v10.py
+      - name: Validar JavaScript básico
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          assert 'Orientações gerais' in s
+          assert 'pdfBuildAdminGuidancePageContent' in s
+          assert 'ORIENTAÇÕES PARA' in s
+          assert 'guidanceChunks' in s
+          print('VALIDACAO_OK')
+          PY
+      - name: Limpar arquivos temporários
+        run: rm -f .github/scripts/patch-admin-guidance-v10.py .github/workflows/aplicar-admin-guidance-v10.yml
+      - name: Commit final
+        run: |
+          git config user.name "proflucasmpc"
+          git config user.email "matematecnica@gmail.com"
+          git add index.html .github/scripts/patch-admin-guidance-v10.py .github/workflows/aplicar-admin-guidance-v10.yml
+          git commit -m "feat: adicionar orientações gerais ao PDF administrativo"
+          git push origin HEAD:agent/correcao-pdfs-personalizacao-v3
