@@ -1,5 +1,4 @@
 from pathlib import Path
-import re
 
 p=Path('index.html')
 s=p.read_text(encoding='utf-8')
@@ -10,7 +9,6 @@ def rep(old,new,label):
         raise SystemExit(f'{label}: bloco não encontrado')
     s=s.replace(old,new,1)
 
-# 1) Permite calcular datas brutas de simulado e, por padrão, protege a véspera da prova contra simulado completo.
 old="""    function adminSimulationDates(draft,window){
       const dates=[];
       if(!draft.simulationEnabled) return dates;
@@ -68,7 +66,6 @@ new="""    function adminSimulationDates(draft,window,options={}){
 """
 rep(old,new,'adminSimulationDates')
 
-# 2) A prévia identifica se um simulado completo foi removido da véspera.
 old="""      const units=interleaveAdminUnits(queues);
       const simDates=adminSimulationDates(draft,window);
       const simKeys=new Set(simDates.map(localDateKey));
@@ -90,25 +87,27 @@ new="""      return {window,queues,units,simDates,simKeys,studyDates,availableMi
 """
 rep(old,new,'preview return')
 
-# 3) Mostra a regra na prévia administrativa.
 old="""      label.textContent=`Período: ${preview.window.days} dias corridos, ${preview.studyDates.length} dias de estudo e ${preview.simDates.length} dias exclusivos de simulado. Capacidade aproximada: ${formatHours(preview.availableMinutes)}; atividades previstas: ${preview.units.length}, com cerca de ${formatHours(preview.requiredMinutes)}.${reserved?` Os últimos ${reserved} dia(s) do período serão priorizados para revisões, questões e simulados.`:''}${fits?' O plano cabe no período e será distribuído ao longo das datas disponíveis.':' O plano não cabe no período com as configurações atuais.'}`;
 """
 new="""      label.textContent=`Período: ${preview.window.days} dias corridos, ${preview.studyDates.length} dias de estudo e ${preview.simDates.length} dias exclusivos de simulado. Capacidade aproximada: ${formatHours(preview.availableMinutes)}; atividades previstas: ${preview.units.length}, com cerca de ${formatHours(preview.requiredMinutes)}.${reserved?` Os últimos ${reserved} dia(s) do período serão priorizados para revisões, questões e simulados.`:''}${preview.examEveProtected?' O simulado completo que cairia na véspera da prova será substituído automaticamente por preparação leve.':''}${fits?' O plano cabe no período e será distribuído ao longo das datas disponíveis.':' O plano não cabe no período com as configurações atuais.'}`;
 """
 rep(old,new,'mensagem capacidade')
 
-# 4) Em vez do simulado de 4h, cria uma tarefa leve de preparação na véspera.
 old="""      preview.simDates.forEach((date,simulationIndex)=>{
         if(draft.examDate&&localDateKey(date)===draft.examDate) return;
         const start=timeToMinutes(draft.simulationStart);
         const day=(date.getDay()+6)%7;
         const bySubject=draft.simulationType==='subject';
         const simulationSubject=bySubject&&draft.subjects.length
-          ? draft.subjects[simulationIndex%draft.subjects.length].name
+          ? String(draft.subjects[simulationIndex%draft.subjects.length].name||'Matéria').trim()
           : '';
         tasks.push({
-          id:cryptoId(), day, date:localDateKey(date), cycleOrder:tasks.length,
-          start:minutesToTime(start), end:minutesToTime(start+draft.simulationDuration),
+          id:cryptoId(),
+          day,
+          date:localDateKey(date),
+          cycleOrder:tasks.length,
+          start:minutesToTime(start),
+          end:minutesToTime(start+draft.simulationMinutes),
           subject:bySubject?`Simulado - ${simulationSubject}`:'Simulado completo',
           activity:bySubject?`Simulado por matéria - ${simulationSubject}`:`Simulado completo - ${draft.goal}`,
           type:bySubject?'Simulado por matéria':'Simulado completo',
@@ -127,11 +126,15 @@ new="""      preview.simDates.forEach((date,simulationIndex)=>{
         const day=(date.getDay()+6)%7;
         const bySubject=draft.simulationType==='subject';
         const simulationSubject=bySubject&&draft.subjects.length
-          ? draft.subjects[simulationIndex%draft.subjects.length].name
+          ? String(draft.subjects[simulationIndex%draft.subjects.length].name||'Matéria').trim()
           : '';
         tasks.push({
-          id:cryptoId(), day, date:localDateKey(date), cycleOrder:tasks.length,
-          start:minutesToTime(start), end:minutesToTime(start+draft.simulationDuration),
+          id:cryptoId(),
+          day,
+          date:localDateKey(date),
+          cycleOrder:tasks.length,
+          start:minutesToTime(start),
+          end:minutesToTime(start+draft.simulationMinutes),
           subject:bySubject?`Simulado - ${simulationSubject}`:'Simulado completo',
           activity:bySubject?`Simulado por matéria - ${simulationSubject}`:`Simulado completo - ${draft.goal}`,
           type:bySubject?'Simulado por matéria':'Simulado completo',
@@ -146,8 +149,12 @@ new="""      preview.simDates.forEach((date,simulationIndex)=>{
         const eve=dateFromKey(preview.examEveKey);
         const day=eve?(eve.getDay()+6)%7:5;
         tasks.push({
-          id:cryptoId(), day, date:preview.examEveKey, cycleOrder:tasks.length,
-          start:'18:00', end:'18:30',
+          id:cryptoId(),
+          day,
+          date:preview.examEveKey,
+          cycleOrder:tasks.length,
+          start:'18:00',
+          end:'18:30',
           subject:'Véspera da prova',
           activity:'Revisão leve e preparação para a prova',
           type:'Preparação',
