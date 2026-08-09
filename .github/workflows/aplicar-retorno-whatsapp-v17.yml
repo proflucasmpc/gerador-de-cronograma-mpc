@@ -1,0 +1,58 @@
+name: Aplicar retorno WhatsApp v17
+on:
+  push:
+    branches:
+      - agent/corrigir-retorno-whatsapp-codigo
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/corrigir-retorno-whatsapp-codigo
+          fetch-depth: 0
+      - name: Aplicar patch
+        run: python .github/scripts/patch-retorno-whatsapp-v17.py
+      - name: Validar JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',s,re.S)
+          js='\n'.join(x for x in scripts if x.strip())
+          Path('/tmp/site.js').write_text(js,encoding='utf-8')
+          PY
+          node --check /tmp/site.js
+      - name: Validar fluxo corrigido
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('index.html').read_text(encoding='utf-8')
+          required=[
+            'whatsappReturned: false',
+            'state.whatsappReturned=false;',
+            'state.whatsappReturned=true;',
+            "const codeStage=Boolean(state.awaitingWhatsapp && state.whatsappOpened && state.whatsappReturned",
+            'armWhatsappReturnDetection();',
+            'markWhatsappPageLeft',
+            'completeWhatsappReturnIfNeeded',
+            'Quando retornar a esta página, aparecerá o campo para inserir seu código.'
+          ]
+          for item in required:
+            assert item in s, item
+          click=s[s.index("el('accessWhatsappBtn').onclick=async()=>"):s.index("el('adminPinInput').addEventListener",s.index("el('accessWhatsappBtn').onclick=async()=>"))]
+          assert 'renderAccessGate();' not in click, 'o clique ainda troca a tela imediatamente'
+          print('VALIDACAO_RETORNO_WHATSAPP_OK')
+          PY
+      - name: Limpar temporários
+        run: rm -f .github/scripts/patch-retorno-whatsapp-v17.py .github/workflows/aplicar-retorno-whatsapp-v17.yml
+      - name: Commit final
+        run: |
+          git config user.name 'proflucasmpc'
+          git config user.email 'matematecnica@gmail.com'
+          git add index.html .github/scripts/patch-retorno-whatsapp-v17.py .github/workflows/aplicar-retorno-whatsapp-v17.yml
+          git commit -m 'Corrigir exibição do código após retorno do WhatsApp' || exit 0
+          git push origin HEAD:agent/corrigir-retorno-whatsapp-codigo
