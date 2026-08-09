@@ -2750,6 +2750,9 @@
     const ADMIN_DRAFT_KEY = 'geradorCronogramaMpcAdminDraft';
     const ADMIN_SESSION_KEY = 'geradorCronogramaMpcAdminUnlocked';
     const ADMIN_VIEW_KEY = 'geradorCronogramaMpcAdminView';
+    const ACCESS_WHATSAPP_PENDING_KEY = 'geradorCronogramaMpcWhatsappPending';
+    const ACCESS_WHATSAPP_LEFT_KEY = 'geradorCronogramaMpcWhatsappLeft';
+    const ACCESS_WHATSAPP_LAUNCH_AT_KEY = 'geradorCronogramaMpcWhatsappLaunchAt';
 
     const defaultState = () => ({
       dataSchemaVersion: DATA_SCHEMA_VERSION,
@@ -2764,6 +2767,7 @@
       registered: false,
       awaitingWhatsapp: false,
       whatsappOpened: false,
+      whatsappReturned: false,
       privacyAcknowledged: false,
       privacyVersion: CURRENT_PRIVACY_VERSION,
       registration: null,
@@ -3892,7 +3896,7 @@
       const input=el('accessCodeInput');
       const nameInput=el('accessNameInput');
       const status=el('accessCodeStatus');
-      const codeStage=Boolean(state.awaitingWhatsapp && state.whatsappOpened && state.registration?.unlockCodeHash);
+      const codeStage=Boolean(state.awaitingWhatsapp && state.whatsappOpened && state.whatsappReturned && state.registration?.unlockCodeHash);
 
       if(requestView) requestView.hidden=codeStage;
       if(codeView) codeView.hidden=!codeStage;
@@ -3911,6 +3915,39 @@
       }
     }
 
+
+    function armWhatsappReturnDetection(){
+      sessionStorage.setItem(ACCESS_WHATSAPP_PENDING_KEY,'1');
+      sessionStorage.removeItem(ACCESS_WHATSAPP_LEFT_KEY);
+      sessionStorage.setItem(ACCESS_WHATSAPP_LAUNCH_AT_KEY,String(Date.now()));
+    }
+
+    function markWhatsappPageLeft(){
+      if(sessionStorage.getItem(ACCESS_WHATSAPP_PENDING_KEY)==='1'){
+        sessionStorage.setItem(ACCESS_WHATSAPP_LEFT_KEY,'1');
+      }
+    }
+
+    function completeWhatsappReturnIfNeeded(){
+      if(state.registered || !state.awaitingWhatsapp || !state.whatsappOpened || state.whatsappReturned) return false;
+      if(sessionStorage.getItem(ACCESS_WHATSAPP_PENDING_KEY)!=='1') return false;
+      if(sessionStorage.getItem(ACCESS_WHATSAPP_LEFT_KEY)!=='1') return false;
+      const launchedAt=Number(sessionStorage.getItem(ACCESS_WHATSAPP_LAUNCH_AT_KEY)||0);
+      const elapsed=Date.now()-launchedAt;
+      if(launchedAt && elapsed<700){
+        setTimeout(completeWhatsappReturnIfNeeded,700-elapsed+80);
+        return false;
+      }
+      state.whatsappReturned=true;
+      sessionStorage.removeItem(ACCESS_WHATSAPP_PENDING_KEY);
+      sessionStorage.removeItem(ACCESS_WHATSAPP_LEFT_KEY);
+      sessionStorage.removeItem(ACCESS_WHATSAPP_LAUNCH_AT_KEY);
+      saveState();
+      renderAccessGate();
+      if(platformAccessRequired()) openModal('accessModal');
+      toast('Agora digite o código enviado pelo Prof. Lucas MPC.');
+      return true;
+    }
 
     function createUnlockCode(){
       const values=new Uint32Array(1);
@@ -6698,7 +6735,14 @@
       document.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>share(b.dataset.share));
       el('shareConfirmCheckbox').onchange=updateShareConfirmButton;
       el('shareConfirmBtn').onclick=completeShareReward;
+      window.addEventListener('blur',markWhatsappPageLeft);
+      window.addEventListener('focus',()=>setTimeout(completeWhatsappReturnIfNeeded,120));
       document.addEventListener('visibilitychange',()=>{
+        if(document.hidden){
+          markWhatsappPageLeft();
+        }else{
+          setTimeout(completeWhatsappReturnIfNeeded,120);
+        }
         if(!document.hidden && shareRewardPending && shareAttempted){
           const button=el('shareConfirmBtn');
           if(button && button.dataset.ready!=='true'){
@@ -6818,6 +6862,7 @@
           state.registered=false;
           state.awaitingWhatsapp=true;
           state.whatsappOpened=true;
+          state.whatsappReturned=false;
           state.registration={
             leadId,
             unlockCodeHash,
@@ -6826,11 +6871,13 @@
             whatsappRequestedAt:createdAt,
             netlifyCapturedAt:new Date().toISOString()
           };
+          armWhatsappReturnDetection();
           saveState();
           const msg=accessWhatsappMessage();
-          renderAccessGate();
+          status.className='registration-submit-status success';
+          status.textContent='WhatsApp aberto. Envie a mensagem ao Prof. Lucas MPC. Quando retornar a esta página, aparecerá o campo para inserir seu código.';
           window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
-          toast('Envie a mensagem e aguarde seu código de liberação.');
+          toast('Envie a mensagem no WhatsApp e depois volte a esta página.');
         }catch(error){
           console.error('Falha ao preparar pedido de acesso:',error);
           status.className='registration-submit-status error';
@@ -6873,6 +6920,10 @@
         state.registered=true;
         state.awaitingWhatsapp=false;
         state.whatsappOpened=false;
+        state.whatsappReturned=false;
+        sessionStorage.removeItem(ACCESS_WHATSAPP_PENDING_KEY);
+        sessionStorage.removeItem(ACCESS_WHATSAPP_LEFT_KEY);
+        sessionStorage.removeItem(ACCESS_WHATSAPP_LAUNCH_AT_KEY);
         state.registration.unlockedAt=new Date().toISOString();
         saveState();
         closeModal('accessModal', true);
@@ -6892,6 +6943,7 @@
         registered:Boolean(state.registered),
         awaitingWhatsapp:false,
         whatsappOpened:false,
+        whatsappReturned:false,
         registration:state.registration ? {...state.registration} : null,
         privacyAcknowledged:Boolean(state.privacyAcknowledged),
         privacyVersion:CURRENT_PRIVACY_VERSION,
@@ -7021,7 +7073,9 @@
       }
 
       if(platformAccessRequired()){
-        setTimeout(enforceAccessGate,120);
+        setTimeout(()=>{
+          if(!completeWhatsappReturnIfNeeded()) enforceAccessGate();
+        },120);
       }else if(!sessionStorage.getItem(TUTORIAL_SESSION_KEY)){
         tutorialIndex=0;
         initTutorial();
