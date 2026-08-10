@@ -1,0 +1,40 @@
+name: Publicar página aprovada do cronograma
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-approved-plan.yml'
+      - 'scripts/apply_approved_plan_preview.py'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Aplicar página aprovada
+        run: python scripts/apply_approved_plan_preview.py
+      - name: Validar alterações
+        run: |
+          git diff --check
+          grep -q 'CRIAR CRONOGRAMA GRÁTIS' plano.html
+          grep -q 'Você está estudando para:' plano.html
+          grep -q 'value="Outro"' plano.html
+          grep -q 'Poderia me enviar o código gratuito de acesso?' plano.html
+          ! grep -q 'TESTAR CAPTURA' plano.html
+      - name: Publicar no GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add plano.html
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração pendente.'
+            exit 0
+          fi
+          git commit -m "Publicar página compartilhada aprovada"
+          git push origin HEAD:main
