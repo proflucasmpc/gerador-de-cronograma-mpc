@@ -2121,6 +2121,7 @@
               <button class="btn btn-secondary btn-small" id="saveBtn">Salvar no app</button>
               <button class="btn btn-dark btn-small" id="downloadPdfBtn">Baixar cronograma</button>
               <button class="btn btn-primary btn-small" id="premiumPdfBtn">PDF Premium</button>
+              <button class="btn btn-secondary btn-small" id="publicPageBtn">Criar página</button>
               <button class="btn btn-primary btn-small" id="exportBtn">Exportar</button>
               <button class="btn btn-danger btn-small" id="clearBtn">Limpar</button>
             </div>
@@ -2411,6 +2412,10 @@
         <button class="export-choice" id="exportPremiumPdfBtn" type="button">
           <span class="export-choice-icon">PRO</span>
           <span><strong>PDF Premium MPC</strong><small>Abre o novo documento editorial inspirado na leitura Kindle, com capa, métricas, raio-X, conteúdos e cronograma em alta legibilidade.</small></span>
+        </button>
+        <button class="export-choice" id="exportPublicPageBtn" type="button">
+          <span class="export-choice-icon">LINK</span>
+          <span><strong>Página online do aluno</strong><small>Publica uma versão somente para leitura e gera um link curto para abrir e compartilhar no celular.</small></span>
         </button>
         <button class="export-choice" id="exportExcelBtn" type="button">
           <span class="export-choice-icon">XLS</span>
@@ -5714,6 +5719,53 @@
       if(!premiumWindow) window.location.href='premium-pdf.html';
     }
 
+    async function createPublicPlanPage(){
+      if(!state.tasks.length) return toast('Adicione atividades antes de criar a página do aluno.');
+      collectSettings();
+      saveState();
+      const button=el('publicPageBtn');
+      const exportButton=el('exportPublicPageBtn');
+      const oldMain=button?.textContent;
+      const oldExport=exportButton?.innerHTML;
+      if(button){ button.disabled=true; button.textContent='Publicando…'; }
+      if(exportButton){ exportButton.disabled=true; }
+      try{
+        const personalization=state.adminPersonalization||{};
+        const payload={
+          studentName: state.studentName||personalization.studentName||'',
+          goal: state.goal||'',
+          examDate: personalization.examDate||state.examDate||'',
+          startDate: personalization.startDate||state.startDate||state.tasks[0]?.date||'',
+          endDate: personalization.endDate||state.endDate||state.tasks.at(-1)?.date||'',
+          hoursPerDay: state.hoursPerDay||0,
+          scheduleStyle: state.scheduleStyle||'weekly',
+          subjects: state.subjects||[],
+          tasks: state.tasks||[]
+        };
+        const response=await fetch('/api/plans',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(payload)
+        });
+        const result=await response.json().catch(()=>({}));
+        if(!response.ok) throw new Error(result.error||'Não foi possível publicar o cronograma.');
+        const url=new URL(result.path,location.origin).href;
+        closeModal('exportModal');
+        try{ await navigator.clipboard.writeText(url); }catch{}
+        toast('Página criada! O link foi copiado.');
+        const publicWindow=window.open(url,'_blank','noopener');
+        if(!publicWindow){
+          window.prompt('Página criada. Copie o link abaixo:',url);
+        }
+      }catch(error){
+        console.error(error);
+        toast(error.message||'Erro ao criar a página do cronograma.');
+      }finally{
+        if(button){ button.disabled=false; button.textContent=oldMain||'Criar página'; }
+        if(exportButton){ exportButton.disabled=false; if(oldExport) exportButton.innerHTML=oldExport; }
+      }
+    }
+
     function exportPdf(){
       if(!state.tasks.length) return toast('Adicione atividades antes de baixar o cronograma.');
       collectSettings();
@@ -6501,9 +6553,11 @@
       el('saveBtn').onclick=()=>{saveState();toast('Cronograma salvo neste navegador.');};
       el('downloadPdfBtn').onclick=exportPdf;
       el('premiumPdfBtn').onclick=openPremiumPdf;
+      el('publicPageBtn').onclick=createPublicPlanPage;
       el('exportBtn').onclick=()=>openModal('exportModal');
       el('exportPdfBtn').onclick=exportPdf;
       el('exportPremiumPdfBtn').onclick=openPremiumPdf;
+      el('exportPublicPageBtn').onclick=createPublicPlanPage;
       el('exportExcelBtn').onclick=exportExcel;
       el('clearBtn').onclick=()=>{if(confirm('Apagar todas as atividades do cronograma?')){state.tasks=[];saveState();renderSchedule();toast('Cronograma limpo.');}};
       el('refreshInsightsBtn').onclick=renderInsights;
