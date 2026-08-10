@@ -1,349 +1,38 @@
-name: Simplificar acesso por código manual
+name: Simplificar acesso manual
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
-      - '.github/workflows/simplify-access.yml'
+      - .github/workflows/simplify-access.yml
 
 permissions:
   contents: write
 
 jobs:
-  patch-access:
+  patch:
     runs-on: ubuntu-latest
     steps:
-      - name: Baixar repositório
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Remover cadastro e simplificar código
-        shell: bash
+      - name: Aplicar alteração
+        run: python scripts/simplify_access.py
+      - name: Validar JavaScript
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
-
-          path = Path('index.html')
-          text = path.read_text(encoding='utf-8')
-          original = text
-
-          def exact(old, new, label):
-              global text
-              if old not in text:
-                  raise SystemExit(f'ERRO: trecho não encontrado: {label}')
-              text = text.replace(old, new, 1)
-
-          def regex(pattern, repl, label, count=1):
-              global text
-              text2, n = re.subn(pattern, repl, text, count=count, flags=re.S)
-              if n != count:
-                  raise SystemExit(f'ERRO: {label}: esperava {count} substituição(ões), encontrei {n}')
-              text = text2
-
-          # Versão dos dados/política.
-          exact("const DATA_SCHEMA_VERSION = 11;", "const DATA_SCHEMA_VERSION = 12;", 'schema')
-          exact("const CURRENT_PRIVACY_VERSION = '1.3-2026-08-04';", "const CURRENT_PRIVACY_VERSION = '1.4-2026-08-10';", 'privacy version js')
-          exact("Versão 1.3 · Última atualização: 4 de agosto de 2026", "Versão 1.4 · Última atualização: 10 de agosto de 2026", 'privacy version visible')
-
-          # O fluxo antigo usava três chaves temporárias de retorno do WhatsApp.
-          text = re.sub(r"\n    const ACCESS_WHATSAPP_PENDING_KEY = .*?;\n    const ACCESS_WHATSAPP_LEFT_KEY = .*?;\n    const ACCESS_WHATSAPP_LAUNCH_AT_KEY = .*?;", "", text, count=1)
-
-          # Remove completamente o formulário de cadastro/Netlify Forms.
-          regex(
-              r"\n  <!-- Cadastro obrigatório -->.*?(?=\n  <!-- Liberação obrigatória pelo WhatsApp -->)",
-              "\n",
-              'remover registerModal'
-          )
-
-          # Substitui o fluxo em duas etapas por uma única tela de código manual.
-          access_modal = r'''
-  <!-- Liberação de acesso por código manual -->
-  <div class="modal-backdrop required-modal" id="accessModal" data-required="true" aria-hidden="true">
-    <div class="modal access-modal-shell" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
-      <div class="modal-head">
-        <h2 id="accessTitle">Liberar acesso ao Gerador MPC</h2>
-      </div>
-
-      <div class="access-code-only-view" id="accessCodeView">
-        <div class="access-icon" aria-hidden="true">🔐</div>
-        <div class="notice">
-          <strong>Digite o código de 6 caracteres enviado pelo Prof. Lucas MPC.</strong><br>
-          O código pode conter letras e números.
-        </div>
-        <div class="field access-code-field">
-          <label for="accessCodeInput">Código de acesso</label>
-          <input
-            id="accessCodeInput"
-            type="text"
-            inputmode="text"
-            autocomplete="one-time-code"
-            maxlength="6"
-            pattern="[A-Za-z0-9]{6}"
-            aria-describedby="accessCodeStatus"
-            placeholder="A1B2C3"
-          >
-        </div>
-        <button class="btn btn-primary access-release-button" id="accessCodeBtn" type="button">
-          Liberar acesso
-        </button>
-        <button class="btn btn-secondary access-release-button" id="accessWhatsappBtn" type="button">
-          Solicitar código pelo WhatsApp
-        </button>
-        <p class="registration-submit-status" id="accessCodeStatus" role="status" aria-live="polite"></p>
-      </div>
-    </div>
-  </div>
-'''
-          regex(
-              r"\n  <!-- Liberação obrigatória pelo WhatsApp -->.*?(?=\n  <script>\n  \(\(\) => \{)",
-              "\n" + access_modal.rstrip(),
-              'substituir accessModal'
-          )
-
-          # Rodapé sem alegação de envio de cadastro.
-          exact(
-              "Plataforma desenvolvida pelo <strong>Prof. Lucas MPC</strong> · O cronograma fica salvo neste navegador; os dados do cadastro são enviados para a área privada da plataforma.",
-              "Plataforma desenvolvida pelo <strong>Prof. Lucas MPC</strong> · O cronograma e a liberação de acesso ficam salvos neste navegador.",
-              'footer'
-          )
-
-          # Política coerente com o novo funcionamento.
-          exact(
-              "<p>Ao entrar na plataforma pela primeira vez, o site solicita o nome para preparar um código individual de acesso. O pedido é registrado na área privada do projeto na Netlify antes do direcionamento ao WhatsApp. O cronograma continua armazenado somente neste navegador. A plataforma também utiliza o Cloudflare Web Analytics para estatísticas gerais de visitas e desempenho.</p>",
-              "<p>O acesso à plataforma é liberado por um código manual de 6 caracteres fornecido pelo Prof. Lucas MPC. Não há formulário obrigatório de cadastro para gerar ou validar esse código. O cronograma e a liberação ficam armazenados neste navegador. A plataforma também utiliza o Cloudflare Web Analytics para estatísticas gerais de visitas e desempenho.</p>",
-              'privacy summary'
-          )
-
-          def replace_section(number, body):
-              global text
-              pattern = rf"        <section>\s*<h3>{number}\. .*?</section>"
-              text2, n = re.subn(pattern, body.strip(), text, count=1, flags=re.S)
-              if n != 1:
-                  raise SystemExit(f'ERRO: seção legal {number} não encontrada')
-              text = text2
-
-          replace_section(2, r'''
-        <section>
-          <h3>2. Quais dados podem ser tratados</h3>
-          <ul>
-            <li>concurso ou objetivo informado no perfil de estudos;</li>
-            <li>objetivo, disciplinas, horários, tarefas e demais informações inseridas no cronograma;</li>
-            <li>preferências de tema, paleta, estilo de cronograma e créditos de criação;</li>
-            <li>ações necessárias ao funcionamento, como conclusão de tarefas e uso dos recursos;</li>
-            <li>informações técnicas e estatísticas gerais de navegação e desempenho fornecidas pelo Cloudflare Web Analytics, sem identificação individual dos visitantes.</li>
-          </ul>
-          <p>O código de acesso não exige o preenchimento de nome, e-mail ou telefone dentro da plataforma. Caso o usuário opte por falar com o Prof. Lucas MPC pelo WhatsApp, essa comunicação ocorre no serviço externo escolhido pelo próprio usuário.</p>
-          <p>Não é necessário informar dados sensíveis, como informações de saúde, religião, origem racial, biometria ou posicionamento político. Evite inserir esse tipo de dado nas observações do cronograma.</p>
-        </section>''')
-
-          replace_section(3, r'''
-        <section>
-          <h3>3. Onde os dados ficam nesta versão</h3>
-          <p>O cronograma, as disciplinas, as preferências, o progresso, os créditos e a liberação de acesso ficam armazenados localmente no navegador do usuário por meio do armazenamento local.</p>
-          <p>A plataforma não utiliza mais um formulário obrigatório do Netlify Forms para liberar o acesso. O Cloudflare Web Analytics pode fornecer estatísticas gerais de navegação e desempenho, sem exibir identificação individual dos visitantes.</p>
-          <p>Ao limpar os dados do navegador, usar uma janela anônima ou trocar de dispositivo, o cronograma e a liberação local poderão ser apagados.</p>
-        </section>''')
-
-          replace_section(4, r'''
-        <section>
-          <h3>4. Finalidades</h3>
-          <p>Os dados armazenados localmente são utilizados para liberar a ferramenta neste navegador, salvar o cronograma, manter preferências, registrar progresso e executar as funções solicitadas pelo usuário.</p>
-          <p>As estatísticas gerais de navegação ajudam a avaliar o funcionamento da plataforma e a identificar falhas técnicas. O contato pelo WhatsApp somente ocorre quando o próprio usuário aciona um link ou botão correspondente.</p>
-        </section>''')
-
-          replace_section(5, r'''
-        <section>
-          <h3>5. Código de acesso</h3>
-          <p>Na primeira entrada, a plataforma solicita um código de 6 caracteres, que pode conter letras e números. O código é informado manualmente pelo Prof. Lucas MPC e a liberação fica registrada apenas no navegador utilizado.</p>
-          <p>Não é necessário preencher formulário de cadastro, nem aguardar a geração automática de um código pela plataforma.</p>
-        </section>''')
-
-          replace_section(8, r'''
-        <section>
-          <h3>8. Cloudflare Web Analytics, WhatsApp e compartilhamento</h3>
-          <p>Os dados pessoais não são vendidos. A plataforma utiliza o <strong>Cloudflare Web Analytics</strong> para medir visitas, visualizações de página e informações gerais de desempenho, sem exibir contador público.</p>
-          <p>O uso do WhatsApp e de outras redes sociais ocorre somente quando o usuário aciona os respectivos botões, ficando sujeito aos termos e políticas desses serviços externos.</p>
-        </section>''')
-
-          replace_section(9, r'''
-        <section>
-          <h3>9. Direitos do usuário</h3>
-          <p>Os dados de planejamento e a liberação de acesso armazenados localmente podem ser removidos limpando os dados deste site no navegador.</p>
-          <p>Quando o usuário fornecer dados diretamente ao Prof. Lucas MPC por WhatsApp ou outro canal externo, poderá solicitar esclarecimentos, correção ou exclusão das informações que estiverem sob controle do responsável, observadas as hipóteses legais aplicáveis.</p>
-        </section>''')
-
-          replace_section(10, r'''
-        <section>
-          <h3>10. Segurança e limitações</h3>
-          <p>São adotadas medidas razoáveis no desenvolvimento da plataforma. Contudo, nenhum sistema é totalmente livre de riscos. Pessoas que utilizem o mesmo perfil do dispositivo poderão ter acesso ao cronograma e à liberação local.</p>
-          <p>O código de seis caracteres funciona como uma liberação simples de uso da ferramenta e não deve ser tratado como mecanismo de autenticação para armazenamento de informações sensíveis.</p>
-        </section>''')
-
-          exact(
-              '<button class="btn btn-primary" id="acknowledgePrivacyBtn" type="button">Voltar ao cadastro</button>',
-              '<button class="btn btn-primary" id="acknowledgePrivacyBtn" type="button">Fechar documento</button>',
-              'privacy button'
-          )
-
-          # Ao carregar versões antigas, elimina estados pendentes do fluxo anterior.
-          regex(
-              r"        if\(loaded\.awaitingWhatsapp && !loaded\.registration\?\.unlockCodeHash\)\{.*?        \}",
-              """        if(!loaded.registered){\n          loaded.awaitingWhatsapp=false;\n          loaded.whatsappOpened=false;\n          loaded.whatsappReturned=false;\n        }""",
-              'migrar estado antigo'
-          )
-
-          # Remove geração, hash, envio ao Netlify e detecção de retorno do WhatsApp.
-          access_functions = r'''    function renderAccessGate(){
-      const input=el('accessCodeInput');
-      const status=el('accessCodeStatus');
-      if(status){
-        status.textContent='';
-        status.className='registration-submit-status';
-      }
-      if(input) input.value='';
-      setTimeout(()=>input?.focus(),120);
-    }
-
-    function accessWhatsappMessage(){
-      return 'Olá, professor Lucas MPC. Gostaria de receber um código de acesso de 6 caracteres para usar gratuitamente o Gerador de Cronograma MPC.';
-    }
-
-'''
-          regex(
-              r"    function renderAccessGate\(\)\{.*?(?=    function renderPrivacyConsent\(\)\{)",
-              access_functions,
-              'substituir funções de acesso'
-          )
-
-          # O link de política do cadastro deixou de existir; o do rodapé permanece.
-          exact("      el('openPrivacyBtn').onclick=openPrivacyDocument;", "      el('openPrivacyBtn')?.addEventListener('click',openPrivacyDocument);", 'privacy optional event')
-
-          old_ack = """      el('acknowledgePrivacyBtn').onclick=()=>{\n        state.privacyAcknowledged=true;\n        saveState();\n        renderPrivacyConsent();\n        closeModal('privacyModal');\n        setTimeout(()=>el('privacyConsent')?.focus(),50);\n      };"""
-          new_ack = """      el('acknowledgePrivacyBtn').onclick=()=>{\n        state.privacyAcknowledged=true;\n        saveState();\n        closeModal('privacyModal');\n      };"""
-          exact(old_ack, new_ack, 'privacy acknowledge event')
-
-          # Remove listeners usados somente para detectar saída/retorno do WhatsApp.
-          text = text.replace("      window.addEventListener('blur',markWhatsappPageLeft);\n", "")
-          text = text.replace("      window.addEventListener('focus',()=>setTimeout(completeWhatsappReturnIfNeeded,120));\n", "")
-          old_visibility = """      document.addEventListener('visibilitychange',()=>{\n        if(document.hidden){\n          markWhatsappPageLeft();\n        }else{\n          setTimeout(completeWhatsappReturnIfNeeded,120);\n        }\n        if(!document.hidden && shareRewardPending && shareAttempted){\n          const button=el('shareConfirmBtn');\n          if(button && button.dataset.ready!=='true'){\n            clearTimeout(shareConfirmTimer);\n            button.dataset.ready='true';\n            el('shareRewardStatus').textContent='Marque a confirmação abaixo para liberar o novo pacote de créditos.';\n            updateShareConfirmButton();\n          }\n        }\n      });"""
-          new_visibility = """      document.addEventListener('visibilitychange',()=>{\n        if(!document.hidden && shareRewardPending && shareAttempted){\n          const button=el('shareConfirmBtn');\n          if(button && button.dataset.ready!=='true'){\n            clearTimeout(shareConfirmTimer);\n            button.dataset.ready='true';\n            el('shareRewardStatus').textContent='Marque a confirmação abaixo para liberar o novo pacote de créditos.';\n            updateShareConfirmButton();\n          }\n        }\n      });"""
-          exact(old_visibility, new_visibility, 'visibility listener')
-
-          # Remove os dois handlers antigos (formulário e geração do código) e deixa apenas o pedido pelo WhatsApp.
-          new_whatsapp_handler = r'''      el('accessWhatsappBtn').onclick=()=>{
-        const msg=accessWhatsappMessage();
-        window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
-        toast('Envie a mensagem ao Prof. Lucas MPC e aguarde seu código.');
-      };
-'''
-          regex(
-              r"      el\('registerForm'\)\.onsubmit=async e=>\{.*?(?=      el\('adminPinInput'\)\.addEventListener)",
-              new_whatsapp_handler,
-              'remover handlers de cadastro/geração'
-          )
-
-          # Campo e validação: seis caracteres alfanuméricos, sem comparar com hash ou lista.
-          new_code_handlers = r'''      el('accessCodeInput').addEventListener('input',event=>{
-        event.target.value=event.target.value
-          .toUpperCase()
-          .replace(/[^A-Z0-9]/g,'')
-          .slice(0,6);
-      });
-      el('accessCodeInput').addEventListener('keydown',event=>{
-        if(event.key==='Enter') el('accessCodeBtn').click();
-      });
-      el('accessCodeBtn').onclick=()=>{
-        const input=el('accessCodeInput');
-        const status=el('accessCodeStatus');
-        const code=String(input.value||'')
-          .toUpperCase()
-          .replace(/[^A-Z0-9]/g,'')
-          .slice(0,6);
-        if(!/^[A-Z0-9]{6}$/.test(code)){
-          status.className='registration-submit-status error';
-          status.textContent='Digite um código com exatamente 6 letras e/ou números.';
-          input.focus();
-          return;
-        }
-        state.registered=true;
-        state.awaitingWhatsapp=false;
-        state.whatsappOpened=false;
-        state.whatsappReturned=false;
-        state.registration={
-          ...(state.registration||{}),
-          accessMode:'manual-code',
-          unlockedAt:new Date().toISOString()
-        };
-        saveState();
-        closeModal('accessModal',true);
-        setAccessLock(false);
-        toast('Acesso gratuito liberado neste navegador.');
-      };
-'''
-          regex(
-              r"      el\('accessCodeInput'\)\.addEventListener\('input',event=>\{.*?(?=      el\('toolsButton'\)\.onclick)",
-              new_code_handlers,
-              'substituir validação do código'
-          )
-
-          # A página pública abre diretamente o novo gate, sem retorno de WhatsApp.
-          old_init = """      if(platformAccessRequired()){\n        setTimeout(()=>{\n          if(!completeWhatsappReturnIfNeeded()) enforceAccessGate();\n        },120);\n      }else if(!sessionStorage.getItem(TUTORIAL_SESSION_KEY)){"""
-          new_init = """      if(platformAccessRequired()){\n        setTimeout(enforceAccessGate,120);\n      }else if(!sessionStorage.getItem(TUTORIAL_SESSION_KEY)){"""
-          exact(old_init, new_init, 'initialize gate')
-
-          text = text.replace("toast('Planejamento resetado. Seu cadastro, acesso e créditos foram preservados.');", "toast('Planejamento resetado. Seu acesso e créditos foram preservados.');")
-
-          # Garantias de que o sistema antigo realmente saiu do arquivo executável.
-          forbidden = [
-              'data-netlify="true"',
-              'createUnlockCode',
-              'hashUnlockCode',
-              'submitRegistrationToNetlify',
-              'unlockCodeHash',
-              'codigo_liberacao',
-              "el('registerForm')",
-              'completeWhatsappReturnIfNeeded',
-              'markWhatsappPageLeft',
-              'armWhatsappReturnDetection'
-          ]
-          for item in forbidden:
-              if item in text:
-                  raise SystemExit(f'ERRO: referência antiga ainda presente: {item}')
-
-          required = [
-              'pattern="[A-Za-z0-9]{6}"',
-              ".replace(/[^A-Z0-9]/g,'')",
-              '/^[A-Z0-9]{6}$/.test(code)',
-              "accessMode:'manual-code'",
-              'Solicitar código pelo WhatsApp'
-          ]
-          for item in required:
-              if item not in text:
-                  raise SystemExit(f'ERRO: recurso novo ausente: {item}')
-
-          if text == original:
-              raise SystemExit('ERRO: nenhuma alteração aplicada')
-
-          path.write_text(text, encoding='utf-8')
-
-          # Extrai o script principal para validação sintática com Node.
-          start = text.find("  <script>\n  (() => {")
-          end_marker = "  })();\n  </script>"
-          end = text.find(end_marker, start)
+          text=Path('index.html').read_text(encoding='utf-8')
+          start=text.find('  <script>\n  (() => {')
+          end=text.find('  })();\n  </script>', start)
           if start < 0 or end < 0:
-              raise SystemExit('ERRO: script principal não encontrado para validação')
-          js = text[start + len("  <script>\n"):end + len("  })();")]
-          Path('/tmp/main.js').write_text(js, encoding='utf-8')
-          print('Alteração aplicada com sucesso.')
+              raise SystemExit('script principal não encontrado')
+          Path('/tmp/main.js').write_text(text[start+len('  <script>\n'):end+len('  })();')],encoding='utf-8')
           PY
-
           node --check /tmp/main.js
           git diff --check
-
-      - name: Publicar alteração
-        shell: bash
+      - name: Publicar no GitHub
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
