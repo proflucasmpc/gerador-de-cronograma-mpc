@@ -2187,7 +2187,7 @@
     </div>
 
     <footer>
-      Plataforma desenvolvida pelo <strong>Prof. Lucas MPC</strong> · O cronograma fica salvo neste navegador; os dados do cadastro são enviados para a área privada da plataforma.
+      Plataforma desenvolvida pelo <strong>Prof. Lucas MPC</strong> · O cronograma e a liberação de acesso ficam salvos neste navegador.
       <span class="footer-legal">· <button type="button" id="footerPrivacyBtn">Política de Privacidade e Termos de Uso</button></span>
     </footer>
   </main>
@@ -2469,7 +2469,7 @@
 
       <div class="legal-summary">
         <h3>Resumo em linguagem simples</h3>
-        <p>Ao entrar na plataforma pela primeira vez, o site solicita o nome para preparar um código individual de acesso. O pedido é registrado na área privada do projeto na Netlify antes do direcionamento ao WhatsApp. O cronograma continua armazenado somente neste navegador. A plataforma também utiliza o Cloudflare Web Analytics para estatísticas gerais de visitas e desempenho.</p>
+        <p>Ao entrar na plataforma pela primeira vez, o acesso é liberado por um código manual de 6 caracteres fornecido pelo Prof. Lucas MPC. Não há formulário obrigatório para gerar esse código. O cronograma continua armazenado somente neste navegador. A plataforma também utiliza o Cloudflare Web Analytics para estatísticas gerais de visitas e desempenho.</p>
       </div>
 
       <div class="legal-document" id="legalDocument" tabindex="0">
@@ -2508,7 +2508,7 @@
 
         <section>
           <h3>5. Cadastro obrigatório e escolha do usuário</h3>
-          <p>Na primeira entrada, a solicitação do código e o direcionamento ao WhatsApp são apresentados como condição para liberar gratuitamente a plataforma. O cadastro precisa ser recebido pela plataforma antes de o usuário avançar para a etapa do WhatsApp. A continuidade do acesso pode depender do recebimento e da validação de uma senha enviada pelo Prof. Lucas MPC.</p>
+          <p>Na primeira entrada, a plataforma solicita um código manual de 6 caracteres fornecido pelo Prof. Lucas MPC. O código pode conter letras e números e a liberação fica registrada neste navegador.</p>
           <p>A autorização para comunicações promocionais é independente, opcional e não vem marcada previamente.</p>
         </section>
 
@@ -2569,7 +2569,7 @@
 
       <div class="modal-actions">
         <button class="btn btn-secondary" data-close="privacyModal" type="button">Fechar documento</button>
-        <button class="btn btn-primary" id="acknowledgePrivacyBtn" type="button">Voltar ao cadastro</button>
+        <button class="btn btn-primary" id="acknowledgePrivacyBtn" type="button">Fechar documento</button>
       </div>
     </div>
   </div>
@@ -2606,142 +2606,35 @@
     </div>
   </div>
 
-  <!-- Cadastro obrigatório -->
-  <div class="modal-backdrop required-modal" id="registerModal" data-required="true" aria-hidden="true">
-    <div class="modal registration-modal" role="dialog" aria-modal="true" aria-labelledby="registerTitle" aria-describedby="registerDescription">
-      <div class="modal-head">
-        <h2 id="registerTitle">Salve seu acesso gratuito</h2>
-      </div>
-      <p class="required-intro" id="registerDescription">
-        Você já realizou cinco ações importantes. Preencha seus dados para seguir para a liberação gratuita pelo WhatsApp.
-      </p>
-      <form
-        id="registerForm"
-        name="captura-alunos-gerador-cronograma"
-        method="POST"
-        data-netlify="true"
-        data-netlify-honeypot="bot-field"
-      >
-        <input type="hidden" name="form-name" value="captura-alunos-gerador-cronograma">
-        <input type="hidden" name="subject" value="Novo cadastro — Gerador de Cronograma MPC" data-remove-prefix>
-        <p hidden>
-          <label>Não preencha este campo: <input name="bot-field" autocomplete="off"></label>
-        </p>
-        <input type="hidden" name="lead_id" id="leadId">
-        <input type="hidden" name="codigo_liberacao" id="leadUnlockCode">
-        <input type="hidden" name="concurso_objetivo" id="leadGoal">
-        <input type="hidden" name="data_prova" id="leadExamDate">
-        <input type="hidden" name="marketing_autorizado" id="leadMarketing">
-        <input type="hidden" name="politica_versao" id="leadPrivacyVersion">
-        <input type="hidden" name="politica_aceita_em" id="leadPrivacyAcceptedAt">
-        <input type="hidden" name="cadastro_em" id="leadCreatedAt">
-        <input type="hidden" name="pagina" id="leadPage">
-        <input type="hidden" name="origem" id="leadOrigin">
-        <input type="hidden" name="referencia" id="leadReferrer">
-        <input type="hidden" name="utm_source" id="leadUtmSource">
-        <input type="hidden" name="utm_medium" id="leadUtmMedium">
-        <input type="hidden" name="utm_campaign" id="leadUtmCampaign">
-        <input type="hidden" name="utm_content" id="leadUtmContent">
-        <input type="hidden" name="utm_term" id="leadUtmTerm">
-        <input type="hidden" name="dispositivo" id="leadDevice">
-        <input type="hidden" name="navegador" id="leadBrowser">
-        <input type="hidden" name="idioma" id="leadLanguage">
-        <input type="hidden" name="fuso_horario" id="leadTimezone">
-        <div class="form-grid registration-form-grid">
-          <div class="field full">
-            <label for="regName">Nome completo</label>
-            <input id="regName" name="nome" autocomplete="name" required placeholder="Digite seu nome">
-          </div>
-          <div class="field">
-            <label for="regEmail">E-mail</label>
-            <input id="regEmail" name="email" type="email" autocomplete="email" required placeholder="seuemail@exemplo.com">
-          </div>
-          <div class="field">
-            <label for="regWhatsapp">WhatsApp</label>
-            <input id="regWhatsapp" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" required placeholder="(DDD) número">
-          </div>
-          <div class="consent-row field full">
-            <input id="privacyConsent" name="politica_aceita" value="sim" type="checkbox" required>
-            <div class="consent-copy">
-              <label for="privacyConsent">Concordo com a Política de Privacidade, os Termos de Uso e o tratamento dos dados necessários ao funcionamento da plataforma.</label>
-              <button class="legal-link" id="openPrivacyBtn" type="button">Consultar a Política de Privacidade e os Termos de Uso</button>
-              <span class="consent-status" id="privacyReadStatus">A consulta ao documento está disponível, mas não é necessário abri-lo antes de marcar a concordância.</span>
-            </div>
-          </div>
-          <div class="consent-row field full">
-            <input id="marketingConsent" name="marketing_opcional" value="sim" type="checkbox">
-            <div class="consent-copy">
-              <label for="marketingConsent">Quero receber aulas, conteúdos, novidades e ofertas por e-mail e WhatsApp.</label>
-              <span class="consent-status">Esta autorização é opcional e pode ser retirada a qualquer momento pelo WhatsApp do Prof. Lucas MPC.</span>
-            </div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button class="btn btn-primary" id="registerSubmitBtn" type="submit">Cadastrar e seguir para o WhatsApp</button>
-        </div>
-        <p class="registration-submit-status" id="registrationSubmitStatus" role="status" aria-live="polite"></p>
-      </form>
-      <p class="access-number">Esta etapa é obrigatória para continuar usando gratuitamente.</p>
-    </div>
-  </div>
 
-  <!-- Liberação obrigatória pelo WhatsApp -->
+
+  <!-- Liberação de acesso por código manual -->
   <div class="modal-backdrop required-modal" id="accessModal" data-required="true" aria-hidden="true">
     <div class="modal access-modal-shell" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
       <div class="modal-head">
-        <h2 id="accessTitle">Acesso gratuito ao Gerador MPC</h2>
+        <h2 id="accessTitle">Liberar acesso ao Gerador MPC</h2>
       </div>
-
-      <!-- Tela 1: solicitação do código -->
-      <div class="access-content" id="accessRequestView">
+      <div class="access-code-only-view" id="accessCodeView">
         <div class="access-icon" aria-hidden="true">🔐</div>
         <div class="notice">
-          <strong>Para usar o Gerador de Cronogramas MPC GRATUITAMENTE, solicite seu código de acesso ao professor Lucas através do WhatsApp.</strong>
+          <strong>Digite o código de 6 caracteres enviado pelo Prof. Lucas MPC.</strong><br>
+          O código pode conter letras e números.
         </div>
-        <div class="field">
-          <label for="accessNameInput">Seu nome</label>
-          <input id="accessNameInput" type="text" autocomplete="name" maxlength="100" placeholder="Digite seu nome">
-        </div>
-        <div class="access-steps">
-          <div class="access-step"><strong>1</strong><span>Digite seu nome.</span></div>
-          <div class="access-step"><strong>2</strong><span>Clique no botão abaixo e envie a mensagem pronta pelo WhatsApp.</span></div>
-          <div class="access-step"><strong>3</strong><span>Ao receber o código, volte a esta página e informe os 6 números.</span></div>
-        </div>
-        <div class="modal-actions">
-          <button class="btn btn-primary" id="accessWhatsappBtn" type="button">Solicitar código pelo WhatsApp</button>
-        </div>
-        <p class="registration-submit-status" id="accessRequestStatus" role="status" aria-live="polite"></p>
-        <p class="access-number">Prof. Lucas MPC: (11) 96018-9699</p>
-      </div>
-
-      <!-- Tela 2: apenas validação do código -->
-      <div class="access-code-only-view" id="accessCodeView" hidden>
         <div class="field access-code-field">
-          <label for="accessCodeInput">Código de liberação</label>
-          <input
-            id="accessCodeInput"
-            type="text"
-            inputmode="numeric"
-            autocomplete="one-time-code"
-            maxlength="6"
-            pattern="[0-9]{6}"
-            aria-describedby="accessCodeStatus"
-            placeholder="Digite os 6 números"
-          >
+          <label for="accessCodeInput">Código de acesso</label>
+          <input id="accessCodeInput" type="text" inputmode="text" autocomplete="one-time-code" maxlength="6" pattern="[A-Za-z0-9]{6}" aria-describedby="accessCodeStatus" placeholder="A1B2C3">
         </div>
-        <button class="btn btn-primary access-release-button" id="accessCodeBtn" type="button">
-          Liberar acesso gratuito
-        </button>
+        <button class="btn btn-primary access-release-button" id="accessCodeBtn" type="button">Liberar acesso</button>
+        <button class="btn btn-secondary access-release-button" id="accessWhatsappBtn" type="button">Solicitar código pelo WhatsApp</button>
         <p class="registration-submit-status" id="accessCodeStatus" role="status" aria-live="polite"></p>
       </div>
     </div>
   </div>
-
   <script>
   (() => {
     'use strict';
     const STORAGE_KEY = 'geradorCronogramaMpcData';
-    const DATA_SCHEMA_VERSION = 11;
+    const DATA_SCHEMA_VERSION = 12;
     const CURRENT_PRIVACY_VERSION = '1.3-2026-08-04';
     const LEGACY_STORAGE_KEYS = ['cronogramaLucasMpcV11'];
     const TUTORIAL_SESSION_KEY = 'cronogramaTutorialAbertoNestaSessaoV2';
@@ -2755,9 +2648,6 @@
     const ADMIN_DRAFT_KEY = 'geradorCronogramaMpcAdminDraft';
     const ADMIN_SESSION_KEY = 'geradorCronogramaMpcAdminUnlocked';
     const ADMIN_VIEW_KEY = 'geradorCronogramaMpcAdminView';
-    const ACCESS_WHATSAPP_PENDING_KEY = 'geradorCronogramaMpcWhatsappPending';
-    const ACCESS_WHATSAPP_LEFT_KEY = 'geradorCronogramaMpcWhatsappLeft';
-    const ACCESS_WHATSAPP_LAUNCH_AT_KEY = 'geradorCronogramaMpcWhatsappLaunchAt';
 
     const defaultState = () => ({
       dataSchemaVersion: DATA_SCHEMA_VERSION,
@@ -3842,10 +3732,10 @@
           dataSchemaVersion: DATA_SCHEMA_VERSION,
           privacyVersion: CURRENT_PRIVACY_VERSION
         };
-        if(loaded.awaitingWhatsapp && !loaded.registration?.unlockCodeHash){
+        if(!loaded.registered){
           loaded.awaitingWhatsapp=false;
           loaded.whatsappOpened=false;
-          loaded.registered=false;
+          loaded.whatsappReturned=false;
         }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(loaded));
         return loaded;
@@ -3895,139 +3785,18 @@
       if(!document.querySelector('.required-modal.open')) setAccessLock(false);
     }
     function renderAccessGate(){
-      const requestView=el('accessRequestView');
-      const codeView=el('accessCodeView');
-      const title=el('accessTitle');
       const input=el('accessCodeInput');
-      const nameInput=el('accessNameInput');
       const status=el('accessCodeStatus');
-      const codeStage=Boolean(state.awaitingWhatsapp && state.whatsappOpened && state.whatsappReturned && state.registration?.unlockCodeHash);
-
-      if(requestView) requestView.hidden=codeStage;
-      if(codeView) codeView.hidden=!codeStage;
-      if(title) title.textContent=codeStage ? 'Digite o código recebido' : 'Acesso gratuito ao Gerador MPC';
-
-      if(!codeStage){
-        if(nameInput && !nameInput.value && state.registration?.name) nameInput.value=state.registration.name;
-        if(input) input.value='';
-        if(status){
-          status.textContent='';
-          status.className='registration-submit-status';
-        }
-        setTimeout(()=>nameInput?.focus(),120);
-      }else{
-        setTimeout(()=>input?.focus(),120);
+      if(status){
+        status.textContent='';
+        status.className='registration-submit-status';
       }
-    }
-
-
-    function armWhatsappReturnDetection(){
-      sessionStorage.setItem(ACCESS_WHATSAPP_PENDING_KEY,'1');
-      sessionStorage.removeItem(ACCESS_WHATSAPP_LEFT_KEY);
-      sessionStorage.setItem(ACCESS_WHATSAPP_LAUNCH_AT_KEY,String(Date.now()));
-    }
-
-    function markWhatsappPageLeft(){
-      if(sessionStorage.getItem(ACCESS_WHATSAPP_PENDING_KEY)==='1'){
-        sessionStorage.setItem(ACCESS_WHATSAPP_LEFT_KEY,'1');
-      }
-    }
-
-    function completeWhatsappReturnIfNeeded(){
-      if(state.registered || !state.awaitingWhatsapp || !state.whatsappOpened || state.whatsappReturned) return false;
-      if(sessionStorage.getItem(ACCESS_WHATSAPP_PENDING_KEY)!=='1') return false;
-      if(sessionStorage.getItem(ACCESS_WHATSAPP_LEFT_KEY)!=='1') return false;
-      const launchedAt=Number(sessionStorage.getItem(ACCESS_WHATSAPP_LAUNCH_AT_KEY)||0);
-      const elapsed=Date.now()-launchedAt;
-      if(launchedAt && elapsed<700){
-        setTimeout(completeWhatsappReturnIfNeeded,700-elapsed+80);
-        return false;
-      }
-      state.whatsappReturned=true;
-      sessionStorage.removeItem(ACCESS_WHATSAPP_PENDING_KEY);
-      sessionStorage.removeItem(ACCESS_WHATSAPP_LEFT_KEY);
-      sessionStorage.removeItem(ACCESS_WHATSAPP_LAUNCH_AT_KEY);
-      saveState();
-      renderAccessGate();
-      if(platformAccessRequired()) openModal('accessModal');
-      toast('Agora digite o código enviado pelo Prof. Lucas MPC.');
-      return true;
-    }
-
-    function createUnlockCode(){
-      const values=new Uint32Array(1);
-      crypto.getRandomValues(values);
-      return String(100000 + (values[0] % 900000));
-    }
-
-    async function hashUnlockCode(value){
-      const normalized=String(value||'').replace(/\D/g,'').slice(0,6);
-      const bytes=new TextEncoder().encode(normalized);
-      const digest=await crypto.subtle.digest('SHA-256',bytes);
-      return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,'0')).join('');
-    }
-
-    function registrationDevice(){
-      const ua=navigator.userAgent||'';
-      if(/iPad|Tablet|PlayBook|Silk/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua))) return 'Tablet';
-      if(/Mobi|Android|iPhone|iPod/i.test(ua)) return 'Celular';
-      return 'Computador';
-    }
-
-    function registrationOrigin(params){
-      const source=params.get('utm_source');
-      if(source) return source;
-      if(document.referrer){
-        try { return new URL(document.referrer).hostname || 'Referência externa'; }
-        catch { return 'Referência externa'; }
-      }
-      return 'Acesso direto ou origem não informada';
-    }
-
-    function fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt,marketing,unlockCode}){
-      collectSettings();
-      const params=new URLSearchParams(location.search);
-      const values={
-        leadId,
-        leadUnlockCode:unlockCode,
-        leadGoal:state.goal||'Não informado',
-        leadExamDate:state.examDate||'Não informada',
-        leadMarketing:marketing?'Sim':'Não',
-        leadPrivacyVersion:CURRENT_PRIVACY_VERSION,
-        leadPrivacyAcceptedAt:privacyAcceptedAt,
-        leadCreatedAt:createdAt,
-        leadPage:location.href,
-        leadOrigin:registrationOrigin(params),
-        leadReferrer:document.referrer||'Não informado',
-        leadUtmSource:params.get('utm_source')||'',
-        leadUtmMedium:params.get('utm_medium')||'',
-        leadUtmCampaign:params.get('utm_campaign')||'',
-        leadUtmContent:params.get('utm_content')||'',
-        leadUtmTerm:params.get('utm_term')||'',
-        leadDevice:registrationDevice(),
-        leadBrowser:navigator.userAgent||'Não informado',
-        leadLanguage:navigator.language||'Não informado',
-        leadTimezone:Intl.DateTimeFormat().resolvedOptions().timeZone||'Não informado'
-      };
-      Object.entries(values).forEach(([id,value])=>{
-        const field=el(id);
-        if(field) field.value=value;
-      });
-    }
-
-    async function submitRegistrationToNetlify(form){
-      const formData=new FormData(form);
-      const response=await fetch('/',{
-        method:'POST',
-        headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body:new URLSearchParams(formData).toString()
-      });
-      if(!response.ok) throw new Error(`Falha no envio do cadastro (${response.status}).`);
+      if(input) input.value='';
+      setTimeout(()=>input?.focus(),120);
     }
 
     function accessWhatsappMessage(){
-      const name=String(state.registration?.name||'').trim();
-      return `Olá, professor Lucas MPC. Gostaria de usar o gerador de cronogramas MPC GRATUITAMENTE. Poderia me enviar o meu código de acesso? Meu nome é: ${name}`;
+      return 'Olá, professor Lucas MPC. Gostaria de receber um código de acesso de 6 caracteres para usar gratuitamente o Gerador de Cronograma MPC.';
     }
 
     function renderPrivacyConsent(){
@@ -6664,14 +6433,12 @@
         option.addEventListener('click',()=>setPalette(option.dataset.paletteChoice));
       });
       el('resetPaletteBtn').onclick=()=>setPalette('classic');
-      el('openPrivacyBtn').onclick=openPrivacyDocument;
+      el('openPrivacyBtn')?.addEventListener('click',openPrivacyDocument);
       el('footerPrivacyBtn').onclick=openPrivacyDocument;
       el('acknowledgePrivacyBtn').onclick=()=>{
         state.privacyAcknowledged=true;
         saveState();
-        renderPrivacyConsent();
         closeModal('privacyModal');
-        setTimeout(()=>el('privacyConsent')?.focus(),50);
       };
       document.querySelectorAll('[data-schedule-style]').forEach(button=>{
         button.addEventListener('click',()=>{
@@ -6750,14 +6517,7 @@
       document.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>share(b.dataset.share));
       el('shareConfirmCheckbox').onchange=updateShareConfirmButton;
       el('shareConfirmBtn').onclick=completeShareReward;
-      window.addEventListener('blur',markWhatsappPageLeft);
-      window.addEventListener('focus',()=>setTimeout(completeWhatsappReturnIfNeeded,120));
       document.addEventListener('visibilitychange',()=>{
-        if(document.hidden){
-          markWhatsappPageLeft();
-        }else{
-          setTimeout(completeWhatsappReturnIfNeeded,120);
-        }
         if(!document.hidden && shareRewardPending && shareAttempted){
           const button=el('shareConfirmBtn');
           if(button && button.dataset.ready!=='true'){
@@ -6778,128 +6538,10 @@
           });
         }
       });
-      el('registerForm').onsubmit=async e=>{
-        e.preventDefault();
-        if(!el('privacyConsent').checked){
-          toast('Marque a concordância com a Política de Privacidade e os Termos de Uso.');
-          el('privacyConsent').focus();
-          return;
-        }
-
-        const form=e.currentTarget;
-        const submitButton=el('registerSubmitBtn');
-        const status=el('registrationSubmitStatus');
-        const originalLabel=submitButton.textContent;
-        const leadId=form.dataset.leadId||cryptoId();
-        const createdAt=new Date().toISOString();
-        const privacyAcceptedAt=createdAt;
-        const marketing=el('marketingConsent').checked;
-        const unlockCode=createUnlockCode();
-        const unlockCodeHash=await hashUnlockCode(unlockCode);
-
-        form.dataset.leadId=leadId;
-        fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt,marketing,unlockCode});
-
-        submitButton.disabled=true;
-        submitButton.textContent='Salvando seu cadastro...';
-        status.className='registration-submit-status sending';
-        status.textContent='Aguarde. Estamos registrando seus dados com segurança.';
-
-        try{
-          await submitRegistrationToNetlify(form);
-
-          state.privacyAcknowledged=true;
-          state.registered=false;
-          state.awaitingWhatsapp=true;
-          state.whatsappOpened=false;
-          state.registration={
-            leadId,
-            unlockCodeHash,
-            name:el('regName').value.trim(),
-            email:el('regEmail').value.trim(),
-            whatsapp:el('regWhatsapp').value.trim(),
-            goal:state.goal||'',
-            examDate:state.examDate||'',
-            privacyAccepted:true,
-            privacyVersion:CURRENT_PRIVACY_VERSION,
-            privacyAcceptedAt,
-            marketing,
-            marketingAcceptedAt:marketing ? createdAt : null,
-            createdAt,
-            netlifyCapturedAt:new Date().toISOString()
-          };
-          saveState();
-
-          status.className='registration-submit-status success';
-          status.textContent='Cadastro recebido. Abrindo a etapa do WhatsApp...';
-          closeModal('registerModal', true);
-          renderAccessGate();
-          openModal('accessModal');
-        }catch(error){
-          console.error('Falha ao salvar cadastro:',error);
-          status.className='registration-submit-status error';
-          status.textContent='Não foi possível registrar seu cadastro. Verifique sua conexão e tente novamente.';
-          toast('O cadastro não foi enviado. Tente novamente para continuar.');
-        }finally{
-          submitButton.disabled=false;
-          submitButton.textContent=originalLabel;
-        }
-      };
-      el('accessWhatsappBtn').onclick=async()=>{
-        const name=String(el('accessNameInput')?.value||'').trim();
-        const status=el('accessRequestStatus');
-        const button=el('accessWhatsappBtn');
-        if(name.length<2){
-          status.className='registration-submit-status error';
-          status.textContent='Digite seu nome antes de solicitar o código.';
-          el('accessNameInput')?.focus();
-          return;
-        }
-
-        const form=el('registerForm');
-        const unlockCode=createUnlockCode();
-        const unlockCodeHash=await hashUnlockCode(unlockCode);
-        const leadId=cryptoId();
-        const createdAt=new Date().toISOString();
-        if(el('regName')) el('regName').value=name;
-        if(el('regEmail')) el('regEmail').value='';
-        if(el('regWhatsapp')) el('regWhatsapp').value='';
-        if(el('privacyConsent')) el('privacyConsent').checked=false;
-        if(el('marketingConsent')) el('marketingConsent').checked=false;
-        form.dataset.leadId=leadId;
-        fillRegistrationMetadata({leadId,createdAt,privacyAcceptedAt:'',marketing:false,unlockCode});
-
-        button.disabled=true;
-        status.className='registration-submit-status sending';
-        status.textContent='Preparando seu código de acesso...';
-        try{
-          await submitRegistrationToNetlify(form);
-          state.registered=false;
-          state.awaitingWhatsapp=true;
-          state.whatsappOpened=true;
-          state.whatsappReturned=false;
-          state.registration={
-            leadId,
-            unlockCodeHash,
-            name,
-            createdAt,
-            whatsappRequestedAt:createdAt,
-            netlifyCapturedAt:new Date().toISOString()
-          };
-          armWhatsappReturnDetection();
-          saveState();
-          const msg=accessWhatsappMessage();
-          status.className='registration-submit-status success';
-          status.textContent='WhatsApp aberto. Envie a mensagem ao Prof. Lucas MPC. Quando retornar a esta página, aparecerá o campo para inserir seu código.';
-          window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
-          toast('Envie a mensagem no WhatsApp e depois volte a esta página.');
-        }catch(error){
-          console.error('Falha ao preparar pedido de acesso:',error);
-          status.className='registration-submit-status error';
-          status.textContent='Não foi possível preparar seu código agora. Verifique sua conexão e tente novamente.';
-        }finally{
-          button.disabled=false;
-        }
+      el('accessWhatsappBtn').onclick=()=>{
+        const msg=accessWhatsappMessage();
+        window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
+        toast('Envie a mensagem ao Prof. Lucas MPC e aguarde seu código.');
       };
       el('adminPinInput').addEventListener('input',event=>{
         event.target.value=event.target.value.replace(/\D/g,'').slice(0,8);
@@ -6908,42 +6550,30 @@
         event.target.value=event.target.value.replace(/\D/g,'').slice(0,8);
       });
       el('accessCodeInput').addEventListener('input',event=>{
-        event.target.value=event.target.value.replace(/\D/g,'').slice(0,6);
+        event.target.value=event.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
       });
-      el('accessCodeBtn').onclick=async()=>{
+      el('accessCodeInput').addEventListener('keydown',event=>{
+        if(event.key==='Enter') el('accessCodeBtn').click();
+      });
+      el('accessCodeBtn').onclick=()=>{
         const input=el('accessCodeInput');
         const status=el('accessCodeStatus');
-        const code=input.value.replace(/\D/g,'');
-        if(!state.awaitingWhatsapp || !state.registration?.unlockCodeHash){
-          toast('Primeiro solicite seu código pelo WhatsApp.');
-          renderAccessGate();
-          return;
-        }
-        if(code.length!==6){
+        const code=String(input.value||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+        if(!/^[A-Z0-9]{6}$/.test(code)){
           status.className='registration-submit-status error';
-          status.textContent='Digite o código completo de 6 números.';
+          status.textContent='Digite um código com exatamente 6 letras e/ou números.';
           input.focus();
-          return;
-        }
-        const informedHash=await hashUnlockCode(code);
-        if(!state.registration?.unlockCodeHash || informedHash!==state.registration.unlockCodeHash){
-          status.className='registration-submit-status error';
-          status.textContent='Código incorreto. Confira a resposta enviada pelo Prof. Lucas MPC.';
-          input.select();
           return;
         }
         state.registered=true;
         state.awaitingWhatsapp=false;
         state.whatsappOpened=false;
         state.whatsappReturned=false;
-        sessionStorage.removeItem(ACCESS_WHATSAPP_PENDING_KEY);
-        sessionStorage.removeItem(ACCESS_WHATSAPP_LEFT_KEY);
-        sessionStorage.removeItem(ACCESS_WHATSAPP_LAUNCH_AT_KEY);
-        state.registration.unlockedAt=new Date().toISOString();
+        state.registration={...(state.registration||{}),accessMode:'manual-code',unlockedAt:new Date().toISOString()};
         saveState();
-        closeModal('accessModal', true);
+        closeModal('accessModal',true);
         setAccessLock(false);
-        toast('Código correto. Acesso gratuito liberado neste navegador.');
+        toast('Acesso gratuito liberado neste navegador.');
       };
       el('toolsButton').onclick=()=>openModal('toolsModal');
       document.querySelectorAll('[data-tool-action]').forEach(item=>{
@@ -7016,7 +6646,7 @@
       focusInterval=null;
       saveState();
       initialize();
-      toast('Planejamento resetado. Seu cadastro, acesso e créditos foram preservados.');
+      toast('Planejamento resetado. Seu acesso e créditos foram preservados.');
     }
 
     const PALETTE_NAMES={
@@ -7088,9 +6718,7 @@
       }
 
       if(platformAccessRequired()){
-        setTimeout(()=>{
-          if(!completeWhatsappReturnIfNeeded()) enforceAccessGate();
-        },120);
+        setTimeout(enforceAccessGate,120);
       }else if(!sessionStorage.getItem(TUTORIAL_SESSION_KEY)){
         tutorialIndex=0;
         initTutorial();
