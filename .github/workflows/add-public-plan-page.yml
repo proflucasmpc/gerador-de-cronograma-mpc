@@ -1,0 +1,90 @@
+name: Integrar página pública do cronograma
+
+on:
+  push:
+    branches: [agent/pagina-publica-cronograma]
+    paths:
+      - '.github/workflows/add-public-plan-page.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Integrar botões e rota pública
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          def replace_once(old, new, label):
+              global text
+              if old not in text:
+                  raise SystemExit(f'Trecho não encontrado: {label}')
+              text = text.replace(old, new, 1)
+
+          replace_once(
+              '<button class="btn btn-primary btn-small" id="premiumPdfBtn">PDF Premium</button>\n              <button class="btn btn-primary btn-small" id="exportBtn">Exportar</button>',
+              '<button class="btn btn-primary btn-small" id="premiumPdfBtn">PDF Premium</button>\n              <button class="btn btn-secondary btn-small" id="publicPageBtn">Criar página</button>\n              <button class="btn btn-primary btn-small" id="exportBtn">Exportar</button>',
+              'botão principal'
+          )
+
+          replace_once(
+              '''        <button class="export-choice" id="exportPremiumPdfBtn" type="button">\n          <span class="export-choice-icon">PRO</span>\n          <span><strong>PDF Premium MPC</strong><small>Abre o novo documento editorial inspirado na leitura Kindle, com capa, métricas, raio-X, conteúdos e cronograma em alta legibilidade.</small></span>\n        </button>\n        <button class="export-choice" id="exportExcelBtn" type="button">''',
+              '''        <button class="export-choice" id="exportPremiumPdfBtn" type="button">\n          <span class="export-choice-icon">PRO</span>\n          <span><strong>PDF Premium MPC</strong><small>Abre o novo documento editorial inspirado na leitura Kindle, com capa, métricas, raio-X, conteúdos e cronograma em alta legibilidade.</small></span>\n        </button>\n        <button class="export-choice" id="exportPublicPageBtn" type="button">\n          <span class="export-choice-icon">LINK</span>\n          <span><strong>Página online do aluno</strong><small>Publica uma versão somente para leitura e gera um link curto para abrir e compartilhar no celular.</small></span>\n        </button>\n        <button class="export-choice" id="exportExcelBtn" type="button">''',
+              'opção exportar'
+          )
+
+          replace_once(
+              '''    function openPremiumPdf(){\n      if(!state.tasks.length) return toast('Adicione atividades antes de gerar o PDF Premium.');\n      saveState();\n      closeModal('exportModal');\n      const premiumWindow=window.open('premium-pdf.html','_blank','noopener');\n      if(!premiumWindow) window.location.href='premium-pdf.html';\n    }\n\n    function exportPdf(){''',
+              '''    function openPremiumPdf(){\n      if(!state.tasks.length) return toast('Adicione atividades antes de gerar o PDF Premium.');\n      saveState();\n      closeModal('exportModal');\n      const premiumWindow=window.open('premium-pdf.html','_blank','noopener');\n      if(!premiumWindow) window.location.href='premium-pdf.html';\n    }\n\n    async function createPublicPlanPage(){\n      if(!state.tasks.length) return toast('Adicione atividades antes de criar a página do aluno.');\n      collectSettings();\n      saveState();\n      const button=el('publicPageBtn');\n      const exportButton=el('exportPublicPageBtn');\n      const oldMain=button?.textContent;\n      const oldExport=exportButton?.innerHTML;\n      if(button){ button.disabled=true; button.textContent='Publicando…'; }\n      if(exportButton){ exportButton.disabled=true; }\n      try{\n        const personalization=state.adminPersonalization||{};\n        const payload={\n          studentName: state.studentName||personalization.studentName||'',\n          goal: state.goal||'',\n          examDate: personalization.examDate||state.examDate||'',\n          startDate: personalization.startDate||state.startDate||state.tasks[0]?.date||'',\n          endDate: personalization.endDate||state.endDate||state.tasks.at(-1)?.date||'',\n          hoursPerDay: state.hoursPerDay||0,\n          scheduleStyle: state.scheduleStyle||'weekly',\n          subjects: state.subjects||[],\n          tasks: state.tasks||[]\n        };\n        const response=await fetch('/api/plans',{\n          method:'POST',\n          headers:{'Content-Type':'application/json'},\n          body:JSON.stringify(payload)\n        });\n        const result=await response.json().catch(()=>({}));\n        if(!response.ok) throw new Error(result.error||'Não foi possível publicar o cronograma.');\n        const url=new URL(result.path,location.origin).href;\n        closeModal('exportModal');\n        try{ await navigator.clipboard.writeText(url); }catch{}\n        toast('Página criada! O link foi copiado.');\n        const publicWindow=window.open(url,'_blank','noopener');\n        if(!publicWindow){\n          window.prompt('Página criada. Copie o link abaixo:',url);\n        }\n      }catch(error){\n        console.error(error);\n        toast(error.message||'Erro ao criar a página do cronograma.');\n      }finally{\n        if(button){ button.disabled=false; button.textContent=oldMain||'Criar página'; }\n        if(exportButton){ exportButton.disabled=false; if(oldExport) exportButton.innerHTML=oldExport; }\n      }\n    }\n\n    function exportPdf(){''',
+              'função publicar página'
+          )
+
+          replace_once(
+              '''      el('premiumPdfBtn').onclick=openPremiumPdf;\n      el('exportBtn').onclick=()=>openModal('exportModal');\n      el('exportPdfBtn').onclick=exportPdf;\n      el('exportPremiumPdfBtn').onclick=openPremiumPdf;\n      el('exportExcelBtn').onclick=exportExcel;''',
+              '''      el('premiumPdfBtn').onclick=openPremiumPdf;\n      el('publicPageBtn').onclick=createPublicPlanPage;\n      el('exportBtn').onclick=()=>openModal('exportModal');\n      el('exportPdfBtn').onclick=exportPdf;\n      el('exportPremiumPdfBtn').onclick=openPremiumPdf;\n      el('exportPublicPageBtn').onclick=createPublicPlanPage;\n      el('exportExcelBtn').onclick=exportExcel;''',
+              'eventos'
+          )
+
+          path.write_text(text, encoding='utf-8')
+
+          toml = Path('netlify.toml')
+          cfg = toml.read_text(encoding='utf-8')
+          if 'from = "/plano/*"' not in cfg:
+              cfg += '''\n[[redirects]]\n  from = "/plano/*"\n  to = "/plano.html"\n  status = 200\n\n'''
+          toml.write_text(cfg, encoding='utf-8')
+          PY
+
+      - name: Validar JavaScript e configuração
+        shell: bash
+        run: |
+          node --check netlify/functions/plans.mjs
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          text=Path('index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script(?:[^>]*)>(.*?)</script>',text,re.S)
+          main=max(scripts,key=len)
+          Path('/tmp/index-main.js').write_text(main,encoding='utf-8')
+          PY
+          node --check /tmp/index-main.js
+          git diff --check
+
+      - name: Commitar integração
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html netlify.toml
+          git commit -m "Adicionar página pública compartilhável do cronograma"
+          git push origin HEAD:agent/pagina-publica-cronograma
