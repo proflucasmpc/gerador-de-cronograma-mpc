@@ -1,5 +1,6 @@
 from pathlib import Path
 import re
+import subprocess
 
 index_path=Path('index.html')
 plan_path=Path('plano.html')
@@ -45,7 +46,6 @@ replacement='''        state.registered=true;\n        try{sessionStorage.remove
 if needle not in index: raise SystemExit('Ponto de liberação do acesso não encontrado.')
 index=index.replace(needle,replacement,1)
 
-# Requisitos finais da captura nova.
 checks=[
  'Você está prestes a criar seu cronograma gratuitamente',
  'Você está estudando para:',
@@ -60,4 +60,7 @@ assert 'placeholder="A1B2C3"' not in index
 assert '<div class="access-code-only-view" id="accessCodeView" hidden>' in index
 
 index_path.write_text(index,'utf-8')
-print('Captura do Gerador MPC atualizada e validada.')
+
+# Aplica também a interface de tópicos individualizados da área guiada.
+subprocess.run(['python','scripts/update_guided_topics_ui.py'],check=True)
+print('Captura do Gerador MPC e cadastro individual de tópicos atualizados e validados.')
