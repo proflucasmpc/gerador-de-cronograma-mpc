@@ -59,10 +59,10 @@ jobs:
           path.write_text(text, encoding='utf-8')
 
           toml = Path('netlify.toml')
-          cfg = toml.read_text(encoding='utf-8')
+          cfg = toml.read_text(encoding='utf-8').rstrip()
           if 'from = "/plano/*"' not in cfg:
-              cfg += '''\n[[redirects]]\n  from = "/plano/*"\n  to = "/plano.html"\n  status = 200\n\n'''
-          toml.write_text(cfg, encoding='utf-8')
+              cfg += '''\n\n[[redirects]]\n  from = "/plano/*"\n  to = "/plano.html"\n  status = 200'''
+          toml.write_text(cfg + '\n', encoding='utf-8')
           PY
 
       - name: Validar JavaScript e configuração
