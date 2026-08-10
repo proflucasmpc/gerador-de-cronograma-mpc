@@ -1067,7 +1067,7 @@
 
     .export-choice-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
       margin-top: 16px;
     }
@@ -2120,6 +2120,7 @@
             <div class="toolbar tool-destination" id="scheduleTools">
               <button class="btn btn-secondary btn-small" id="saveBtn">Salvar no app</button>
               <button class="btn btn-dark btn-small" id="downloadPdfBtn">Baixar cronograma</button>
+              <button class="btn btn-primary btn-small" id="premiumPdfBtn">PDF Premium</button>
               <button class="btn btn-primary btn-small" id="exportBtn">Exportar</button>
               <button class="btn btn-danger btn-small" id="clearBtn">Limpar</button>
             </div>
@@ -2405,7 +2406,11 @@
       <div class="export-choice-grid">
         <button class="export-choice" id="exportPdfBtn" type="button">
           <span class="export-choice-icon">PDF</span>
-          <span><strong>PDF de alta qualidade</strong><small>Baixa diretamente um PDF nítido, organizado e com o botão clicável no rodapé.</small></span>
+          <span><strong>PDF clássico</strong><small>Mantém o modelo de PDF já existente no Gerador MPC.</small></span>
+        </button>
+        <button class="export-choice" id="exportPremiumPdfBtn" type="button">
+          <span class="export-choice-icon">PRO</span>
+          <span><strong>PDF Premium MPC</strong><small>Abre o novo documento editorial inspirado na leitura Kindle, com capa, métricas, raio-X, conteúdos e cronograma em alta legibilidade.</small></span>
         </button>
         <button class="export-choice" id="exportExcelBtn" type="button">
           <span class="export-choice-icon">XLS</span>
@@ -5932,6 +5937,14 @@
       }
     }
 
+    function openPremiumPdf(){
+      if(!state.tasks.length) return toast('Adicione atividades antes de gerar o PDF Premium.');
+      saveState();
+      closeModal('exportModal');
+      const premiumWindow=window.open('premium-pdf.html','_blank','noopener');
+      if(!premiumWindow) window.location.href='premium-pdf.html';
+    }
+
     function exportPdf(){
       if(!state.tasks.length) return toast('Adicione atividades antes de baixar o cronograma.');
       collectSettings();
@@ -6720,8 +6733,10 @@
       };
       el('saveBtn').onclick=()=>{saveState();toast('Cronograma salvo neste navegador.');};
       el('downloadPdfBtn').onclick=exportPdf;
+      el('premiumPdfBtn').onclick=openPremiumPdf;
       el('exportBtn').onclick=()=>openModal('exportModal');
       el('exportPdfBtn').onclick=exportPdf;
+      el('exportPremiumPdfBtn').onclick=openPremiumPdf;
       el('exportExcelBtn').onclick=exportExcel;
       el('clearBtn').onclick=()=>{if(confirm('Apagar todas as atividades do cronograma?')){state.tasks=[];saveState();renderSchedule();toast('Cronograma limpo.');}};
       el('refreshInsightsBtn').onclick=renderInsights;
