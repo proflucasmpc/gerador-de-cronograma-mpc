@@ -20,144 +20,115 @@ jobs:
           ref: agent/corrigir-responsividade-pdf-premium
           fetch-depth: 0
 
-      - name: Ajustar legibilidade e responsividade
+      - name: Aplicar CSS de legibilidade
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
-
           path = Path('premium-pdf.html')
           text = path.read_text(encoding='utf-8')
-
-          anchor = '@page{size:A4;margin:0}'
-          if anchor not in text:
-              raise SystemExit('Âncora CSS do PDF Premium não encontrada.')
-
-          override = r'''
-/* Legibilidade Premium v2 — desktop, impressão e celular */
-.pdf-page{overflow:visible}
-.eyebrow{font-size:11px}
-.page-title{font-size:29px;line-height:1.08}
-.subtitle{font-size:13px;line-height:1.5}
-.page-footer{font-size:10px}
-.cover .brand{font-size:13px}
-.cover h1{font-size:44px;line-height:1.06}
-.cover .goal-label{font-size:12px}
-.cover .goal{font-size:30px;line-height:1.2}
-.cover-card small{font-size:11px}
-.cover-card strong{font-size:24px;line-height:1.2}
-.cover-card em{font-size:12px}
-.badge{font-size:11px}
-.toc-row .n{font-size:12px}
-.toc-row .t{font-size:18px;line-height:1.25}
-.toc-row .p{font-size:12px}
-.metric strong{font-size:29px}
-.metric span{font-size:11px;line-height:1.35}
-.callout strong{font-size:17px;line-height:1.45}
-.bar-row .name{font-size:11px;line-height:1.3}
-.bar-row .count{font-size:11px}
-.subject-head{font-size:22px;line-height:1.2}
-.subject-meta{font-size:11px}
-.topic{margin-bottom:5mm}
-.topic strong{font-size:12px;line-height:1.4}
-.topic ul{font-size:11.5px;line-height:1.55}
-.strategy-card b.num{font-size:11px}
-.strategy-card h3{font-size:18px;line-height:1.25}
-.strategy-card p{font-size:12px;line-height:1.55}
-.legend-row{font-size:12px;line-height:1.5}
-.pill{font-size:10px;min-height:9mm;height:auto;padding:2.5mm 5mm;line-height:1.2;text-align:center}
-.day-head small{font-size:10px}
-.day-head strong{font-size:24px}
-.day-head em{font-size:10px}
-.task-title{font-size:13px;line-height:1.35}
-.task-desc{font-size:12px;line-height:1.55}
-.check{font-size:13px;line-height:1.5}
-.close-card{font-size:13px;line-height:1.55}
-
-'''
-          if 'Legibilidade Premium v2' not in text:
-              text = text.replace(anchor, override + anchor, 1)
-
-          # Substitui os media queries antigos por versões que priorizam leitura.
-          old_print = re.search(r'@page\{size:A4;margin:0\}@media print\{.*?\}\n@media\(max-width:900px\)\{.*?\}\n', text, re.S)
-          if not old_print:
-              raise SystemExit('Bloco responsivo original não encontrado.')
-
-          responsive = r'''@page{size:A4;margin:0}
-@media print{
-  html,body{background:#fff}
-  .toolbar{display:none!important}
-  .document{padding:0}
-  .pdf-page{box-shadow:none;margin:0;width:210mm;min-height:297mm;height:auto;overflow:visible;page-break-after:always;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .error{display:none}
-}
-@media(max-width:900px){
-  html,body{background:#eef1f5;overflow-x:hidden}
-  .toolbar{position:sticky;top:0;padding:10px;gap:8px;justify-content:stretch;flex-wrap:wrap}
-  .toolbar a,.toolbar button{flex:1 1 145px;text-align:center;padding:12px 10px;font-size:13px}
-  .toolbar .status{flex:1 0 100%;text-align:center;font-size:12px;line-height:1.35}
-  .document{padding:10px 0 30px}
-  .pdf-page{width:100%;min-height:0;margin:0 0 12px;padding:0 18px 34px;box-shadow:none;border-radius:0;overflow:visible}
-  .pdf-page:not(.cover):not(.dark){background:#fff}
-  .page-header{position:relative;left:auto;right:auto;top:auto;height:auto;margin:0 -18px 0;padding:22px 22px 18px}
-  .gold-bar{left:18px;top:20px;width:4px;height:40px}
-  .eyebrow{font-size:12px;padding-left:12px}
-  .page-title{font-size:30px;line-height:1.08;padding-left:12px;margin-top:6px}
-  .subtitle{font-size:16px;line-height:1.55;margin:20px 0 18px}
-  .page-footer{position:relative;left:auto;right:auto;bottom:auto;margin:28px 0 0;padding-top:12px;font-size:11px;gap:10px}
-  .cover{min-height:100svh;padding:28px 20px 36px;display:flex;flex-direction:column}
-  .cover .brand{font-size:14px;padding-right:120px}
-  .cover h1{font-size:42px;line-height:1.04;margin:70px 0 0}
-  .cover .goal-label{margin-top:38px;font-size:12px}
-  .cover .goal{font-size:28px;line-height:1.2}
-  .badge{right:18px;top:20px;padding:10px 14px;font-size:10px}
-  .cover-card{position:relative;left:auto;right:auto;bottom:auto;margin-top:auto;padding:22px;border-radius:14px}
-  .cover-card small{font-size:11px}
-  .cover-card strong{font-size:24px}
-  .cover-card em{font-size:13px}
-  .toc-row{grid-template-columns:32px 1fr 40px;gap:10px;padding:16px 0}
-  .toc-row .n{font-size:12px}.toc-row .t{font-size:18px}.toc-row .p{font-size:12px}
-  .metrics{grid-template-columns:1fr;gap:10px}
-  .metric{padding:18px}
-  .metric strong{font-size:31px}
-  .metric span{font-size:12px}
-  .callout{padding:18px;margin-top:18px}
-  .callout strong{font-size:17px}
-  .bar-row{grid-template-columns:1fr;gap:8px;margin:18px 0;padding-bottom:12px;border-bottom:1px solid var(--line)}
-  .bar-row .name{font-size:14px}.bar-row .count{text-align:left;font-size:12px}.bar{height:8px}
-  .subject-head{font-size:25px;margin-top:8px}.subject-meta{font-size:12px;margin-bottom:20px}
-  .topic{padding-left:12px;margin-bottom:20px}.topic strong{font-size:15px}.topic ul{font-size:14px;line-height:1.6;margin-top:8px;padding-left:18px}
-  .strategy-card{grid-template-columns:44px 1fr;gap:12px;padding:16px;margin-bottom:12px}
-  .strategy-card b.num{width:40px;height:40px;font-size:11px}
-  .strategy-card h3{font-size:19px}.strategy-card p{font-size:15px;line-height:1.6}
-  .legend{gap:12px}.legend-row{grid-template-columns:1fr;gap:8px;font-size:15px}.pill{justify-self:start;min-height:36px;font-size:11px;padding:8px 14px}
-  .day-card{margin-top:14px;border-radius:12px}
-  .day-head{padding:16px}.day-head small{font-size:11px}.day-head strong{font-size:26px}.day-head em{font-size:11px}
-  .task{grid-template-columns:1fr;gap:10px;padding:18px 16px}
-  .task-title{font-size:17px;margin-bottom:7px}.task-desc{font-size:15px;line-height:1.6}
-  .checklist{gap:14px}.check{grid-template-columns:24px 1fr;gap:10px;font-size:15px;line-height:1.55}.box{width:20px;height:20px}
-  .close-card{margin-top:50px;padding:22px;font-size:15px}
-  .pdf-page.dark:not(.cover){min-height:70svh;padding-top:34px}
-}
-'''
-          text = text[:old_print.start()] + responsive + text[old_print.end():]
-
+          marker = '/* Legibilidade Premium v2 */'
+          css = '''
+          /* Legibilidade Premium v2 */
+          .pdf-page{overflow:visible}
+          .eyebrow{font-size:11px}
+          .page-title{font-size:29px;line-height:1.08}
+          .subtitle{font-size:13px;line-height:1.5}
+          .page-footer{font-size:10px}
+          .cover .brand{font-size:13px}
+          .cover h1{font-size:44px;line-height:1.06}
+          .cover .goal-label{font-size:12px}
+          .cover .goal{font-size:30px;line-height:1.2}
+          .cover-card small{font-size:11px}
+          .cover-card strong{font-size:24px;line-height:1.2}
+          .cover-card em{font-size:12px}
+          .badge{font-size:11px}
+          .toc-row .n{font-size:12px}
+          .toc-row .t{font-size:18px;line-height:1.25}
+          .toc-row .p{font-size:12px}
+          .metric strong{font-size:29px}
+          .metric span{font-size:11px;line-height:1.35}
+          .callout strong{font-size:17px;line-height:1.45}
+          .bar-row .name,.bar-row .count{font-size:11px;line-height:1.3}
+          .subject-head{font-size:22px;line-height:1.2}
+          .subject-meta{font-size:11px}
+          .topic{margin-bottom:5mm}
+          .topic strong{font-size:12px;line-height:1.4}
+          .topic ul{font-size:11.5px;line-height:1.55}
+          .strategy-card b.num{font-size:11px}
+          .strategy-card h3{font-size:18px;line-height:1.25}
+          .strategy-card p{font-size:12px;line-height:1.55}
+          .legend-row{font-size:12px;line-height:1.5}
+          .pill{font-size:10px;min-height:9mm;height:auto;padding:2.5mm 5mm;line-height:1.2;text-align:center}
+          .day-head small{font-size:10px}
+          .day-head strong{font-size:24px}
+          .day-head em{font-size:10px}
+          .task-title{font-size:13px;line-height:1.35}
+          .task-desc{font-size:12px;line-height:1.55}
+          .check{font-size:13px;line-height:1.5}
+          .close-card{font-size:13px;line-height:1.55}
+          @media print{
+            .pdf-page{height:auto!important;min-height:297mm!important;overflow:visible!important}
+          }
+          @media(max-width:900px){
+            html,body{background:#eef1f5;overflow-x:hidden}
+            .toolbar{position:sticky;top:0;padding:10px;gap:8px;justify-content:stretch;flex-wrap:wrap}
+            .toolbar a,.toolbar button{flex:1 1 145px;text-align:center;padding:12px 10px;font-size:13px}
+            .toolbar .status{flex:1 0 100%;text-align:center;font-size:12px;line-height:1.35}
+            .document{padding:10px 0 30px}
+            .pdf-page{width:100%!important;min-height:0!important;margin:0 0 12px!important;padding:0 18px 34px!important;box-shadow:none!important;border-radius:0;overflow:visible!important}
+            .pdf-page:not(.cover):not(.dark){background:#fff}
+            .page-header{position:relative!important;left:auto!important;right:auto!important;top:auto!important;height:auto!important;margin:0 -18px;padding:22px 22px 18px!important}
+            .gold-bar{left:18px!important;top:20px!important;width:4px;height:40px}
+            .eyebrow{font-size:12px;padding-left:12px}
+            .page-title{font-size:30px;line-height:1.08;padding-left:12px;margin-top:6px}
+            .subtitle{font-size:16px;line-height:1.55;margin:20px 0 18px}
+            .page-footer{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;margin:28px 0 0;padding-top:12px;font-size:11px;gap:10px}
+            .cover{min-height:100svh!important;padding:28px 20px 36px!important;display:flex;flex-direction:column}
+            .cover .brand{font-size:14px;padding-right:120px}
+            .cover h1{font-size:42px;line-height:1.04;margin:70px 0 0}
+            .cover .goal-label{margin-top:38px;font-size:12px}
+            .cover .goal{font-size:28px;line-height:1.2}
+            .badge{right:18px!important;top:20px;padding:10px 14px;font-size:10px}
+            .cover-card{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;margin-top:auto;padding:22px;border-radius:14px}
+            .cover-card strong{font-size:24px}.cover-card em{font-size:13px}
+            .toc-row{grid-template-columns:32px 1fr 40px;gap:10px;padding:16px 0}
+            .toc-row .t{font-size:18px}
+            .metrics{grid-template-columns:1fr;gap:10px}
+            .metric{padding:18px}.metric strong{font-size:31px}.metric span{font-size:12px}
+            .callout{padding:18px;margin-top:18px}.callout strong{font-size:17px}
+            .bar-row{grid-template-columns:1fr;gap:8px;margin:18px 0;padding-bottom:12px;border-bottom:1px solid var(--line)}
+            .bar-row .name{font-size:14px}.bar-row .count{text-align:left;font-size:12px}.bar{height:8px}
+            .subject-head{font-size:25px;margin-top:8px}.subject-meta{font-size:12px;margin-bottom:20px}
+            .topic{padding-left:12px;margin-bottom:20px}.topic strong{font-size:15px}.topic ul{font-size:14px;line-height:1.6;margin-top:8px;padding-left:18px}
+            .strategy-card{grid-template-columns:44px 1fr;gap:12px;padding:16px;margin-bottom:12px}
+            .strategy-card b.num{width:40px;height:40px;font-size:11px}
+            .strategy-card h3{font-size:19px}.strategy-card p{font-size:15px;line-height:1.6}
+            .legend{gap:12px}.legend-row{grid-template-columns:1fr;gap:8px;font-size:15px}.pill{justify-self:start;min-height:36px;font-size:11px;padding:8px 14px}
+            .day-card{margin-top:14px;border-radius:12px}
+            .day-head{padding:16px}.day-head small{font-size:11px}.day-head strong{font-size:26px}.day-head em{font-size:11px}
+            .task{grid-template-columns:1fr;gap:10px;padding:18px 16px}
+            .task-title{font-size:17px;margin-bottom:7px}.task-desc{font-size:15px;line-height:1.6}
+            .checklist{gap:14px}.check{grid-template-columns:24px 1fr;gap:10px;font-size:15px;line-height:1.55}.box{width:20px;height:20px}
+            .close-card{margin-top:50px;padding:22px;font-size:15px}
+            .pdf-page.dark:not(.cover){min-height:70svh!important;padding-top:34px!important}
+          }
+          '''
+          if marker not in text:
+              text = text.replace('</style>', css + '\n</style>', 1)
           path.write_text(text, encoding='utf-8')
-
-          # Valida HTML básico e JS inline.
           scripts = re.findall(r'<script(?:\s[^>]*)?>([\s\S]*?)</script>', text)
           if not scripts:
-              raise SystemExit('Script principal não encontrado.')
-          Path('/tmp/premium.js').write_text(max(scripts,key=len), encoding='utf-8')
-          required = ['Legibilidade Premium v2','font-size:15px;line-height:1.6','width:100%;min-height:0','height:auto;overflow:visible']
-          missing=[x for x in required if x not in text]
-          if missing:
-              raise SystemExit('Correção incompleta: '+', '.join(missing))
+              raise SystemExit('Script principal não encontrado')
+          Path('/tmp/premium.js').write_text(max(scripts,key=len),encoding='utf-8')
+          for required in [marker,'font-size:15px;line-height:1.6','width:100%!important','height:auto!important']:
+              if required not in text:
+                  raise SystemExit('Validação falhou: '+required)
           PY
           node --check /tmp/premium.js
 
-      - name: Remover workflow temporário e salvar
+      - name: Salvar correção
         shell: bash
         run: |
           rm -f .github/workflows/corrigir-pdf-premium-responsivo.yml
