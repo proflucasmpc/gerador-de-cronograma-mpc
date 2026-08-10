@@ -1,0 +1,102 @@
+name: Integrar PDF Premium
+
+on:
+  push:
+    branches:
+      - agent/integrar-botao-pdf-premium
+    paths:
+      - .github/workflows/integrar-pdf-premium.yml
+
+permissions:
+  contents: write
+
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: agent/integrar-botao-pdf-premium
+          fetch-depth: 0
+
+      - name: Integrar botão e validar
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          # 1) Botão direto na barra do cronograma.
+          old_toolbar = '''              <button class="btn btn-dark btn-small" id="downloadPdfBtn">Baixar cronograma</button>\n              <button class="btn btn-primary btn-small" id="exportBtn">Exportar</button>'''
+          new_toolbar = '''              <button class="btn btn-dark btn-small" id="downloadPdfBtn">Baixar cronograma</button>\n              <button class="btn btn-primary btn-small" id="premiumPdfBtn">PDF Premium</button>\n              <button class="btn btn-primary btn-small" id="exportBtn">Exportar</button>'''
+          if 'id="premiumPdfBtn"' not in text:
+              if old_toolbar not in text:
+                  raise SystemExit('Ponto de inserção do botão direto não encontrado.')
+              text = text.replace(old_toolbar, new_toolbar, 1)
+
+          # 2) Terceira opção no modal Exportar.
+          old_export = '''        <button class="export-choice" id="exportPdfBtn" type="button">\n          <span class="export-choice-icon">PDF</span>\n          <span><strong>PDF de alta qualidade</strong><small>Baixa diretamente um PDF nítido, organizado e com o botão clicável no rodapé.</small></span>\n        </button>\n        <button class="export-choice" id="exportExcelBtn" type="button">'''
+          new_export = '''        <button class="export-choice" id="exportPdfBtn" type="button">\n          <span class="export-choice-icon">PDF</span>\n          <span><strong>PDF clássico</strong><small>Mantém o modelo de PDF já existente no Gerador MPC.</small></span>\n        </button>\n        <button class="export-choice" id="exportPremiumPdfBtn" type="button">\n          <span class="export-choice-icon">PRO</span>\n          <span><strong>PDF Premium MPC</strong><small>Abre o novo documento editorial inspirado na leitura Kindle, com capa, métricas, raio-X, conteúdos e cronograma em alta legibilidade.</small></span>\n        </button>\n        <button class="export-choice" id="exportExcelBtn" type="button">'''
+          if 'id="exportPremiumPdfBtn"' not in text:
+              if old_export not in text:
+                  raise SystemExit('Ponto de inserção da opção Premium não encontrado.')
+              text = text.replace(old_export, new_export, 1)
+
+          # 3) Função segura para abrir o Premium usando o mesmo localStorage.
+          anchor = '''    function exportPdf(){\n      if(!state.tasks.length) return toast('Adicione atividades antes de baixar o cronograma.');'''
+          premium_fn = '''    function openPremiumPdf(){\n      if(!state.tasks.length) return toast('Adicione atividades antes de gerar o PDF Premium.');\n      saveState();\n      closeModal('exportModal');\n      const premiumWindow=window.open('premium-pdf.html','_blank','noopener');\n      if(!premiumWindow) window.location.href='premium-pdf.html';\n    }\n\n'''
+          if 'function openPremiumPdf()' not in text:
+              if anchor not in text:
+                  raise SystemExit('Ponto de inserção da função Premium não encontrado.')
+              text = text.replace(anchor, premium_fn + anchor, 1)
+
+          # 4) Eventos dos dois acessos Premium.
+          old_events = '''      el('downloadPdfBtn').onclick=exportPdf;\n      el('exportBtn').onclick=()=>openModal('exportModal');\n      el('exportPdfBtn').onclick=exportPdf;\n      el('exportExcelBtn').onclick=exportExcel;'''
+          new_events = '''      el('downloadPdfBtn').onclick=exportPdf;\n      el('premiumPdfBtn').onclick=openPremiumPdf;\n      el('exportBtn').onclick=()=>openModal('exportModal');\n      el('exportPdfBtn').onclick=exportPdf;\n      el('exportPremiumPdfBtn').onclick=openPremiumPdf;\n      el('exportExcelBtn').onclick=exportExcel;'''
+          if "el('premiumPdfBtn').onclick=openPremiumPdf" not in text:
+              if old_events not in text:
+                  raise SystemExit('Ponto de inserção dos eventos Premium não encontrado.')
+              text = text.replace(old_events, new_events, 1)
+
+          # Pequeno ajuste para três opções ficarem bem distribuídas em telas grandes.
+          css_anchor = '''    .export-choice-grid {\n      display: grid;\n      grid-template-columns: repeat(2, minmax(0, 1fr));'''
+          css_new = '''    .export-choice-grid {\n      display: grid;\n      grid-template-columns: repeat(3, minmax(0, 1fr));'''
+          if css_anchor in text:
+              text = text.replace(css_anchor, css_new, 1)
+
+          # A versão mobile já redefine para 1 coluna, então continua responsiva.
+          required = [
+              'id="premiumPdfBtn"',
+              'id="exportPremiumPdfBtn"',
+              'function openPremiumPdf()',
+              "el('premiumPdfBtn').onclick=openPremiumPdf",
+              "el('exportPremiumPdfBtn').onclick=openPremiumPdf",
+              "window.open('premium-pdf.html'"
+          ]
+          missing = [item for item in required if item not in text]
+          if missing:
+              raise SystemExit('Integração incompleta: ' + ', '.join(missing))
+
+          path.write_text(text, encoding='utf-8')
+
+          scripts = re.findall(r'<script(?:\s[^>]*)?>([\s\S]*?)</script>', text)
+          inline = max(scripts, key=len)
+          Path('/tmp/app.js').write_text(inline, encoding='utf-8')
+          PY
+
+          node --check /tmp/app.js
+          test -f premium-pdf.html
+
+      - name: Remover workflow temporário e salvar alteração
+        shell: bash
+        run: |
+          rm -f .github/workflows/integrar-pdf-premium.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/integrar-pdf-premium.yml
+          git commit -m "Integrar botão do PDF Premium ao gerador [skip ci]"
+          git push origin HEAD:agent/integrar-botao-pdf-premium
