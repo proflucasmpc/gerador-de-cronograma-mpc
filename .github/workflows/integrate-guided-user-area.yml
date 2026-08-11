@@ -9,6 +9,7 @@ on:
       - scripts/update_generator_access_capture.py
       - scripts/update_guided_topics_ui.py
       - scripts/update_guided_subtopics_ui.py
+      - scripts/normalize_guided_runtime_page.py
       - .github/workflows/integrate-guided-user-area.yml
 
 permissions:
@@ -39,6 +40,9 @@ jobs:
       - name: Aplicar cadastro individual de subtópicos
         run: python scripts/update_guided_subtopics_ui.py
 
+      - name: Conectar a página real à interface guiada atualizada
+        run: python scripts/normalize_guided_runtime_page.py
+
       - name: Validar resultado
         run: |
           test -f area-usuario.html
@@ -51,6 +55,8 @@ jobs:
           grep -q "+ ADICIONAR SUBTÓPICO" guided-user.js
           ! grep -q "Digite um tópico por linha" guided-user.js
           ! grep -q "Digite os subtópicos, um por linha" guided-user.js
+          grep -q '<script src="/guided-user.js"></script>' area-usuario.html
+          ! grep -q "DecompressionStream" area-usuario.html
           node --check guided-user.js
 
       - name: Commitar resultado
@@ -59,5 +65,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html plano.html netlify/functions/plans.mjs area-usuario.html guided-user.js guided-bridge.js user-plan-attribution.js
           git diff --cached --quiet && exit 0
-          git commit -m "Aplicar cadastro individual de tópicos e subtópicos"
+          git commit -m "Aplicar interface individual de tópicos e subtópicos na página real"
           git push origin HEAD:agent/integrar-area-usuario-real
