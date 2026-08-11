@@ -38,6 +38,8 @@ function sanitizePlan(input = {}) {
   return {
     version: 1,
     studentName: cleanString(input.studentName, 180),
+    createdByUser: Boolean(input.createdByUser),
+    creatorName: cleanString(input.creatorName || input.studentName, 180),
     goal: cleanString(input.goal, 300),
     examDate: cleanString(input.examDate, 20),
     startDate: cleanString(input.startDate, 20),

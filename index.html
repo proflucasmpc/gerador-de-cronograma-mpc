@@ -1603,7 +1603,34 @@
       .week-grid { min-width: 0; grid-template-columns: repeat(7, 1fr); }
       .day-column { min-height: 0; }
     }
-  </style>
+  
+/* MPC generator access capture v2 */
+.access-modal-shell.mpc-capture-v2{max-width:660px;padding:30px 34px 28px;border:1px solid #E4E8F0;border-top:6px solid #8A5CFF;border-radius:20px;max-height:min(88vh,780px);overflow:auto;background:#fff;color:#172033;box-shadow:0 28px 80px rgba(5,18,37,.32)}
+.mpc-capture-v2 .access-brand{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.mpc-capture-v2 .access-brand-logo{width:60px;height:60px;border-radius:12px;object-fit:cover;background:#071225;box-shadow:0 6px 18px rgba(7,18,37,.14)}
+.mpc-capture-v2 .access-brand strong{font-size:19px;color:#071225;letter-spacing:-.01em}
+.mpc-capture-v2 .access-request-view,.mpc-capture-v2 .access-code-only-view{display:grid;gap:15px;padding:0}
+.mpc-capture-v2 .access-request-view[hidden],.mpc-capture-v2 .access-code-only-view[hidden]{display:none!important}
+.mpc-capture-v2 .access-capture-title{font-family:Georgia,'Times New Roman',serif;font-size:clamp(30px,4vw,42px);line-height:1.06;letter-spacing:-.025em;color:#071225;margin:0}
+.mpc-capture-v2 .access-capture-copy{font-size:17px;line-height:1.55;color:#657086;margin:0 0 4px}
+.mpc-capture-v2 .access-field{display:grid;gap:7px}
+.mpc-capture-v2 .access-field label,.mpc-capture-v2 .access-legend{font-weight:900;color:#071225;font-size:14px}
+.mpc-capture-v2 .access-name-input,.mpc-capture-v2 .access-code-input{width:100%;min-height:56px;border:1px solid #D8DFEA;border-radius:11px;padding:0 14px;background:#fff;color:#172033;font:inherit;outline:none}
+.mpc-capture-v2 .access-code-input{text-align:center;text-transform:uppercase;letter-spacing:.28em;font-size:22px;font-weight:900}
+.mpc-capture-v2 .access-name-input:focus,.mpc-capture-v2 .access-code-input:focus{border-color:#24C8FF;box-shadow:0 0 0 3px rgba(36,200,255,.14)}
+.mpc-capture-v2 .access-options{display:grid;gap:9px}
+.mpc-capture-v2 .access-option{display:flex;align-items:center;gap:12px;min-height:58px;padding:12px 16px;border:1px solid #E4E8F0;border-radius:11px;background:#fff;cursor:pointer;font-size:16px;color:#172033}
+.mpc-capture-v2 .access-option:hover{border-color:#B8C5D8;background:#FAFBFD}
+.mpc-capture-v2 .access-option input{width:20px;height:20px;accent-color:#8A5CFF;flex:0 0 auto}
+.mpc-capture-v2 .access-whatsapp-btn,.mpc-capture-v2 .access-unlock-btn{width:100%;min-height:56px;border:0;border-radius:11px;padding:12px 16px;font-weight:950;font-size:14px;cursor:pointer;transition:.18s ease}
+.mpc-capture-v2 .access-whatsapp-btn{background:#31B77A;color:#fff}
+.mpc-capture-v2 .access-unlock-btn{background:#4C7DFF;color:#fff}
+.mpc-capture-v2 .access-whatsapp-btn:hover:not(:disabled),.mpc-capture-v2 .access-unlock-btn:hover{filter:brightness(.96);transform:translateY(-1px)}
+.mpc-capture-v2 .access-whatsapp-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.mpc-capture-v2 .registration-submit-status{min-height:20px;margin:0;text-align:center;font-size:13px}
+@media(max-width:680px){.access-modal-shell.mpc-capture-v2{width:calc(100% - 24px);padding:24px 20px 22px;border-radius:17px}.mpc-capture-v2 .access-brand-logo{width:52px;height:52px}.mpc-capture-v2 .access-capture-copy{font-size:15px}}
+</style>
+  <script src="/guided-bridge.js" defer></script>
 </head>
 <body data-theme="light">
 
@@ -2615,26 +2642,47 @@
 
   <!-- Liberação de acesso por código manual -->
   <div class="modal-backdrop required-modal" id="accessModal" data-required="true" aria-hidden="true">
-    <div class="modal access-modal-shell" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
-      <div class="modal-head">
-        <h2 id="accessTitle">Liberar acesso ao Gerador MPC</h2>
+    <div class="modal access-modal-shell mpc-capture-v2" role="dialog" aria-modal="true" aria-labelledby="accessTitle">
+      <div class="access-brand">
+        <img class="access-brand-logo" src="data:image/webp;base64,UklGRrgUAABXRUJQVlA4IKwUAACwTwCdASrcANwAPkkij0UioiES/ATEKASEpu56AOJVOIScvXIYp8L+j3+q/qvu0WD/A/1X9hewfpy6l8zrmn/c/1/8zPnR/ef8T7CvvO9wD9VvOq/W73Nftv6gP6J/df/D/o/du/1n7Ee5L+r/6X8jvkA/pP+T9a7/kewl+2/sAfsh/8/W//b/4Pf6x/sf2m+BT9hP/f7AH/q9QDqT+oX967S/8D4d/hnzz9z/ITlWxKfiv2Y++/2v9svza+Gu+P1XeoF+Nfyn+//1n9qv7XwvAAPzP+a/5/84/8h6Ff8R6E/Yj/Me4B/Pf59/p/KX8CnzP2Av51/Xv/N/mfdj/kv/d/qfPF+ef4r/zf5n8hPsL/mX9T/5397/JLwUkKdA/LhQ1A4wSefaOx0D8t+bX//Sv/wxP86YADO6ijK+5XrWBqiT10RB7xKSY/DKIjLQaGT6ZwFDLVzmOaAop0jwDYGKToRjPLqc135x2UZxBQDpXRZFE9wDPzKF/+VdpunQYxkV5zpfOe91VjHQJCScmqM+5fcqGJM3l/MS2bVzt11/Pqt+QTmZ8TLKfLCQwLVCPsn3I+2a9VDO3pehmIqCvwb97iwtyFNJcJFM1kzfbBr75S3uIl5lslG2q/C0dw1A4yDoEakI08tIo9tYIdCci/Ry4UNQIle7Co8ixt0+nRDFHuzjzgHVmQwhV/AOZrQwzmsH48afTlPF0D8scvuqhplYeFu2aZMv3GNoadQ0v26E0+MrwnOtHeWf1JA8jXrLuv8Z8MOH4EY54tzwr+GuinlLCQVM2kmbYUlN1D+wC466FVor97lZnFZ6WTmREJKqqqpwjBYlKe06bkKlVlbnY6bkKfY6B5gAAP7/xsz7d4EI5qz/5QACcKvW8xAKAwxltmR3i2UiMEvt5Ziv86/7P/q3cQfHGecf9HXWwpMdkX/8q3zpOZiw6pYWItZYZv5srsjBnZG5QviKCU+HEsFjbNf3EFvO4FtH9R6qjeL80tqyiVEbJHayLB4ICZCvfZClolLyGSNGltoOHA78+LouxLf9dGkuWI14Gjn4jzhwJlFoR5IBiR/y71FPtHgh+i6UzDv+o/XpEBccESpdWG9btALqr2rPdd8EjwoKu7G3Kt2wSm9+J9ZrdUI1GnZE+FlR33WJAfaXi0yfgAL3fUPy8WsMkX984WScMRedAkMawkB2k5we/2q6CU0WT1HbJIwrA1VB1xntjZKPuqyQ9Q46CVZh75NjV2fEoJ/BR7yIoPQjbbEF5CIdiwgmRmhc/DNfRJJMBoPfygKWN9HC/gbdf6lH8u6xb6hLz7KvZSAuwSB1um63P01a4U3cjH7/gvsII5qzT/L8gCYmuoIqZrMnUdwJnpmFmXRjsM96mYRWdS4UsH7MGL6AU5gcfYbODZ75ez8R45N+/be7qo6dETqXslS1ucD/k+EydkkI8HR29FhuEISYU4DOyB9g+qHkl5FICy3MtjMCzkHq3KiqdIDMZIXLXuHzgp327RUpr3fn5rHWLIFMz5///K5si+Eh/yn/UmeHSBe8EDD3bI/s8DihIWWt4Hx8m/Y1zQeQWk1FFBd7/DWsEv/UbtWP0/VDQkPoDbfe+n28gvUkhQpAUItRLPp1QhcqQ2rHQ5qnqLSDJOZfAZZivw7v5iHzLNxKZd63emBxWH1wHSOPEp9l0/gBcHgVDTy4rPqeCT/Th8+IVAxdvH1s6HYic1NXGH5huNrESF8pzmIsPdzIEZ8lzwZu38o3ffjVq/tKxvgWn/8yy156jZfT3e/PxR3/dfb8KRG9xsxM+j6YBh0ytH2M1G2AULhM5SYYjKmsq47Fm8ohRVj3EjFxbGuHvjnVk1RT1vnDhjwF0UQn4910v3xNgYcplqVYyjUd45g55vnv7cGEugQXfA/H4kZYCw1JRCme5UU885/6D2KXqib52Rz55aUutEefgqYZhE6mLdRw/9xqrhFzHXkfKhzpwMCATKAJQaE+iisGAfDqwzai+uizSYl/GtWd/+lXL4eOlmdY4KJAprw2k4RhwHX/yggNNTNkWU9QAU0iyqPJQnUkKLn4TIXNFQSQzcCUXDPAFFcCe9WtBPxCAkodOofC17D6bJ3qrAkBW4QEzY8zdhyTpw8hKfYbRQuDSq+6ZP2NkJ8VsPLh1pQpkGjiHmjJz1JTacCjXhbL8Lj81D0G46c61KDscAlyFWGnFif0O7MHk1pW+C+gpJTkcjeqffcQbgCcfAc955fwGi8C3rjTdPL3oc/51IK1U+W5uP9NXunGe801wf3R5fPC66uobO5atU07ixrpEv6BioiD/nvsDZLr/Fp7wMCK8u9/RBQRxeM2ImoXsm7paV3zIVq0co7j1eWrwELp06yBAODe+L3bz7vvZdjbETkj7NwtokXOf44fH+DEE+z7etWYLvsamqOUa3IW670ruvm5KLP9wBHeryyWVn9c/sdPd89zonmoNW9/JNf2xbIoWGlB6qDU58WJ3824P1geYFA6wlLOCvGT742W32p87xRlzvdsJ9qdQZIQxoT8hxl8J7MvNUdAgXvP+SvfPqJDcgt1Ikq6VE/9cpH/W7xCcmI7qC0FUxETB6ZIjbNMrQ6m5949vT/+TFerWOUlKERvS+2i6doLuFTN265E/LGLKZvvAKPtSzFWJ9LZT61MHCS2ROg5g4aAuJbCqhYsxVUwkuNmHPNUlLHYvis6afCBKL+91xN9qnZfguOpulIUT9bvfS8nvb2wXuj8Gjsg2+EJqqrNzN07C3zkjDxmLyaaJF354iXmnESHialx7KIr5ApzIb9x5IB0m8itX7TC08zhRXE9QKQL9zBXVxIhYSBI0Vdi+fXE2OpFnTi0VUhq/zr3S7awiE09FcCCwIHo3oIPXL4JVmFv21tefrWik3NlxDDuitwjqP+qKQsZ9RtATEHJr3hBNzXd9R7EYjsUmz60G5WCwYlXjvf63gkMeZacLKTgnSKDKFitexlMm4kHBfGUsozYLphp49gK4oOJ7nAv2WEbXyQIfaVAEGwTeLKtoeSZbV4kKC9+FqjhJVCXxMtSRM4eoqteaFLlwVoWH61rdt8NTJqy8xCC6yPtjmKK7rXvr5cP2QK3XIAzwpTjUxeZ2TrD9epk7BBjWZi92/yZBeVvM+XdWC+5m70Pu3LUomfI6g/yF+PD6jSRmvT5bYrNyH7o6UfrbBGKHu/oaS9hzlrZCPDQEB66QCu9P9V8RXKfGniof98LGKDt+bnsba5W/zuwvp+IYEUdGog0WRJJKXNUuLBNa5KVwKQr5GDBdlQECkuhxv/9XP1btBGiqy4WDGVoGcC/2Mb383vtXx+gOwZToj/djByqgf/pbCiXHsIBwiqDkccttyHcsWf6FWhxneXgoMhncY4vJo2xcBztRMzBA+z8UR6TRDjTys1YtF1/3BW1XlELXhyhP/xKVgX8OHHowO3PCkBRiCHrCq7L1GEGtGBjk44W2ernS3wZTwGyPsjFaH+GkuQ/IjJPuBi5i7uGPUVtjAY/Hsa/iDqA+YsC9UL8wxHa6twG6goYNdxNtWKsEjBeQVzRlL7pnjSSg1r/j/5PiSxFEl2capUmKEtxivJudNHAXPFkvjbUKtR9gR3cAj+aUa7xJOR9Agd/5q+LvkPEqCVXuklkkHdhlPPotiFkaTDFTiE8coMnjxUneAAF0nLFTiOPIAgLW1+PCtcrqCFg/21LKJjDAk6EyqA3AGKIpNW1lK5y4hRrpE5girOQ1SZBNT6quuz4EXgzcGnLJTR9ngzqco5LMFQzQHBAvOeg9zz6wP8M3wH6ztMRIRNVdRARg3WEIaxhF32Kmpd8op9zAqz8chhQ422cM2DfkGT6t8ymJvp7xvwjCVVgDaK72M62BsUc3FewmdR4PDhr4jGXVuBDruNgkhWHWoGaw2E2XDIgvD1kr7JNaJWlMZU/07liRBvir1rzEndWzafMh1ZZcfKtNwZE9cNgJz2PCLCPMhmHxqXVRF7DGdjsh4wnrV2CayTOulyQuzkDDhcxC+BWuQrAXoDa7A4f2/Gv9MNC6nXdFbfXvNPZ2+BmzirbpKySWzS4xCMYm/xWZV9Q+5c3yZnbBRGEuK/R6bI48g9iKVW2qJFwMENwjVxfIB/clvFQEz3FBz9sWGz56s7qmB7HyMUHbP49qTUetJPMzgsbYJux+WTgAAAyFvE1+zPa6H3b+RnYyikSOxqkU08LSurXflhWVGx1vF5VNMFhPcNPEmnR8kkxaB9nDXNwapvJsnjVkMmX6694IDAl6vgL/I56erCVB+Bs23grdcDsF3v4fAPbOH3vpkkTEFP1+ZYoIPdkflwBSz8Cx3rSkXRBsiTw4VcxMEmHCYMxRXEIHjjLpcR9hd0Ig9kTG8XqAaCJFu+rOhL/5vdSrevIfGhx9nUloMKoMh90qLqsHO83GSL783rZoMhNv7EzLC7WFPwvOtpWFC5rYBLAmGwAA+LwVHQuRp8+QTsegxe5qH2K1iEVDhnNpT9EW66vePpgP1W4oGXUcZWdKTauCtr/w/cGSZOlL64NbxQbmdkDAnpiFLqMOSDt0pHcf9IVxO25syBKQ0nF+JvXan1wltq+UDfUPASo3/Mvw9dy69EwHeJupgnT459MZNCKjtfYAzufiheI6fXYx/fAZF5DIABm5sRWGEE3aL3JzHfPULNlISVL7z9dC55ya80TSuMStZ1BLSSe+ap3PwwRK0iEw/J2zi4QOzAeFh4ng9m+P8czdpbPNgfjUR4pID++l/xoZlQ1x1/uW2W1Ak0tbyvXGiLW+3EMXnOppa/jelyBf6ao4AsEbzXyR1c5iEWGsW+Uad9yxyayNjwrXT4Zv9TF1GAkbhFLljb1T/wJCn0fUQjGDGfjcq2eoYGYnedsCBBhz3P5CKcEIxpoZ9JOSUABt4EwMSJc3Eos5BGc5ehMRiXxcaoQ+bAhxqYaVGnTCVFql6FSs/PMX85s4HqCJ3jPcraFJqzzWfr3NqPwVc0abZHMnXKxBWfF7Xu169HAR4DrmOym7wQaUY4BdSv/5Uq7ti5qjkPtY/+eKAW/biRKK1bVY4R+cGCbGap/FnTfV3v6Uwayd3tKe2+/DpHg3rV4nfh95G/sueFfAAKvA9raHtJpvPTiph6zuErHCGFFp9UZIrxJbd38b1K/zGfNvo/d9dloEamfPZ3VF1X96e4xNIKmDgr7y+KzkyYmMK32ILs0cn+eUWcrfW6lXcKWkvWVmdZMIVOHHFbMCWvnxQiNJr9kZnuiXUKF1+a7LcsV15N+YRWQcI3wzC8tyZVO+LYG/H4xfk4ou0KGWYKCGEtA4nY2uO4pfgC4jtoi8Kz/fmyUEq3xfofrDujJjhHotbggEODGm8z7piXH9QXWbEk0WPzQ9Bd7s/6wiKKJxv/w8RgIl4zqmmmqqn/6zfKbgG34f5mBEPfT8fQs6o7n/jgvyQxqfXRYdoW0QPNYGhqpLZsXWv0wmV7V2OpHRPnwSm52iA9HauwpYbkAWIRkwFVtpP6BfwUolNByI+2Hzcmm7xy4nM+HyMUi0R6xFrk3saHXcoTYNR3WWW4zq52tqDnRrXcmC/nYHjCB2hmtvFII1tuMnIXp/8Mwr1fjzq+QUlSbjqyRTzFbT9iDyZYeIb+HI2vGGR1EHAaVCxKc49cSztdvVU+V7Y/7LsrVT4PPsxutKyTf9/wMrCcUqYJxu0hY9gdmtlsXpA0yafCgm5luyuqYTWzgdZempRVY8Piffd/mfN39kswSwpEp2CvDbpCTHF+00oDPgcvzbD6T8FsbKVZBJFLdk88lMHaLyAoNaU8lKxS5sXGIn00xec+53o6qNgode1qeCM0ihFa7ITucJpIvGZmbaIcVLQv9/zBiqFWu/2cCbCcP3NZHGuMLG4VjnCEPzSj5w3uZ1v8SIjZD3arxKVvLk+vLBP0OXgv1/kr0pQNKTBZMtD1jSjx0MYwIibNPAQANcNVOB29LHIcrieaKH5etvlRNAkA5WiKJx08+4QN2AX8+xEWv1Qfryyz4u0a0NYG4Szq3nctRxQXrevm0PLym9ancoYAPoHj7oy0dCrBMa0fwqDE2WtcfJrqEu5bG5EiojklhL/kPAxqhLrmOL5xGDOiAg7vFUtLxINf4v6v6FSQ8+KvoqXZX5Wdmacy82MOfaaEOZXeTiWOEp5KWDAYPaTSl8I7veC3EmbcUcmmp98/6pKIXYEPcwzTRJEkpAzUutzKkbRE2ol9RA8VFAtBKA29fbKf/0G9bMszfPDyjdGOCSK+mnFcJBs18fRrfWMjTd804UJrV+QeglUmBjevyAugXqrVERBw2W7Gbn0HD4sIGwFVZwyg+ikyvZhm5CSGDH5G+n9w3vesj4XEeVsrFxcfel17S7UuKqcKkoWDOOxZJcMed41H4fDgEazaXRKnpX/bAa3sHKDsvZUttLNtvqbIiz4OPp7an9Unar4vf8d0FntG7zHJarV3GgpwwY687NN0RAhMSIeEni+hWAUMWqgB74CEXN323zuIOqs9ws8ut+MUuYvYxnQCb5XFkKLQE17SjlQ/Pm8mnJ1JDz9F+jNumgORcEgGy9oEcAX94EN7nbxc2NlREPEY+oKgY6/DabUg6WCGPaFt6aHn7YHwmOTrXl4vas8hX4y82N9IFW/9rmc7N/ibbAb3riSH24Oj/MJWAbcXpD+S0NfTAQXd8goeYtuOK7UXR5rmFVkjcpWaP/OMgPgF6tNrr7dGsDW+anmnE7dmim8hGW28EHLBay56zcpxftuH3IZDraVG4heW9ts6/WtY2D9n6o/nSwQVzqEqUs7bA1NgiyAIkgQV7r/qiTslGYjBAeF85Ac+KF2YQYJ2GdLuxT99/pltThnPi7yh7cN9mn3ceb9zNJnlusQqJqA3XoUMOHkbGTGfd4cn4yVLsHDsH9ObvNqwqg0T+qf6fUcF1yxITN8qXLtOMQj7NVlQumXF6Dzu/QVR5GLJPyWi3l3pOaF8ERJs0wk5IcMESklCqi9DmqBydUjHKo/xznbyzsJ+kVUmH/NO3m7So2TsMQE/h7fVW7EIV9I+x29/pTAR/80OAAAAAAAA=" alt="Logo Professor Lucas MPC">
+        <strong>Professor Lucas MPC</strong>
       </div>
-      <div class="access-code-only-view" id="accessCodeView">
-        <div class="access-icon" aria-hidden="true">🔐</div>
-        <div class="notice">
-          <strong>Digite o código de 6 caracteres enviado pelo Prof. Lucas MPC.</strong><br>
-          O código pode conter letras e números.
+
+      <div class="access-request-view" id="accessRequestView">
+        <h2 class="access-capture-title" id="accessTitle">Você está prestes a criar seu cronograma gratuitamente</h2>
+        <p class="access-capture-copy">Quer iniciar a criação do seu cronograma personalizado e explorar todos os recursos do Gerador de Cronograma MPC? Informe seu nome, escolha seu objetivo de estudos e solicite gratuitamente seu código de acesso pelo WhatsApp.</p>
+
+        <div class="access-field">
+          <label for="accessNameInput">Nome</label>
+          <input class="access-name-input" id="accessNameInput" type="text" autocomplete="name" maxlength="100" placeholder="Digite seu nome">
         </div>
-        <div class="field access-code-field">
+
+        <fieldset class="access-field" style="border:0;padding:0;margin:0">
+          <legend class="access-legend">Você está estudando para:</legend>
+          <div class="access-options">
+            <label class="access-option"><input type="radio" name="accessInterest" value="Concurso público"><span>Concurso público</span></label>
+            <label class="access-option"><input type="radio" name="accessInterest" value="Vestibular / ENEM"><span>Vestibular / ENEM</span></label>
+            <label class="access-option"><input type="radio" name="accessInterest" value="Outro"><span>Outro</span></label>
+          </div>
+        </fieldset>
+
+        <button class="access-whatsapp-btn" id="accessWhatsappBtn" type="button" disabled>SOLICITAR CÓDIGO GRATUITO PELO WHATSAPP</button>
+        <p class="registration-submit-status" id="accessRequestStatus" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="access-code-only-view" id="accessCodeView" hidden>
+        <h2 class="access-capture-title">Digite o código recebido</h2>
+        <p class="access-capture-copy">Insira abaixo o código de 6 caracteres enviado pelo Prof. Lucas MPC no WhatsApp.</p>
+        <div class="access-field">
           <label for="accessCodeInput">Código de acesso</label>
-          <input id="accessCodeInput" type="text" inputmode="text" autocomplete="one-time-code" maxlength="6" pattern="[A-Za-z0-9]{6}" aria-describedby="accessCodeStatus" placeholder="A1B2C3">
+          <input class="access-code-input" id="accessCodeInput" type="text" inputmode="text" autocomplete="one-time-code" maxlength="6" pattern="[A-Za-z0-9]{6}" aria-describedby="accessCodeStatus">
         </div>
-        <button class="btn btn-primary access-release-button" id="accessCodeBtn" type="button">Liberar acesso</button>
-        <button class="btn btn-secondary access-release-button" id="accessWhatsappBtn" type="button">Solicitar código pelo WhatsApp</button>
+        <button class="access-unlock-btn" id="accessCodeBtn" type="button">LIBERAR ACESSO AO GERADOR</button>
         <p class="registration-submit-status" id="accessCodeStatus" role="status" aria-live="polite"></p>
       </div>
     </div>
   </div>
+
   <script>
   (() => {
     'use strict';
@@ -3789,19 +3837,51 @@
       m.setAttribute('aria-hidden','true');
       if(!document.querySelector('.required-modal.open')) setAccessLock(false);
     }
-    function renderAccessGate(){
-      const input=el('accessCodeInput');
-      const status=el('accessCodeStatus');
-      if(status){
-        status.textContent='';
-        status.className='registration-submit-status';
-      }
-      if(input) input.value='';
+    const ACCESS_PENDING_KEY='mpcGeneratorAccessWhatsappPending';
+    const ACCESS_PROFILE_KEY='mpcGeneratorAccessLeadProfile';
+    function selectedAccessInterest(){
+      return document.querySelector('input[name="accessInterest"]:checked')?.value||'';
+    }
+    function readAccessLeadProfile(){
+      try{return JSON.parse(localStorage.getItem(ACCESS_PROFILE_KEY)||'{}')}catch{return {}}
+    }
+    function saveAccessLeadProfile(){
+      const profile={name:String(el('accessNameInput')?.value||'').trim(),interest:selectedAccessInterest()};
+      try{localStorage.setItem(ACCESS_PROFILE_KEY,JSON.stringify(profile))}catch{}
+      return profile;
+    }
+    function accessPending(){try{return sessionStorage.getItem(ACCESS_PENDING_KEY)==='1'}catch{return false}}
+    function updateAccessWhatsappButton(){
+      const btn=el('accessWhatsappBtn');if(!btn)return;
+      const ready=String(el('accessNameInput')?.value||'').trim().length>=2&&!!selectedAccessInterest();
+      btn.disabled=!ready;
+      if(ready&&el('accessRequestStatus'))el('accessRequestStatus').textContent='';
+    }
+    function showAccessRequestStep(){
+      const request=el('accessRequestView'),code=el('accessCodeView');
+      if(request)request.hidden=false;if(code)code.hidden=true;
+      const p=readAccessLeadProfile(),name=el('accessNameInput');
+      if(name&&!name.value&&p.name)name.value=p.name;
+      if(p.interest){const radio=document.querySelector(`input[name="accessInterest"][value="${CSS.escape(p.interest)}"]`);if(radio)radio.checked=true}
+      updateAccessWhatsappButton();setTimeout(()=>name?.focus(),120);
+    }
+    function showAccessCodeStep(){
+      const request=el('accessRequestView'),code=el('accessCodeView'),input=el('accessCodeInput');
+      if(request)request.hidden=true;if(code)code.hidden=false;
+      if(input)input.value='';
+      if(el('accessCodeStatus')){el('accessCodeStatus').textContent='';el('accessCodeStatus').className='registration-submit-status'}
       setTimeout(()=>input?.focus(),120);
+    }
+    function renderAccessGate(){
+      if(accessPending())showAccessCodeStep();else showAccessRequestStep();
     }
 
     function accessWhatsappMessage(){
-      return 'Olá, professor Lucas MPC. Gostaria de receber um código de acesso de 6 caracteres para usar gratuitamente o Gerador de Cronograma MPC.';
+      const p=saveAccessLeadProfile();
+      const pageUrl=location.href.split('#')[0];
+      return `Olá, professor Lucas! Meu nome é ${p.name}. Estou estudando para: ${p.interest}. Gostaria de receber gratuitamente meu código de acesso ao Gerador de Cronograma MPC.
+
+Página: ${pageUrl}`;
     }
 
     function renderPrivacyConsent(){
@@ -6592,11 +6672,23 @@
           });
         }
       });
+      el('accessNameInput')?.addEventListener('input',updateAccessWhatsappButton);
+      document.querySelectorAll('input[name="accessInterest"]').forEach(r=>r.addEventListener('change',updateAccessWhatsappButton));
       el('accessWhatsappBtn').onclick=()=>{
+        const profile=saveAccessLeadProfile();
+        const status=el('accessRequestStatus');
+        if(profile.name.length<2||!profile.interest){
+          if(status){status.className='registration-submit-status error';status.textContent='Preencha seu nome e escolha uma opção para continuar.'}
+          updateAccessWhatsappButton();return;
+        }
+        try{sessionStorage.setItem(ACCESS_PENDING_KEY,'1')}catch{}
         const msg=accessWhatsappMessage();
-        window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank','noopener');
-        toast('Envie a mensagem ao Prof. Lucas MPC e aguarde seu código.');
+        location.href=`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
       };
+      const showCodeAfterWhatsappReturn=()=>{if(platformAccessRequired()&&accessPending())showAccessCodeStep()};
+      document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')showCodeAfterWhatsappReturn()});
+      window.addEventListener('pageshow',showCodeAfterWhatsappReturn);
+      window.addEventListener('focus',showCodeAfterWhatsappReturn);
       el('adminPinInput').addEventListener('input',event=>{
         event.target.value=event.target.value.replace(/\D/g,'').slice(0,8);
       });
@@ -6620,6 +6712,9 @@
           return;
         }
         state.registered=true;
+        try{sessionStorage.removeItem(ACCESS_PENDING_KEY)}catch{}
+        const accessProfile=readAccessLeadProfile();
+        state.registration={...(state.registration||{}),name:accessProfile.name||'',studyInterest:accessProfile.interest||''};
         state.awaitingWhatsapp=false;
         state.whatsappOpened=false;
         state.whatsappReturned=false;
