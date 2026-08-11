@@ -1,0 +1,51 @@
+name: Integrar melhorias da área administrativa
+
+on:
+  push:
+    branches:
+      - agent/melhorias-area-administrativa
+    paths:
+      - 'admin-enhancements.css'
+      - 'admin-enhancements.js'
+      - 'scripts/integrate_admin_enhancements.py'
+      - '.github/workflows/integrate-admin-enhancements.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Aplicar integração
+        run: python scripts/integrate_admin_enhancements.py
+
+      - name: Validar JavaScript
+        run: node --check admin-enhancements.js
+
+      - name: Validar integração e preservação
+        run: |
+          grep -q 'admin-enhancements.css' admin.html
+          grep -q 'admin-enhancements.js' admin.html
+          grep -q 'id="adminPanel"' admin.html
+          grep -q 'id="adminGenerateScheduleBtn"' admin.html
+          grep -q 'id="adminSaveDraftBtn"' admin.html
+          grep -q 'id="adminSubjectsList"' admin.html
+          grep -q 'id="adminPdfTheme"' admin.html
+          grep -q 'id="publicPageBtn"' admin.html
+          grep -q 'id="downloadPdfBtn"' admin.html
+
+      - name: Commitar admin.html integrado
+        run: |
+          if git diff --quiet; then
+            echo 'Nenhuma alteração adicional.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add admin.html
+          git commit -m 'Integrar nova experiência visual da área administrativa'
+          git push
