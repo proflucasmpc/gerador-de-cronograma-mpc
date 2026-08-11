@@ -1,0 +1,42 @@
+name: Separar área do usuário e administração
+
+on:
+  push:
+    branches:
+      - agent/separar-raiz-e-admin
+    paths:
+      - scripts/separate_user_admin_routes.py
+      - .github/workflows/separate-user-admin-routes.yml
+
+permissions:
+  contents: write
+
+jobs:
+  separate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Aplicar separação das rotas
+        run: python scripts/separate_user_admin_routes.py
+
+      - name: Validar JavaScript e arquivos
+        run: |
+          node --check guided-user.js
+          grep -q 'id="mpc-root-access-guard"' index.html
+          grep -q '<script src="/guided-user.js"></script>' index.html
+          grep -q 'id="adminPanel"' admin.html
+          grep -q 'SOLICITAR CÓDIGO GRATUITO PELO WHATSAPP' acesso.html
+          ! grep -q 'guided-bridge.js' admin.html
+          ! grep -q 'id="adminPanel"' index.html
+
+      - name: Commitar resultado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html admin.html acesso.html guided-user.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Separar raiz do usuário e área administrativa"
+          git push origin HEAD:agent/separar-raiz-e-admin

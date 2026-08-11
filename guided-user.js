@@ -24,7 +24,7 @@ const initialState=()=>({
  priority:'Equilibrada',reviews:true,sims:true,finalWeek:false,rules:'',publicUrl:'',lastPlanId:''
 });
 function readAccess(){try{return JSON.parse(localStorage.getItem(ACCESS_STORAGE_KEY)||'{}')}catch{return {}}}
-if(!readAccess().registered){location.replace('/');return;}
+if(!readAccess().registered){location.replace('/acesso.html');return;}
 function loadState(){try{return {...initialState(),...JSON.parse(localStorage.getItem(WIZARD_STORAGE_KEY)||'{}')}}catch{return initialState()}}
 let state=loadState();
 const el=id=>document.getElementById(id), intro=el('introScreen'), wizard=el('wizardScreen'), footer=el('wizardFooter'), timerBox=el('timerBox'), clock=el('timerClock'), offer=el('offerModal');
