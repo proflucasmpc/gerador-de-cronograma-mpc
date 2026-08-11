@@ -12,4 +12,52 @@ on:
       - .github/workflows/integrate-guided-user-area.yml
 
 permissions:
-  contents:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Aplicar integração base
+        run: python scripts/integrate_guided_area.py
+
+      - name: Aplicar captura de acesso quando necessário
+        run: |
+          if grep -q "Você está prestes a criar seu cronograma gratuitamente" index.html; then
+            echo "Captura de acesso já aplicada."
+          else
+            python scripts/update_generator_access_capture.py
+          fi
+
+      - name: Aplicar cadastro individual de tópicos
+        run: python scripts/update_guided_topics_ui.py
+
+      - name: Aplicar cadastro individual de subtópicos
+        run: python scripts/update_guided_subtopics_ui.py
+
+      - name: Validar resultado
+        run: |
+          test -f area-usuario.html
+          test -f guided-user.js
+          test -f guided-bridge.js
+          test -f user-plan-attribution.js
+          grep -q "Você está prestes a criar seu cronograma gratuitamente" index.html
+          ! grep -q 'placeholder="A1B2C3"' index.html
+          grep -q "+ ADICIONAR TÓPICO" guided-user.js
+          grep -q "+ ADICIONAR SUBTÓPICO" guided-user.js
+          ! grep -q "Digite um tópico por linha" guided-user.js
+          ! grep -q "Digite os subtópicos, um por linha" guided-user.js
+          node --check guided-user.js
+
+      - name: Commitar resultado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html plano.html netlify/functions/plans.mjs area-usuario.html guided-user.js guided-bridge.js user-plan-attribution.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Aplicar cadastro individual de tópicos e subtópicos"
+          git push origin HEAD:agent/integrar-area-usuario-real
