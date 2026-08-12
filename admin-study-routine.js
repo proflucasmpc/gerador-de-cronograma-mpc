@@ -257,6 +257,13 @@
   function stripBasePrefix(activity){
     return String(activity||'').replace(/^\s*(Teoria|Exercícios|Exercicios|Revisão|Revisao)\s*[-:–—]?\s*/i,'').trim();
   }
+  function topicKey(task){
+    const subject=String(task.subject||'Disciplina').trim().toLowerCase();
+    const raw=stripBasePrefix(task.activity).replace(/\s*·\s*Parte\s+\d+\s+de\s+\d+\s*$/i,'').trim();
+    const match=raw.match(/^Tópico:\s*(.*?)\s*\|\s*Subtópico:/i);
+    const topic=(match?.[1]||raw.split(/\s+[—–]\s+|\s+-\s+/)[0]||raw).trim().toLowerCase();
+    return `${subject}|${topic}`;
+  }
   function activityFor(task,slot){
     const body=stripBasePrefix(task.activity);
     if(!slot.videoOnly)return task.activity;
@@ -282,7 +289,7 @@
       const e=parseDate(exam);
       if(e&&e>s&&end>=e)end=addDays(e,-1);
     }
-    return {start:s,end};
+    return {start:s,end,exam:exam?parseDate(exam):null};
   }
 
   function studyWeekdays(){
@@ -317,7 +324,7 @@
       [...windows].sort((a,b)=>(timeMinutes(a.time)??9999)-(timeMinutes(b.time)??9999)).forEach(w=>{
         const start=timeMinutes(w.time)??fallback;
         const duration=Math.max(5,Number(w.duration)||30);
-        slots.push({date:key,start,duration,moment:w.moment||'Janela de estudo',environment:w.environment||'',types:Array.isArray(w.types)?w.types:[],videoOnly:Boolean(w.videoOnly)});
+        slots.push({date:key,start,duration,used:0,moment:w.moment||'Janela de estudo',environment:w.environment||'',types:Array.isArray(w.types)?w.types:[],videoOnly:Boolean(w.videoOnly)});
         fallback=start+duration;
       });
     }
@@ -340,6 +347,130 @@
     if(first&&$('#adminPreferredStart')){$('#adminPreferredStart').value=first;$('#adminPreferredStart').dispatchEvent(new Event('change',{bubbles:true}))}
   }
 
+  function groupSlotsByDate(slots){
+    const map=new Map();
+    slots.forEach(slot=>{if(!map.has(slot.date))map.set(slot.date,[]);map.get(slot.date).push(slot)});
+    return map;
+  }
+  function slotRemaining(slot){return Math.max(0,slot.duration-slot.used)}
+  function capacityFor(slots,categories){
+    return slots.reduce((sum,slot)=>sum+(categories.some(cat=>allowed(slot,cat))?slotRemaining(slot):0),0);
+  }
+  function itemEligible(item,slot,date,ctx){
+    if(item.remaining<=0)return false;
+    const category=taskCategory(item.task);
+    if(!allowed(slot,category))return false;
+    const key=topicKey(item.task);
+    if(category==='exercise'&&ctx.theoryTopics.has(key)){
+      const completed=ctx.theoryCompleted.get(key);
+      if(!completed||completed>=date)return false;
+    }
+    if(category==='theory'&&!ctx.theoryStarted.has(key)&&ctx.newTheoryTopicsToday>=ctx.maxNewTopicsPerDay)return false;
+    return true;
+  }
+  function createSegment(item,slot,take){
+    const start=slot.start+slot.used;
+    const segment={
+      ...item.task,
+      id:`${item.task.id||'task'}-fr-${item.segments.length+1}-${Math.random().toString(36).slice(2,6)}`,
+      date:slot.date,
+      day:(parseDate(slot.date).getDay()+6)%7,
+      start:timeText(start),
+      end:timeText(start+take),
+      activity:activityFor(item.task,slot),
+      notes:noteFor(slot,config.mode),
+      done:false,
+      _source:item
+    };
+    slot.used+=take;
+    item.remaining-=take;
+    item.segments.push(segment);
+    return segment;
+  }
+  function remainingMinutes(items){return items.reduce((sum,item)=>sum+Math.max(0,item.remaining),0)}
+  function appendPartLabels(items){
+    items.forEach(item=>{
+      const n=item.segments.length;
+      if(n>1)item.segments.forEach((seg,i)=>{seg.activity=`${seg.activity} · Parte ${i+1} de ${n}`});
+    });
+  }
+
+  function scheduleAcquisition(items,slots,protectedDays){
+    const allDates=[...new Set(slots.map(s=>s.date))].sort();
+    if(!allDates.length)return {ok:false,created:[],lastDate:''};
+    const range=planRange();
+    const protectedStart=range?.exam?dateKey(addDays(range.exam,-protectedDays)):'';
+    const usableDates=protectedStart?allDates.filter(d=>d<protectedStart):allDates;
+    const usableSlots=slots.filter(s=>usableDates.includes(s.date));
+    const need=remainingMinutes(items);
+    const theoreticalCapacity=capacityFor(usableSlots,['theory','exercise','study']);
+    if(theoreticalCapacity<need)return {ok:false,created:[],lastDate:'',capacity:theoreticalCapacity,need};
+
+    const byDate=groupSlotsByDate(usableSlots);
+    const theoryTopics=new Set(items.filter(x=>taskCategory(x.task)==='theory').map(x=>topicKey(x.task)));
+    const ctx={theoryTopics,theoryCompleted:new Map(),theoryStarted:new Set(),newTheoryTopicsToday:0,maxNewTopicsPerDay:2};
+    const created=[];
+    let lastDate='';
+    for(let di=0;di<usableDates.length&&remainingMinutes(items)>0;di++){
+      const date=usableDates[di];
+      const daySlots=byDate.get(date)||[];
+      ctx.newTheoryTopicsToday=0;
+      const remainingNeed=remainingMinutes(items);
+      const remainingSlots=usableDates.slice(di).flatMap(d=>byDate.get(d)||[]);
+      const remainingCapacity=Math.max(1,capacityFor(remainingSlots,['theory','exercise','study']));
+      const dayCapacity=capacityFor(daySlots,['theory','exercise','study']);
+      let dayBudget=Math.min(dayCapacity,Math.max(15,Math.ceil(remainingNeed*dayCapacity/remainingCapacity)));
+      let placedToday=0;
+
+      for(const slot of daySlots){
+        while(slotRemaining(slot)>0&&placedToday<dayBudget&&remainingMinutes(items)>0){
+          const index=items.findIndex(item=>itemEligible(item,slot,date,ctx));
+          if(index<0)break;
+          const item=items[index];
+          const category=taskCategory(item.task);
+          const key=topicKey(item.task);
+          if(category==='theory'&&!ctx.theoryStarted.has(key)){
+            ctx.theoryStarted.add(key);
+            ctx.newTheoryTopicsToday++;
+          }
+          const take=Math.min(item.remaining,slotRemaining(slot),dayBudget-placedToday);
+          if(take<=0)break;
+          created.push(createSegment(item,slot,take));
+          placedToday+=take;
+          lastDate=date;
+          if(item.remaining<=0){
+            if(category==='theory')ctx.theoryCompleted.set(key,date);
+            items.splice(index,1);
+          }
+        }
+      }
+    }
+    return {ok:remainingMinutes(items)===0,created,lastDate,remaining:remainingMinutes(items)};
+  }
+
+  function scheduleReviews(items,slots,acquisitionLastDate,preferredStart){
+    const created=[];
+    if(!items.length)return {ok:true,created,lastDate:acquisitionLastDate};
+    const candidates=slots.filter(s=>slotRemaining(s)>0&&(!acquisitionLastDate||s.date>acquisitionLastDate));
+    const preferred=candidates.filter(s=>!preferredStart||s.date>=preferredStart);
+    const need=remainingMinutes(items);
+    const ordered=capacityFor(preferred,['review'])>=need?preferred:candidates;
+    let lastDate=acquisitionLastDate||'';
+    for(const slot of ordered){
+      while(slotRemaining(slot)>0&&items.length){
+        const index=items.findIndex(item=>allowed(slot,'review')&&item.remaining>0);
+        if(index<0)break;
+        const item=items[index];
+        const take=Math.min(item.remaining,slotRemaining(slot));
+        if(take<=0)break;
+        created.push(createSegment(item,slot,take));
+        lastDate=slot.date;
+        if(item.remaining<=0)items.splice(index,1);
+      }
+    }
+    return {ok:items.length===0,created,lastDate,remaining:remainingMinutes(items)};
+  }
+
   function transformGeneratedSchedule(){
     if(config.mode==='continuous')return false;
     const status=$('#adminGenerationStatus');
@@ -349,56 +480,60 @@
     if(!state||!Array.isArray(state.tasks)||!state.tasks.length)return false;
 
     const simulations=state.tasks.filter(t=>String(t.type||'').toLowerCase().includes('simulado'));
-    const regular=state.tasks.filter(t=>!String(t.type||'').toLowerCase().includes('simulado'))
+    const reviews=state.tasks.filter(t=>taskCategory(t)==='review');
+    const acquisition=state.tasks.filter(t=>!String(t.type||'').toLowerCase().includes('simulado')&&taskCategory(t)!=='review')
       .sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.start||'').localeCompare(String(b.start||'')));
     const simDates=new Set(simulations.map(t=>t.date).filter(Boolean));
     const slots=buildSlots(simDates);
     if(!slots.length){alert('A rotina escolhida não possui janelas disponíveis dentro do período do cronograma.');return false}
 
-    const queue=regular.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
-    let cursor=0;
-    const created=[];
-    for(const slot of slots){
-      let remainingSlot=slot.duration;
-      let offset=0;
-      while(remainingSlot>0&&cursor<queue.length){
-        const item=queue[cursor];
-        const category=taskCategory(item.task);
-        if(!allowed(slot,category))break;
-        const take=Math.min(item.remaining,remainingSlot);
-        const part={
-          ...item.task,
-          id:`${item.task.id||'task'}-fr-${item.segments.length+1}-${Math.random().toString(36).slice(2,6)}`,
-          date:slot.date,
-          day:(parseDate(slot.date).getDay()+6)%7,
-          start:timeText(slot.start+offset),
-          end:timeText(slot.start+offset+take),
-          activity:activityFor(item.task,slot),
-          notes:noteFor(slot,config.mode),
-          done:false,
-          _source:item
-        };
-        item.segments.push(part);created.push(part);
-        item.remaining-=take;remainingSlot-=take;offset+=take;
-        if(item.remaining<=0)cursor++;
-      }
+    const acquisitionItems=acquisition.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
+    const reviewItems=reviews.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
+    const range=planRange();
+    let protectedDays=range?.exam?7:0;
+    let acquisitionResult=null;
+    while(protectedDays>=0){
+      const clonedSlots=slots.map(s=>({...s,used:0}));
+      const clonedItems=acquisition.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
+      const trial=scheduleAcquisition(clonedItems,clonedSlots,protectedDays);
+      if(trial.ok){acquisitionResult={trial,slots:clonedSlots,items:clonedItems};break}
+      protectedDays=protectedDays>3?protectedDays-1:(protectedDays===3?0:-1);
     }
-
-    if(cursor<queue.length){
-      const missing=queue.slice(cursor).reduce((s,x)=>s+x.remaining,0);
-      alert(`A rotina fracionada não comporta todas as atividades. Faltam aproximadamente ${formatMinutes(missing)} de janelas compatíveis. O cronograma original foi mantido. Aumente ou ajuste as janelas e gere novamente.`);
+    if(!acquisitionResult){
+      alert('A rotina configurada não comporta teoria e exercícios com uma distribuição segura até a prova. O cronograma original foi mantido. Aumente as janelas ou reduza o conteúdo.');
       return false;
     }
 
-    queue.forEach(item=>{
-      const n=item.segments.length;
-      if(n>1)item.segments.forEach((seg,i)=>{seg.activity=`${seg.activity} · Parte ${i+1} de ${n}`});
-    });
+    const actualItems=acquisition.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
+    const actualSlots=slots.map(s=>({...s,used:0}));
+    const acquisitionScheduled=scheduleAcquisition(actualItems,actualSlots,protectedDays);
+    if(!acquisitionScheduled.ok){
+      alert('Não foi possível distribuir teoria e exercícios respeitando os pré-requisitos. O cronograma original foi mantido.');
+      return false;
+    }
+
+    const reviewStart=range?.exam&&protectedDays>0?dateKey(addDays(range.exam,-protectedDays)):'';
+    const actualReviewItems=reviews.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
+    const reviewScheduled=scheduleReviews(actualReviewItems,actualSlots,acquisitionScheduled.lastDate,reviewStart);
+    if(!reviewScheduled.ok){
+      alert(`A teoria e os exercícios couberam, mas faltam aproximadamente ${formatMinutes(reviewScheduled.remaining||0)} para as revisões. O cronograma original foi mantido. Ajuste as janelas ou o período.`);
+      return false;
+    }
+
+    const created=[...acquisitionScheduled.created,...reviewScheduled.created];
+    const usedSources=[...new Set(created.map(x=>x._source).filter(Boolean))];
+    appendPartLabels(usedSources);
     created.forEach(x=>delete x._source);
     const merged=[...created,...simulations].sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.start||'').localeCompare(String(b.start||'')));
     merged.forEach((t,i)=>t.cycleOrder=i);
     state.tasks=merged;
     state.studyRoutine=clone(config);
+    state.studyRoutine.planningStrategy={
+      capacityIsCeiling:true,
+      maxNewTheoryTopicsPerDay:2,
+      theoryBeforeExercises:true,
+      protectedFinalReviewDays:protectedDays
+    };
     try{localStorage.setItem(STATE_KEY,JSON.stringify(state))}catch{return false}
     return true;
   }
