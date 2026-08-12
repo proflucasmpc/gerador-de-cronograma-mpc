@@ -1,0 +1,31 @@
+name: Validar gerador e Pomodoro
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - admin-enhancements.js
+      - admin-study-routine.js
+      - user-plan-attribution.js
+      - pomodoro.js
+      - plano.html
+      - _headers
+      - .github/workflows/validate-current-app.yml
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar sintaxe JavaScript
+        run: |
+          node --check admin-enhancements.js
+          node --check admin-study-routine.js
+          node --check user-plan-attribution.js
+          node --check pomodoro.js
+      - name: Validar integração pública
+        run: |
+          grep -q '/pomodoro.js?v=20260812-1' plano.html
+          grep -q 'admin-study-routine.js?v=20260812-3' admin-enhancements.js
+          grep -q 'Cache-Control: public, max-age=0, must-revalidate' _headers
