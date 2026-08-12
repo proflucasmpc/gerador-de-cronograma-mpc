@@ -1,0 +1,8 @@
+/admin-study-routine.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-enhancements.js
+  Cache-Control: public, max-age=0, must-revalidate
+/user-plan-attribution.js
+  Cache-Control: public, max-age=0, must-revalidate
+/plano.html
+  Cache-Control: public, max-age=0, must-revalidate
