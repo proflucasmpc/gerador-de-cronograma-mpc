@@ -8,32 +8,129 @@
   const val=id=>($(id)?.value||'').trim();
   const ptDate=iso=>{try{return new Date(iso).toLocaleString('pt-BR')}catch{return iso||'—'}};
   const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  let pendingUpdate=null;
 
   function loadRecent(){try{return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]')}catch{return[]}}
   function saveRecent(items){try{localStorage.setItem(RECENT_KEY,JSON.stringify(items.slice(0,50)))}catch{}}
-  function rememberPublished(path){
+  function planId(path){return String(path||'').match(/\/plano\/([A-Z0-9]{10})/i)?.[1]?.toUpperCase()||''}
+  function findRecent(path){return loadRecent().find(x=>x.path===path)||null}
+
+  function rememberPublished(path,manageKey=''){
     if(!path||!/^\/plano\/[A-Z0-9]+/i.test(path))return;
+    const previous=findRecent(path);
     const items=loadRecent().filter(x=>x.path!==path);
-    items.unshift({path,name:val('#adminStudentName')||'Aluno não informado',goal:val('#adminGoal')||'Objetivo não informado',createdAt:new Date().toISOString()});
+    items.unshift({
+      path,
+      manageKey:manageKey||previous?.manageKey||'',
+      name:val('#adminStudentName')||previous?.name||'Aluno não informado',
+      goal:val('#adminGoal')||previous?.goal||'Objetivo não informado',
+      createdAt:previous?.createdAt||new Date().toISOString(),
+      updatedAt:previous?.updatedAt||''
+    });
     saveRecent(items);renderRecent();showPublishedActions(path);
+  }
+
+  function markUpdated(path){
+    const items=loadRecent();
+    const item=items.find(x=>x.path===path);
+    if(item){
+      item.name=val('#adminStudentName')||item.name;
+      item.goal=val('#adminGoal')||item.goal;
+      item.updatedAt=new Date().toISOString();
+      saveRecent(items);
+    }
+    renderRecent();showPublishedActions(path);
+  }
+
+  function removeRecent(path){
+    saveRecent(loadRecent().filter(x=>x.path!==path));
+    renderRecent();
+    const box=$('#mpcPublishedActions');
+    if(box)box.innerHTML='';
   }
 
   function installFetchObserver(){
     const original=window.fetch;
     if(!original||original.__mpcAdminWrapped)return;
     async function wrapped(...args){
-      const response=await original.apply(this,args);
+      const input=args[0],opts=args[1]||{};
+      const url=typeof input==='string'?input:(input?.url||'');
+      const method=(opts.method||input?.method||'GET').toUpperCase();
+      let response;
+      let updatePath='';
+
+      if(method==='POST'&&/\/api\/plans(?:\?|$)/.test(url)&&pendingUpdate){
+        const current=pendingUpdate;
+        pendingUpdate=null;
+        const id=planId(current.path);
+        const headers=new Headers(opts.headers||{});
+        headers.set('Content-Type','application/json');
+        headers.set('X-Plan-Key',current.manageKey);
+        response=await original.call(this,`/api/plans?id=${encodeURIComponent(id)}`,{
+          ...opts,
+          method:'PUT',
+          headers
+        });
+        updatePath=current.path;
+      }else{
+        response=await original.apply(this,args);
+      }
+
       try{
-        const input=args[0],opts=args[1]||{};
-        const url=typeof input==='string'?input:(input?.url||'');
-        const method=(opts.method||input?.method||'GET').toUpperCase();
         if(method==='POST'&&/\/api\/plans(?:\?|$)/.test(url)){
-          response.clone().json().then(data=>{if(data?.path)rememberPublished(data.path)}).catch(()=>{});
+          response.clone().json().then(data=>{
+            if(!response.ok)return;
+            if(updatePath){
+              markUpdated(updatePath);
+              setTimeout(()=>alert('Página atualizada com sucesso. O mesmo link foi mantido.'),120);
+            }else if(data?.path){
+              rememberPublished(data.path,data.manageKey||'');
+            }
+          }).catch(()=>{});
         }
       }catch{}
       return response;
     }
     wrapped.__mpcAdminWrapped=true;window.fetch=wrapped;
+  }
+
+  async function updatePublished(path){
+    const item=findRecent(path);
+    if(!item?.manageKey){
+      alert('Esta página foi publicada antes da função de gerenciamento. Publique uma nova página uma vez para habilitar futuras atualizações no mesmo link.');
+      return;
+    }
+    if(!confirm('Atualizar esta página com o cronograma que está aberto agora? O link continuará o mesmo.'))return;
+    pendingUpdate={path,manageKey:item.manageKey};
+    const button=$('#publicPageBtn');
+    if(!button){
+      pendingUpdate=null;
+      alert('Não foi possível localizar o botão de publicação.');
+      return;
+    }
+    button.click();
+  }
+
+  async function deletePublished(path){
+    const item=findRecent(path);
+    if(!item?.manageKey){
+      alert('Esta página foi publicada antes da função de gerenciamento e não possui chave local de exclusão.');
+      return;
+    }
+    if(!confirm('Excluir definitivamente esta página publicada? O link deixará de funcionar. Esta ação não pode ser desfeita.'))return;
+    const id=planId(path);
+    try{
+      const response=await fetch(`/api/plans?id=${encodeURIComponent(id)}`,{
+        method:'DELETE',
+        headers:{'X-Plan-Key':item.manageKey}
+      });
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(data.error||'Não foi possível excluir a página.');
+      removeRecent(path);
+      alert('Página excluída. O link antigo não abrirá mais o cronograma.');
+    }catch(error){
+      alert(error.message||'Erro ao excluir a página.');
+    }
   }
 
   function makeDashboard(){
@@ -120,7 +217,7 @@
 
   function makeRecentSection(){
     const sec=document.createElement('section');sec.className='mpc-admin-recent mpc-admin-section-anchor';sec.id='mpcRecentSection';
-    sec.innerHTML=`<div class="section-title"><div><h3>Cronogramas publicados recentemente</h3><p class="helper">Histórico local dos links publicados neste navegador a partir desta versão.</p></div><div class="field" style="min-width:min(320px,100%)"><input id="mpcRecentSearch" type="search" placeholder="Buscar por aluno ou concurso"></div></div><div class="mpc-admin-recent-list" id="mpcRecentList"></div><div id="mpcPublishedActions"></div>`;
+    sec.innerHTML=`<div class="section-title"><div><h3>Cronogramas publicados recentemente</h3><p class="helper">Os links novos podem ser atualizados sem mudar de endereço ou excluídos diretamente deste navegador.</p></div><div class="field" style="min-width:min(320px,100%)"><input id="mpcRecentSearch" type="search" placeholder="Buscar por aluno ou concurso"></div></div><div class="mpc-admin-recent-list" id="mpcRecentList"></div><div id="mpcPublishedActions"></div>`;
     const panel=$('#adminPanel');const generate=document.getElementById('mpc-sec-gerar');(generate?.parentElement||panel)?.appendChild(sec);
     $('#mpcRecentSearch')?.addEventListener('input',renderRecent);renderRecent();
   }
@@ -130,14 +227,24 @@
     const q=($('#mpcRecentSearch')?.value||'').toLowerCase().trim();
     const items=loadRecent().filter(x=>!q||`${x.name} ${x.goal}`.toLowerCase().includes(q));
     if(!items.length){list.innerHTML='<div class="mpc-admin-empty">Nenhum cronograma publicado registrado neste navegador.</div>';return}
-    list.innerHTML=items.slice(0,20).map(x=>`<div class="mpc-admin-recent-item"><div><strong>${esc(x.name)}</strong><small>${esc(x.goal)} · ${esc(ptDate(x.createdAt))}</small></div><a href="${esc(x.path)}" target="_blank" rel="noopener">Abrir cronograma</a></div>`).join('');
+    list.innerHTML=items.slice(0,20).map(x=>{
+      const managed=Boolean(x.manageKey);
+      const status=managed?(x.updatedAt?` · atualizado ${esc(ptDate(x.updatedAt))}`:' · gerenciamento ativo'):' · publicação antiga';
+      return `<div class="mpc-admin-recent-item"><div><strong>${esc(x.name)}</strong><small>${esc(x.goal)} · ${esc(ptDate(x.createdAt))}${status}</small></div><div class="mpc-admin-actions"><a href="${esc(x.path)}" target="_blank" rel="noopener">Abrir</a>${managed?`<button type="button" data-update-plan="${esc(x.path)}">Atualizar página</button><button type="button" data-delete-plan="${esc(x.path)}" data-mpc-confirmed="1">Excluir página</button>`:''}</div></div>`;
+    }).join('');
+    $$('[data-update-plan]',list).forEach(btn=>btn.addEventListener('click',()=>updatePublished(btn.dataset.updatePlan)));
+    $$('[data-delete-plan]',list).forEach(btn=>btn.addEventListener('click',()=>deletePublished(btn.dataset.deletePlan)));
   }
 
   function showPublishedActions(path){
     const box=$('#mpcPublishedActions');if(!box)return;
     const full=new URL(path,location.origin).href;
-    box.innerHTML=`<div class="mpc-admin-statusbar" style="margin-top:12px"><div><div class="mpc-admin-ready ready"><i></i><span>Página criada com sucesso</span></div><div class="mpc-admin-save-state">${esc(full)}</div></div><div class="mpc-admin-actions"><button type="button" data-copy-link>Copiar link</button><a href="${esc(full)}" target="_blank" rel="noopener">Abrir cronograma</a><a href="https://wa.me/?text=${encodeURIComponent(full)}" target="_blank" rel="noopener">Compartilhar no WhatsApp</a></div></div>`;
+    const item=findRecent(path);
+    const managed=Boolean(item?.manageKey);
+    box.innerHTML=`<div class="mpc-admin-statusbar" style="margin-top:12px"><div><div class="mpc-admin-ready ready"><i></i><span>${item?.updatedAt?'Página atualizada com sucesso':'Página publicada com sucesso'}</span></div><div class="mpc-admin-save-state">${esc(full)}${managed?' · este link pode ser atualizado ou excluído':''}</div></div><div class="mpc-admin-actions"><button type="button" data-copy-link>Copiar link</button><a href="${esc(full)}" target="_blank" rel="noopener">Abrir cronograma</a><a href="https://wa.me/?text=${encodeURIComponent(full)}" target="_blank" rel="noopener">Compartilhar no WhatsApp</a>${managed?`<button type="button" data-update-current>Atualizar página publicada</button><button type="button" data-delete-current data-mpc-confirmed="1">Excluir página antiga</button>`:''}</div></div>`;
     $('[data-copy-link]',box)?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(full);alert('Link copiado.')}catch{prompt('Copie o link:',full)}});
+    $('[data-update-current]',box)?.addEventListener('click',()=>updatePublished(path));
+    $('[data-delete-current]',box)?.addEventListener('click',()=>deletePublished(path));
     box.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
 
