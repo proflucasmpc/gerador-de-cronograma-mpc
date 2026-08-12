@@ -1,0 +1,38 @@
+name: Integrar Pomodoro na página pública
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - pomodoro.js
+      - scripts/patch_public_pomodoro.py
+      - .github/workflows/patch-public-pomodoro.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Inserir carregamento do Pomodoro
+        run: python scripts/patch_public_pomodoro.py
+      - name: Validar integração
+        run: |
+          grep -q '/pomodoro.js?v=20260812-1' plano.html
+          grep -q 'Timer Pomodoro Flexível' pomodoro.js
+      - name: Commitar integração
+        run: |
+          if git diff --quiet; then
+            echo 'Sem alterações.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add plano.html
+          git commit -m 'Integrar Pomodoro à página pública'
+          git push origin HEAD:main
