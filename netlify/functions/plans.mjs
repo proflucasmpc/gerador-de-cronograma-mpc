@@ -26,6 +26,30 @@ function cleanMultiline(value, max = 16000) {
     .slice(0, max);
 }
 
+function cleanRoutineWindow(window = {}) {
+  return {
+    moment: cleanString(window.moment, 120),
+    time: cleanString(window.time, 10),
+    duration: Math.max(5, Math.min(240, Number(window.duration) || 30)),
+    environment: cleanString(window.environment, 80),
+    types: Array.isArray(window.types) ? window.types.slice(0, 12).map(type => cleanString(type, 80)).filter(Boolean) : [],
+    videoOnly: Boolean(window.videoOnly)
+  };
+}
+
+function cleanStudyRoutine(input) {
+  if (!input || typeof input !== 'object') return null;
+  const mode = ['continuous', 'fragmented', '12x36', 'custom'].includes(input.mode) ? input.mode : 'continuous';
+  return {
+    mode,
+    referenceDate: cleanString(input.referenceDate, 20),
+    referenceStatus: input.referenceStatus === 'off' ? 'off' : 'work',
+    windows: Array.isArray(input.windows) ? input.windows.slice(0, 30).map(cleanRoutineWindow) : [],
+    workWindows: Array.isArray(input.workWindows) ? input.workWindows.slice(0, 30).map(cleanRoutineWindow) : [],
+    offWindows: Array.isArray(input.offWindows) ? input.offWindows.slice(0, 30).map(cleanRoutineWindow) : []
+  };
+}
+
 function cleanTask(task = {}) {
   return {
     id: cleanString(task.id, 100),
@@ -36,6 +60,7 @@ function cleanTask(task = {}) {
     subject: cleanString(task.subject, 220),
     activity: cleanString(task.activity, 2500),
     type: cleanString(task.type, 80),
+    notes: cleanString(task.notes, 500),
     done: Boolean(task.done)
   };
 }
@@ -44,7 +69,7 @@ function sanitizePlan(input = {}) {
   const tasks = Array.isArray(input.tasks) ? input.tasks.slice(0, 1600).map(cleanTask) : [];
   if (!tasks.length) throw new Error('O cronograma não possui atividades.');
   return {
-    version: 3,
+    version: 4,
     studentName: cleanString(input.studentName, 180),
     createdByUser: Boolean(input.createdByUser),
     creatorName: cleanString(input.creatorName || input.studentName, 180),
@@ -55,6 +80,7 @@ function sanitizePlan(input = {}) {
     hoursPerDay: Math.max(0, Math.min(24, Number(input.hoursPerDay) || 0)),
     scheduleStyle: cleanString(input.scheduleStyle, 40),
     generalGuidance: cleanMultiline(input.generalGuidance, 16000),
+    studyRoutine: cleanStudyRoutine(input.studyRoutine),
     subjects: Array.isArray(input.subjects) ? input.subjects.slice(0, 80).map(s => ({
       name: cleanString(s?.name, 220),
       priority: Number(s?.priority) || 0,
