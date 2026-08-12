@@ -4,5 +4,7 @@
   Cache-Control: public, max-age=0, must-revalidate
 /user-plan-attribution.js
   Cache-Control: public, max-age=0, must-revalidate
+/pomodoro.js
+  Cache-Control: public, max-age=0, must-revalidate
 /plano.html
   Cache-Control: public, max-age=0, must-revalidate
