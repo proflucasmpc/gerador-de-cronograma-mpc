@@ -1,18 +1,21 @@
-(()=>{
+(()=> {
   'use strict';
+
   const GROUP_URL='https://chat.whatsapp.com/DgypQxmPYQvGBNTmQoa6uK';
   const RECENT_KEY='mpcAdminRecentPublishedPlansV1';
   const SAVE_KEY='mpcAdminUiLastSavedAtV1';
   const BYPASS_KEY='mpc-admin-capture-bypass-v1';
+  const ROUTINE_KEY='mpcAdminStudyRoutineV1';
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>[...r.querySelectorAll(s)];
   const val=id=>($(id)?.value||'').trim();
   const ptDate=iso=>{try{return new Date(iso).toLocaleString('pt-BR')}catch{return iso||'—'}};
-  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[m]));
   let pendingUpdate=null;
 
   function loadRecent(){try{return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]')}catch{return[]}}
   function saveRecent(items){try{localStorage.setItem(RECENT_KEY,JSON.stringify(items.slice(0,50)))}catch{}}
+  function loadRoutine(){try{return JSON.parse(localStorage.getItem(ROUTINE_KEY)||'null')}catch{return null}}
   function planId(path){return String(path||'').match(/\/plano\/([A-Z0-9]{10})/i)?.[1]?.toUpperCase()||''}
   function findRecent(path){return loadRecent().find(x=>x.path===path)||null}
   function captureBypassActive(){try{return localStorage.getItem(BYPASS_KEY)==='1'}catch{return false}}
@@ -33,11 +36,12 @@
 
   function removeRecent(path){saveRecent(loadRecent().filter(x=>x.path!==path));renderRecent();const box=$('#mpcPublishedActions');if(box)box.innerHTML=''}
 
-  function injectGuidanceIntoBody(opts){
+  function enrichPlanBody(opts){
     try{
       if(typeof opts.body!=='string')return opts;
       const data=JSON.parse(opts.body);
       data.generalGuidance=val('#adminGeneralGuidance');
+      data.studyRoutine=loadRoutine();
       return {...opts,body:JSON.stringify(data)};
     }catch{return opts}
   }
@@ -49,7 +53,7 @@
       const url=typeof input==='string'?input:(input?.url||'');
       const method=(opts.method||input?.method||'GET').toUpperCase();
       const isPlanPost=method==='POST'&&/\/api\/plans(?:\?|$)/.test(url);
-      if(isPlanPost){opts=injectGuidanceIntoBody(opts);args[1]=opts}
+      if(isPlanPost){opts=enrichPlanBody(opts);args[1]=opts}
       let response;let updatePath='';
       if(isPlanPost&&pendingUpdate){
         const current=pendingUpdate;pendingUpdate=null;const id=planId(current.path);
@@ -82,11 +86,11 @@
   function bypassButtonLabel(){return captureBypassActive()?'Reativar captura neste dispositivo':'Desativar captura neste dispositivo'}
   function makeStatusBar(){const bar=document.createElement('div');bar.className='mpc-admin-statusbar';bar.innerHTML=`<div><div class="mpc-admin-ready" id="mpcAdminReady"><i></i><span>Preencha os dados essenciais</span></div><div class="mpc-admin-save-state" id="mpcAdminSaveState">Rascunho ainda não salvo nesta sessão.</div></div><div class="mpc-admin-actions"><button type="button" id="mpcQuickPreview">Visualizar como aluno</button><button type="button" id="mpcCaptureBypassBtn">${bypassButtonLabel()}</button><button type="button" id="mpcQuickGenerate" class="primary">Ir para gerar</button><a href="${GROUP_URL}" target="_blank" rel="noopener">Grupo gratuito do gerador</a></div>`;return bar}
 
-  const sectionDefs=[['Visão geral','adminPanelTitle'],['Aluno e prova','mpc-sec-aluno'],['Critérios','mpc-sec-criterios'],['Atividades','mpc-sec-atividades'],['Simulados','mpc-sec-simulados'],['Matérias','mpc-sec-materias'],['Resumo','adminInsightsCard'],['PDF','mpc-sec-pdf'],['Gerar','mpc-sec-gerar'],['Cronogramas','mpcRecentSection']];
+  const sectionDefs=[['Visão geral','adminPanelTitle'],['Aluno e prova','mpc-sec-aluno'],['Critérios','mpc-sec-criterios'],['Rotina','mpc-sec-rotina'],['Atividades','mpc-sec-atividades'],['Simulados','mpc-sec-simulados'],['Matérias','mpc-sec-materias'],['Resumo','adminInsightsCard'],['PDF','mpc-sec-pdf'],['Gerar','mpc-sec-gerar'],['Cronogramas','mpcRecentSection']];
   function assignSectionIds(panel){$$('.admin-card',panel).forEach(card=>{const t=$('h3',card)?.textContent||'';if(t.startsWith('1.'))card.id='mpc-sec-aluno';else if(t.startsWith('2.'))card.id='mpc-sec-criterios';else if(t.startsWith('3.'))card.id='mpc-sec-atividades';else if(t.startsWith('4.'))card.id='mpc-sec-simulados';else if(t.startsWith('5.'))card.id='mpc-sec-materias';else if(t.startsWith('7.'))card.id='mpc-sec-pdf';else if(t.startsWith('8.'))card.id='mpc-sec-gerar';if(card.id)card.classList.add('mpc-admin-section-anchor')});$('#adminInsightsCard')?.classList.add('mpc-admin-section-anchor')}
 
   function buildShell(panel){
-    assignSectionIds(panel);const parent=panel.parentElement;const shell=document.createElement('div');shell.className='mpc-admin-shell';const sidebar=document.createElement('aside');sidebar.className='mpc-admin-sidebar';sidebar.innerHTML=`<div class="mpc-admin-title">Painel Administrativo</div><div class="mpc-admin-sub">Gerador de Cronograma MPC</div><nav class="mpc-admin-nav" aria-label="Navegação administrativa">${sectionDefs.map(([label,id])=>`<button type="button" data-admin-target="${id}">${label}</button>`).join('')}</nav>`;const content=document.createElement('div');content.className='mpc-admin-content';parent.insertBefore(shell,panel);shell.append(sidebar,content);content.append(panel);const head=$('.admin-panel-head',panel);if(head){head.insertAdjacentElement('afterend',makeDashboard());head.nextElementSibling.insertAdjacentElement('afterend',makeStatusBar())}
+    assignSectionIds(panel);const parent=panel.parentElement;const shell=document.createElement('div');shell.className='mpc-admin-shell';const sidebar=document.createElement('aside');sidebar.className='mpc-admin-sidebar';sidebar.innerHTML=`<div class="mpc-admin-title">Painel Administrativo</div><div class="mpc-admin-sub">Gerador de Cronograma MPC</div><nav class="mpc-admin-nav" aria-label="Navegação administrativa">${sectionDefs.filter(([,id])=>id!=='mpc-sec-rotina').map(([label,id])=>`<button type="button" data-admin-target="${id}">${label}</button>`).join('')}</nav>`;const content=document.createElement('div');content.className='mpc-admin-content';parent.insertBefore(shell,panel);shell.append(sidebar,content);content.append(panel);const head=$('.admin-panel-head',panel);if(head){head.insertAdjacentElement('afterend',makeDashboard());head.nextElementSibling.insertAdjacentElement('afterend',makeStatusBar())}
     $$('.mpc-admin-nav button',sidebar).forEach(btn=>btn.addEventListener('click',()=>document.getElementById(btn.dataset.adminTarget)?.scrollIntoView({behavior:'smooth',block:'start'})));
     $('#mpcQuickPreview')?.addEventListener('click',()=>$('#adminPreviewStudentBtn')?.click());$('#mpcQuickGenerate')?.addEventListener('click',()=>document.getElementById('mpc-sec-gerar')?.scrollIntoView({behavior:'smooth',block:'center'}));
     $('#mpcCaptureBypassBtn')?.addEventListener('click',()=>{const active=captureBypassActive();try{active?localStorage.removeItem(BYPASS_KEY):localStorage.setItem(BYPASS_KEY,'1')}catch{};const btn=$('#mpcCaptureBypassBtn');if(btn)btn.textContent=bypassButtonLabel();alert(active?'Captura reativada neste navegador. Abra ou atualize uma página de aluno para testar o fluxo normal.':'Captura desativada neste navegador. As páginas dos alunos poderão ser revisadas aqui sem abrir a captura.')});
