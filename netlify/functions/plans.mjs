@@ -18,6 +18,14 @@ function cleanString(value, max = 500) {
   return String(value ?? '').replace(/[\u0000-\u001F\u007F]/g, ' ').trim().slice(0, max);
 }
 
+function cleanMultiline(value, max = 16000) {
+  return String(value ?? '')
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ')
+    .trim()
+    .slice(0, max);
+}
+
 function cleanTask(task = {}) {
   return {
     id: cleanString(task.id, 100),
@@ -36,7 +44,7 @@ function sanitizePlan(input = {}) {
   const tasks = Array.isArray(input.tasks) ? input.tasks.slice(0, 1600).map(cleanTask) : [];
   if (!tasks.length) throw new Error('O cronograma não possui atividades.');
   return {
-    version: 2,
+    version: 3,
     studentName: cleanString(input.studentName, 180),
     createdByUser: Boolean(input.createdByUser),
     creatorName: cleanString(input.creatorName || input.studentName, 180),
@@ -46,6 +54,7 @@ function sanitizePlan(input = {}) {
     endDate: cleanString(input.endDate, 20),
     hoursPerDay: Math.max(0, Math.min(24, Number(input.hoursPerDay) || 0)),
     scheduleStyle: cleanString(input.scheduleStyle, 40),
+    generalGuidance: cleanMultiline(input.generalGuidance, 16000),
     subjects: Array.isArray(input.subjects) ? input.subjects.slice(0, 80).map(s => ({
       name: cleanString(s?.name, 220),
       priority: Number(s?.priority) || 0,
