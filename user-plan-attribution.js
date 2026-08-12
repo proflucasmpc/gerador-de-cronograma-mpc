@@ -1,4 +1,4 @@
-(()=>{
+(()=> {
   'use strict';
   const ADMIN_BYPASS_KEY='mpc-admin-capture-bypass-v1';
 
@@ -77,7 +77,7 @@
       const type=typeText(task);
       if(type.includes('revis')||type.includes('simulado'))return;
       const raw=cleanActivity(task.activity);
-      const match=raw.match(/(?:^|\s)Tópico:\s*(.*?)\s*\|\s*Subtópico:\s*(.*)$/i);
+      const match=raw.match(/(?:^|\s)Tópico:\s*(.*?)\s*\|\s*Subtópico:\s*(.*?)(?:\s*·\s*Parte\s+\d+\s+de\s+\d+)?$/i);
       if(!match)return;
       const subject=String(task.subject||'Disciplina').trim();
       const topic=match[1].trim();
@@ -136,6 +136,32 @@
     }
   }
 
+  function addRoutineContext(plan){
+    const routine=plan?.studyRoutine;
+    if(!routine||routine.mode==='continuous')return;
+    const label={fragmented:'Estudo fracionado','12x36':'Escala 12x36',custom:'Rotina personalizada'}[routine.mode]||'Rotina personalizada';
+    const hero=document.querySelector('.student-meta');
+    if(hero&&!hero.querySelector('[data-routine-chip]')){
+      const chip=document.createElement('span');chip.className='meta-pill';chip.dataset.routineChip='1';chip.textContent=label;hero.appendChild(chip);
+    }
+    const style=document.createElement('style');
+    style.textContent=`.routine-context{margin:18px 0 0;padding:14px 16px;border:1px solid #E4E8F0;border-left:5px solid #8A5CFF;border-radius:12px;background:#fff}.routine-context strong{display:block;color:#071225;margin-bottom:5px}.routine-context p{margin:0;color:#657086;font-size:13px}.schedule-task-copy .routine-note{margin-top:5px;color:#8A5CFF!important;font-size:12px!important;font-weight:800}`;
+    document.head.appendChild(style);
+    const planSection=document.getElementById('plano');
+    if(planSection&&!document.querySelector('.routine-context')){
+      const box=document.createElement('div');box.className='routine-context';box.innerHTML=`<strong>${esc(label)}</strong><p>Os horários foram distribuídos conforme as janelas reais de estudo configuradas para este aluno. Em blocos de transporte marcados como “somente videoaula”, o plano utiliza apenas atividades em vídeo.</p>`;
+      planSection.insertAdjacentElement('afterend',box);
+    }
+    document.querySelectorAll('.schedule-task').forEach((row,index)=>{
+      const task=(plan.tasks||[])[index];
+      if(!task?.notes)return;
+      const copy=row.querySelector('.schedule-task-copy');
+      if(copy&&!copy.querySelector('.routine-note')){
+        const note=document.createElement('span');note.className='routine-note';note.textContent=task.notes;copy.appendChild(note);
+      }
+    });
+  }
+
   function addCreatorBanner(plan){
     if(!plan?.createdByUser)return;
     const hero=document.querySelector('.hero');if(!hero||document.querySelector('.creator-share-banner'))return;
@@ -155,6 +181,7 @@
     strengthenWhatsappReturn(id);
     fixContentsMap(plan);
     addGuidance(plan);
+    addRoutineContext(plan);
     addCreatorBanner(plan);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
