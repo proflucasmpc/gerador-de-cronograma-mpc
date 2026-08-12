@@ -2,24 +2,45 @@
   'use strict';
 
   const ADMIN_BYPASS_KEY='mpc-admin-capture-bypass-v1';
+  const ADMIN_BYPASS_PLANS_KEY='mpc-admin-bypass-plan-ids-v1';
   const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const typeText=t=>String(t?.type||'').toLowerCase();
   const typeClass=v=>{const s=String(v||'').toLowerCase();if(s.includes('simulado'))return'simulado';if(s.includes('exerc')||s.includes('quest'))return'exercicios';if(s.includes('revis'))return'revisao';if(s.includes('teoria'))return'teoria';return'estudo'};
   const cleanActivity=v=>String(v||'').replace(/^\s*(teoria|questões|questoes|exercícios|exercicios|revisão|revisao|simulado)\s*[:–—-]?\s*/i,'').trim();
 
   function bypassActive(){try{return localStorage.getItem(ADMIN_BYPASS_KEY)==='1'}catch{return false}}
+  function bypassPlanIds(){try{return new Set(JSON.parse(localStorage.getItem(ADMIN_BYPASS_PLANS_KEY)||'[]'))}catch{return new Set()}}
+  function saveBypassPlanIds(ids){try{localStorage.setItem(ADMIN_BYPASS_PLANS_KEY,JSON.stringify([...ids]))}catch{}}
 
-  function disableCaptureForAdmin(){
+  function applyAdminBypass(id){
+    const gateKey=`mpc-public-plan-unlocked:${id}`;
+    const ids=bypassPlanIds();
+    try{
+      if(bypassActive()){
+        const wasAlreadyUnlocked=localStorage.getItem(gateKey)==='1';
+        if(!wasAlreadyUnlocked){localStorage.setItem(gateKey,'1');ids.add(id);saveBypassPlanIds(ids)}
+        document.documentElement.dataset.mpcAdminBypass='1';
+        return true;
+      }
+      if(ids.has(id)){
+        localStorage.removeItem(gateKey);
+        ids.delete(id);
+        saveBypassPlanIds(ids);
+      }
+      delete document.documentElement.dataset.mpcAdminBypass;
+    }catch{}
+    return false;
+  }
+
+  function settleAdminBypass(){
     if(!bypassActive())return;
-    const force=()=>{const lock=document.getElementById('captureLock');if(lock){lock.classList.remove('visible');lock.setAttribute('aria-hidden','true')}document.body.classList.remove('capture-open')};
-    force();
-    const observer=new MutationObserver(force);
-    observer.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class','aria-hidden']});
-    window.addEventListener('focus',force);
-    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')force()});
+    const lock=document.getElementById('captureLock');
+    if(lock){lock.classList.remove('visible');lock.setAttribute('aria-hidden','true')}
+    document.body.classList.remove('capture-open');
   }
 
   function strengthenWhatsappReturn(id){
+    if(bypassActive())return;
     const persistKey=`mpc-public-plan-whatsapp-pending-persist:${id}`;
     const sessionKey=`mpc-public-plan-whatsapp-pending:${id}`;
     const unlockKey=`mpc-public-plan-unlocked:${id}`;
@@ -255,9 +276,10 @@
 
   async function run(){
     const parts=location.pathname.split('/').filter(Boolean);const id=(parts.at(-1)||'').toUpperCase();if(!/^[A-Z0-9]{10}$/.test(id))return;
+    const adminMode=applyAdminBypass(id);
     let plan;try{const r=await fetch(`/api/plans?id=${encodeURIComponent(id)}`,{cache:'no-store'});if(!r.ok)return;plan=await r.json()}catch{return}
     await waitForBaseRender();
-    disableCaptureForAdmin();
+    if(adminMode)settleAdminBypass();
     strengthenWhatsappReturn(id);
     fixContentsMap(plan);
     updateContentMetrics(plan);
