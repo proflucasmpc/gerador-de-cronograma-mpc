@@ -1,5 +1,6 @@
 (()=>{
   'use strict';
+  if(!document.querySelector('script[src*="public-plan-buttons.js"]')){const extra=document.createElement('script');extra.src='/public-plan-buttons.js?v=20260813-1';extra.defer=true;document.head.appendChild(extra)}
   const SETTINGS_KEY='mpcPomodoroSettingsV1';
   const SESSION_KEY='mpcPomodoroSessionV1';
   const $=(s,r=document)=>r.querySelector(s);
