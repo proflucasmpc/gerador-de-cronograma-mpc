@@ -1,0 +1,30 @@
+name: Habilitar duplicacao de cronograma
+on:
+  push:
+    paths:
+      - '.github/workflows/enable-duplicate-plan-module.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Integrar modulo
+        run: python .github/scripts/enable_duplicate_plan_module.py
+      - name: Validar JavaScript
+        run: node --check admin-duplicate-plan.js
+      - name: Confirmar integracao
+        run: |
+          grep -q "admin-duplicate-plan.js?v=20260813-1" admin.html
+          grep -q "Duplicar para novo aluno" admin-duplicate-plan.js
+          grep -q "Nova cópia independente" admin-duplicate-plan.js
+      - name: Commitar
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin.html _headers
+          git commit -m "Enable safe duplication of published plans" || exit 0
+          git push
