@@ -1,87 +1,131 @@
-/* Otimização mobile da página pública do aluno — desktop preservado */
+/* Responsividade mobile robusta da página pública do aluno — desktop preservado */
 @media(max-width:880px){
-  html{scroll-padding-top:118px}
-  body{padding-bottom:118px}
-  .shell{padding:0 12px 138px!important}
+  html{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+    scroll-padding-top:118px;
+  }
+  body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+    padding-bottom:118px;
+  }
+  #app,.shell,.topbar,.topbar-inner,.mentoria-fixed,.mentoria-inner,.hero,.hero-grid,.section,.panel,.today-layout,.raiox-grid,.schedule-wrap,.schedule-main,.contents-grid,.timeline,.generator-cta,.final-banner{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+  #app{width:100%!important;overflow-x:clip!important}
+  .shell{width:100%!important;margin-left:auto!important;margin-right:auto!important;padding:0 12px 148px!important;overflow-x:clip!important}
+  img,svg,canvas,video,iframe{max-width:100%;height:auto}
 
-  .topbar-inner{height:58px!important;padding:0 12px!important;gap:9px!important}
-  .brand-logo{width:42px!important;height:42px!important;border-radius:10px!important}
-  .brand-mark{gap:9px!important;min-width:0}
+  .topbar{width:100%!important;overflow:hidden!important}
+  .topbar-inner{width:100%!important;height:58px!important;padding:0 12px!important;gap:8px!important;overflow:hidden!important}
+  .brand-mark{flex:1 1 auto!important;gap:8px!important;min-width:0!important;overflow:hidden!important}
+  .brand-logo{flex:0 0 auto!important;width:42px!important;height:42px!important;border-radius:10px!important}
+  .brand-copy{min-width:0!important;overflow:hidden!important}
+  .brand-copy span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .brand-copy span:first-child{font-size:13px!important}
   .brand-copy span:last-child{font-size:12px!important}
-  .header-generator-cta{margin-left:auto!important;padding:8px 9px!important;font-size:9px!important;line-height:1.15!important;border-radius:9px!important;max-width:170px;text-align:center}
+  .header-generator-cta{flex:0 1 170px!important;min-width:0!important;margin-left:auto!important;padding:8px 9px!important;font-size:9px!important;line-height:1.15!important;border-radius:9px!important;max-width:170px!important;text-align:center!important;white-space:normal!important}
 
-  .mentoria-fixed{top:58px!important}
-  .mentoria-inner{min-height:44px!important;padding:6px 12px!important;gap:8px!important}
-  .mentoria-copy{font-size:10.5px!important;line-height:1.28!important}
-  .mentoria-copy strong{font-size:11px!important;line-height:1.25!important}
-  .mentoria-cta{font-size:9px!important;padding:8px 9px!important;border-radius:8px!important}
+  .mentoria-fixed{width:100%!important;top:58px!important;overflow:hidden!important}
+  .mentoria-inner{width:100%!important;min-height:44px!important;padding:6px 12px!important;gap:8px!important;overflow:hidden!important}
+  .mentoria-inner>*{min-width:0!important}
+  .mentoria-copy{flex:1 1 auto!important;font-size:10.5px!important;line-height:1.28!important;overflow:hidden!important}
+  .mentoria-copy strong{display:block!important;font-size:11px!important;line-height:1.25!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .mentoria-copy span{display:none!important}
+  .mentoria-cta{flex:0 0 auto!important;font-size:9px!important;padding:8px 9px!important;border-radius:8px!important;white-space:nowrap!important}
 
-  .hero{margin:12px 0 18px!important}
-  .hero-grid{display:grid!important;grid-template-columns:1fr!important;gap:16px!important;padding:26px 18px 20px!important}
+  .hero{width:100%!important;margin:12px 0 18px!important;overflow:hidden!important}
+  .hero-grid{width:100%!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important;padding:26px 18px 20px!important;overflow:hidden!important}
+  .hero-grid>*{min-width:0!important;max-width:100%!important}
   .hero-grid:before{left:18px!important;top:20px!important;height:30px!important;width:4px!important}
-  .hero .eyebrow{padding-left:14px!important;font-size:10px!important}
-  .hero h1{font-size:clamp(30px,9vw,38px)!important;line-height:1.01!important;margin:12px 0 14px!important;letter-spacing:-.02em}
-  .hero-sub{font-size:14px!important;line-height:1.5!important;margin:0 0 18px!important;max-width:none!important}
-  .student-name{font-size:24px!important;margin:0 0 8px!important}
-  .student-meta{gap:7px!important}
-  .meta-pill{font-size:11.5px!important;line-height:1.3!important;padding:7px 10px!important;border-radius:14px!important}
-  .hero-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:16px!important}
-  .hero-actions .btn-primary,.hero-actions .btn-ghost,.hero-actions .btn-free{min-height:46px!important;padding:11px 12px!important;font-size:12px!important;text-align:center!important}
-  .hero-actions .btn-free{grid-column:1/-1!important;width:100%!important}
+  .hero .eyebrow{padding-left:14px!important;font-size:10px!important;overflow-wrap:anywhere!important}
+  .hero h1{max-width:100%!important;font-size:clamp(30px,9vw,38px)!important;line-height:1.01!important;margin:12px 0 14px!important;letter-spacing:-.02em!important;overflow-wrap:break-word!important;word-break:normal!important}
+  .hero-sub{max-width:100%!important;font-size:14px!important;line-height:1.5!important;margin:0 0 18px!important}
+  .student-name{max-width:100%!important;font-size:24px!important;margin:0 0 8px!important;overflow-wrap:anywhere!important}
+  .student-meta{width:100%!important;max-width:100%!important;gap:7px!important;overflow:hidden!important}
+  .meta-pill{max-width:100%!important;min-width:0!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;font-size:11.5px!important;line-height:1.3!important;padding:7px 10px!important;border-radius:14px!important}
+  .hero-actions{width:100%!important;max-width:100%!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px!important;margin-top:16px!important}
+  .hero-actions>*{min-width:0!important;max-width:100%!important}
+  .hero-actions .btn-primary,.hero-actions .btn-ghost,.hero-actions .btn-free{width:100%!important;min-width:0!important;min-height:46px!important;padding:11px 10px!important;font-size:12px!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  .hero-actions .btn-free{grid-column:1/-1!important}
 
-  .hero-side{margin:0!important}
-  .countdown-card{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;grid-template-areas:"label label" "number copy" "exam exam"!important;align-items:end!important;column-gap:14px!important;padding:14px 16px!important;border-radius:13px!important}
+  .hero-side{width:100%!important;margin:0!important}
+  .countdown-card{width:100%!important;max-width:100%!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;grid-template-areas:"label label" "number copy" "exam exam"!important;align-items:end!important;column-gap:14px!important;padding:14px 16px!important;border-radius:13px!important;overflow:hidden!important}
   .countdown-card>small{grid-area:label!important;font-size:9px!important;margin:0 0 5px!important}
-  .countdown-number{grid-area:number!important;font-size:46px!important;line-height:.9!important;margin:0!important}
-  .countdown-card>p{grid-area:copy!important;font-size:12px!important;line-height:1.25!important;padding-bottom:2px!important}
-  .exam-strip{grid-area:exam!important;margin-top:10px!important;padding-top:9px!important;font-size:11px!important}
+  .countdown-number{grid-area:number!important;font-size:46px!important;line-height:.9!important;margin:0!important;white-space:nowrap!important}
+  .countdown-card>p{grid-area:copy!important;min-width:0!important;font-size:12px!important;line-height:1.25!important;padding-bottom:2px!important;overflow-wrap:anywhere!important}
+  .exam-strip{grid-area:exam!important;min-width:0!important;margin-top:10px!important;padding-top:9px!important;font-size:11px!important;gap:8px!important}
+  .exam-strip>*{min-width:0!important;overflow-wrap:anywhere!important}
 
-  .section{margin:20px 0!important;scroll-margin-top:116px!important}
-  .section-heading{padding-left:12px!important;margin-bottom:12px!important}
-  .section-heading h2{font-size:27px!important}
-  .section-heading p{font-size:12px!important;line-height:1.45!important;margin-top:5px!important}
-  .today-main,.progress-card,.raiox-list,.raiox-side,.timeline{padding:18px!important}
-  .study-card{padding:15px!important}
+  .section{width:100%!important;margin:20px 0!important;scroll-margin-top:116px!important;overflow:visible!important}
+  .section-heading{max-width:100%!important;padding-left:12px!important;margin-bottom:12px!important}
+  .section-heading>*{min-width:0!important;max-width:100%!important}
+  .section-heading h2{font-size:27px!important;overflow-wrap:anywhere!important}
+  .section-heading p{font-size:12px!important;line-height:1.45!important;margin-top:5px!important;overflow-wrap:anywhere!important}
+  .today-main,.progress-card,.raiox-list,.raiox-side,.timeline{max-width:100%!important;padding:18px!important;overflow:hidden!important}
+  .today-date{gap:12px!important}.today-date>*{min-width:0!important}
+  .study-card{max-width:100%!important;padding:15px!important;overflow:hidden!important}
+  .study-card-top>*{min-width:0!important}
+  .study-card h3,.topic-title,.subtopic{max-width:100%!important;overflow-wrap:anywhere!important;word-break:normal!important}
+  .metric-grid{max-width:100%!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+  .metric-card{min-width:0!important;max-width:100%!important;overflow:hidden!important}
+  .metric-card strong,.metric-card span{overflow-wrap:anywhere!important}
 
-  .mobile-nav{left:max(8px,env(safe-area-inset-left))!important;right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important;padding:6px!important;border-radius:16px!important;gap:2px!important}
-  .mobile-nav a{min-width:0!important;padding:7px 2px!important;font-size:9px!important;line-height:1.2!important}
-  .whatsapp-float{right:10px!important;bottom:86px!important}
+  .mobile-nav{width:auto!important;max-width:none!important;left:max(8px,env(safe-area-inset-left))!important;right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;padding:6px!important;border-radius:16px!important;gap:2px!important;overflow:hidden!important}
+  .mobile-nav a{min-width:0!important;max-width:100%!important;padding:7px 2px!important;font-size:9px!important;line-height:1.2!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  .whatsapp-float{right:max(10px,env(safe-area-inset-right))!important;bottom:92px!important;max-width:calc(100vw - 20px)!important}
 
-  .day-panel,.content-accordion,.panel{max-width:100%;overflow-wrap:anywhere}
-  .schedule-task{grid-template-columns:8px minmax(0,1fr) 32px!important;padding:14px 13px!important;gap:10px!important}
-  .schedule-task-copy strong{font-size:14px!important}
-  .schedule-task-copy>span:last-child{font-size:13px!important;line-height:1.45!important}
+  .day-panel,.content-accordion,.panel,.routine-panel,.guidance-panel,.pomodoro-panel,.mpc-custom-links-panel{width:100%!important;max-width:100%!important;min-width:0!important;overflow-wrap:anywhere!important}
+  .schedule-task{max-width:100%!important;grid-template-columns:8px minmax(0,1fr) 32px!important;padding:14px 13px!important;gap:10px!important;overflow:hidden!important}
+  .schedule-task>*{min-width:0!important;max-width:100%!important}
+  .schedule-task-copy strong{font-size:14px!important;overflow-wrap:anywhere!important}
+  .schedule-task-copy>span:last-child{font-size:13px!important;line-height:1.45!important;overflow-wrap:anywhere!important}
+  .day-panel summary,.content-accordion summary{min-width:0!important;max-width:100%!important}
+  .day-panel summary>*,.content-accordion summary>*{min-width:0!important}
+  .generator-cta,.final-banner{width:100%!important;max-width:100%!important;overflow:hidden!important}
 }
 
 @media(max-width:600px){
   .hero-sub{display:none!important}
   .hero-grid{padding-top:24px!important}
-  .hero h1{font-size:32px!important;max-width:310px!important}
+  .hero h1{font-size:32px!important;max-width:100%!important}
   .student-name{margin-top:2px!important}
   .meta-pill:first-child{width:100%!important;border-radius:12px!important}
   .countdown-card{margin-top:0!important}
-  .mentoria-copy{display:block!important;min-width:0}
-  .mentoria-copy strong{display:block!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .mentoria-cta{white-space:nowrap!important}
   .final-banner,.generator-cta{padding:18px!important;gap:12px!important}
 }
 
 @media(max-width:430px){
-  .topbar-inner{height:56px!important}
+  .topbar-inner{height:56px!important;padding-left:10px!important;padding-right:10px!important}
   .mentoria-fixed{top:56px!important}
   .brand-logo{width:40px!important;height:40px!important}
   .brand-copy span:first-child{font-size:12px!important}
   .brand-copy span:last-child{font-size:11px!important}
-  .header-generator-cta{max-width:145px!important;font-size:8px!important;padding:8px!important}
-  .mentoria-inner{min-height:42px!important}
+  .header-generator-cta{flex-basis:145px!important;max-width:145px!important;font-size:8px!important;padding:8px 7px!important}
+  .mentoria-inner{min-height:42px!important;padding-left:10px!important;padding-right:10px!important}
   .hero-grid{padding:22px 15px 18px!important}
   .hero-grid:before{left:15px!important}
   .hero h1{font-size:30px!important}
   .student-name{font-size:22px!important}
-  .hero-actions{grid-template-columns:1fr!important}
+  .hero-actions{grid-template-columns:minmax(0,1fr)!important}
   .hero-actions .btn-free{grid-column:auto!important}
   .countdown-number{font-size:42px!important}
   .section-heading h2{font-size:25px!important}
   .mobile-nav a{font-size:8.5px!important}
+}
+
+@media(max-width:360px){
+  .brand-copy span:first-child{display:none!important}
+  .brand-copy span:last-child{font-size:11px!important}
+  .header-generator-cta{flex-basis:132px!important;max-width:132px!important;font-size:7.5px!important}
+  .mentoria-copy strong{font-size:10px!important}
+  .mentoria-cta{font-size:8px!important;padding:7px 8px!important}
+  .hero h1{font-size:28px!important}
+  .countdown-card{column-gap:9px!important;padding:13px!important}
+  .countdown-number{font-size:38px!important}
+  .mobile-nav{left:5px!important;right:5px!important}
 }
