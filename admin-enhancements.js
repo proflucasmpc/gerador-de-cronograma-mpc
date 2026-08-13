@@ -53,18 +53,30 @@
   function inferSubjects(plan){
     const tasks=Array.isArray(plan.tasks)?plan.tasks:[];
     const listed=Array.isArray(plan.subjects)?plan.subjects:[];
-    const names=[...new Set([...listed.map(x=>x?.name),...tasks.map(x=>x?.subject)].map(x=>String(x||'').trim()).filter(Boolean))];
-    return names.map((name,index)=>{
-      const related=tasks.filter(t=>String(t.subject||'').trim()===name&&!/simulado/i.test(String(t.type||''))&&!/revis/i.test(String(t.type||'')));
+    const nonSim=tasks.filter(t=>!/simulado/i.test(`${t.type||''} ${t.activity||''}`));
+    const taskNames=[...new Set(nonSim.map(t=>String(t.subject||'').trim()).filter(Boolean))];
+    const listedNames=[...new Set(listed.map(x=>String(x?.name||'').trim()).filter(Boolean))];
+    const names=taskNames.length?taskNames:listedNames;
+    const result=[];
+    names.forEach((name,index)=>{
+      const related=nonSim.filter(t=>String(t.subject||'').trim()===name);
       const theory=related.filter(t=>/teoria/i.test(String(t.type||''))||/^\s*(?:Videoaula\s+de\s+teoria|Teoria)/i.test(String(t.activity||'')));
-      const source=theory.length?theory:related;
+      const exercises=related.filter(t=>/exerc|quest/i.test(`${t.type||''} ${t.activity||''}`));
+      const nonReview=related.filter(t=>!/revis/i.test(`${t.type||''} ${t.activity||''}`));
+      const source=theory.length?theory:exercises.length?exercises:nonReview.length?nonReview:related;
       const seen=new Set(),topics=[];
-      source.forEach(t=>{const topic=cleanPublishedTopic(t.activity);const key=topic.toLocaleLowerCase('pt-BR');if(topic.length>1&&!seen.has(key)){seen.add(key);topics.push(topic)}});
+      source.forEach(t=>{
+        const topic=cleanPublishedTopic(t.activity);
+        const key=topic.toLocaleLowerCase('pt-BR');
+        if(topic.length>1&&!/^(simulado|revis[aã]o\s+geral)$/i.test(topic)&&!seen.has(key)){seen.add(key);topics.push(topic)}
+      });
+      if(!topics.length)return;
       const meta=listed.find(x=>String(x?.name||'').trim()===name)||{};
       const level=String(meta.level||'intermediario');
       const difficulty=level==='iniciante'?'dificil':level==='avancado'?'facil':'intermediario';
-      return {id:`loaded-${Date.now()}-${index}`,name,difficulty,sessionMinutes:median(source.map(taskMinutes),60),topicsText:topics.join('\n')};
+      result.push({id:`loaded-${Date.now()}-${index}`,name,difficulty,sessionMinutes:median(source.map(taskMinutes),60),topicsText:topics.join('\n')});
     });
+    return result;
   }
   function inferSimulation(plan,startDate){
     const sims=(Array.isArray(plan.tasks)?plan.tasks:[]).filter(t=>/simulado/i.test(`${t.type||''} ${t.activity||''}`)).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
