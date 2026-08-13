@@ -1,0 +1,42 @@
+/* Layout administrativo ampliado + gerenciador de botões da página do aluno */
+@media (min-width:1180px){
+  body.admin-view .container{max-width:1480px!important;padding-left:24px!important;padding-right:24px!important}
+  .mpc-admin-shell{grid-template-columns:220px minmax(0,1fr)!important;gap:22px!important}
+  .mpc-admin-sidebar{padding:17px!important}
+  .mpc-admin-dashboard{grid-template-columns:minmax(170px,1fr) minmax(390px,2.25fr) minmax(120px,.68fr) minmax(140px,.78fr)!important;gap:14px!important}
+  .mpc-admin-metric{padding:17px 18px!important;min-width:0}
+  .mpc-admin-metric:nth-child(2) strong{font-size:21px!important;line-height:1.05!important;overflow-wrap:normal!important;word-break:normal!important}
+  body.admin-view .admin-panel-head{padding:30px 34px!important}
+  body.admin-view .admin-panel-head p{max-width:920px!important}
+  body.admin-view .admin-card{padding:24px 26px!important}
+}
+
+@media (min-width:1360px){
+  .mpc-admin-shell{grid-template-columns:225px minmax(0,1fr)!important;gap:24px!important}
+  .mpc-admin-dashboard{grid-template-columns:minmax(180px,.95fr) minmax(460px,2.45fr) minmax(125px,.66fr) minmax(145px,.72fr)!important}
+}
+
+.mpc-public-buttons-manager{margin-top:24px;padding:20px;border:1px solid var(--admin-line,#E4E8F0);border-radius:16px;background:#FAFBFD}
+.mpc-public-buttons-manager-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.mpc-public-buttons-manager-head h4{margin:0 0 5px;color:var(--admin-navy,#071225);font-family:Georgia,"Times New Roman",serif;font-size:19px}
+.mpc-public-buttons-manager-head p{margin:0;color:var(--admin-muted,#657086);font-size:13px;line-height:1.5;max-width:720px}
+.mpc-public-buttons-actions{display:flex;gap:8px;flex-wrap:wrap}
+.mpc-public-buttons-actions button{border:1px solid #B8C5D8;background:#fff;color:var(--admin-navy,#071225);border-radius:10px;padding:9px 12px;font:inherit;font-size:12px;font-weight:900;cursor:pointer}
+.mpc-public-buttons-actions button.primary{background:var(--admin-cyan,#24C8FF);border-color:var(--admin-cyan,#24C8FF)}
+.mpc-public-buttons-list{display:grid;gap:10px}
+.mpc-public-button-row{display:grid;grid-template-columns:minmax(170px,.8fr) minmax(260px,1.55fr) minmax(130px,.55fr) auto;gap:10px;align-items:end;padding:13px;border:1px solid var(--admin-line,#E4E8F0);border-radius:12px;background:#fff}
+.mpc-public-button-row label{display:grid;gap:6px;color:var(--admin-navy,#071225);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.mpc-public-button-row input,.mpc-public-button-row select{width:100%;min-height:43px!important}
+.mpc-public-button-row .remove{min-height:43px;border:1px solid #E2B6B1;background:#FFF7F6;color:#9C2F25;border-radius:10px;padding:0 12px;font-weight:900;cursor:pointer}
+.mpc-public-buttons-empty{border:1px dashed #C9D4E2;border-radius:12px;padding:16px;color:var(--admin-muted,#657086);font-size:13px;background:#fff}
+.mpc-public-buttons-note{margin-top:10px;color:var(--admin-muted,#657086);font-size:12px;line-height:1.45}
+
+@media(max-width:900px){
+  .mpc-public-buttons-manager-head{display:grid}
+  .mpc-public-button-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  .mpc-public-button-row{grid-template-columns:1fr}
+  .mpc-public-buttons-actions{display:grid;grid-template-columns:1fr}
+  .mpc-public-buttons-actions button{width:100%}
+}
