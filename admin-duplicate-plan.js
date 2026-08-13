@@ -8,6 +8,11 @@
   const read=(key,fallback=null)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}};
   const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch{}};
 
+  function loadUiUpgrades(){
+    if(!document.querySelector('link[href*="admin-layout-links.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='/admin-layout-links.css?v=20260813-1';document.head.appendChild(link)}
+    if(!document.querySelector('script[src*="admin-public-buttons.js"]')){const script=document.createElement('script');script.src='/admin-public-buttons.js?v=20260813-1';script.defer=true;document.head.appendChild(script)}
+  }
+
   function convertLoadedCopy(){
     const intent=read(INTENT_KEY,null),editing=read(EDITING_KEY,null);
     if(!intent?.path||editing?.path!==intent.path)return false;
@@ -56,6 +61,7 @@
   }
 
   function init(){
+    loadUiUpgrades();
     if(convertLoadedCopy())return;
     showBanner();
     addButtons();
