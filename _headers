@@ -6,8 +6,18 @@
   Cache-Control: public, max-age=0, must-revalidate
 /pomodoro.js
   Cache-Control: public, max-age=0, must-revalidate
+/public-plan-links.js
+  Cache-Control: public, max-age=0, must-revalidate
+/public-mobile-responsive.css
+  Cache-Control: public, max-age=0, must-revalidate
+/public-plan-buttons.js
+  Cache-Control: public, max-age=0, must-revalidate
 /plano.html
   Cache-Control: public, max-age=0, must-revalidate
 
 /admin-duplicate-plan.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-public-buttons.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-layout-links.css
   Cache-Control: public, max-age=0, must-revalidate
