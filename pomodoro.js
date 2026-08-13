@@ -81,6 +81,17 @@
     if(state.running){if(state.endAt<=Date.now())completePhase();startTicker()}else render();
   }
 
-  function init(){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build,{once:true});else build()}
+  function mountWhenPlanIsReady(){
+    let attempts=0;
+    const tryMount=()=>{
+      if(document.getElementById('pomodoro-flexivel'))return;
+      const anchor=document.getElementById('hoje')||document.getElementById('rotina-estudos')||document.getElementById('plano');
+      if(anchor){build();return}
+      attempts+=1;
+      if(attempts<120)setTimeout(tryMount,100);
+    };
+    tryMount();
+  }
+  function init(){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mountWhenPlanIsReady,{once:true});else mountWhenPlanIsReady()}
   init();
 })();
