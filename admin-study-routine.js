@@ -102,7 +102,7 @@
     card.innerHTML=`
       <div class="section-title"><div><h3>2B. Rotina e janelas de estudo</h3><p class="helper">Use quando o aluno estuda em horários diferentes, no transporte, em pequenos blocos ou em escala 12x36.</p></div></div>
       <div class="mpc-routine-mode-grid">
-        ${modeButton('continuous','Estudo contínuo','Mantém o modelo atual de horas seguidas por dia.')}
+        ${modeButton('continuous','Estudo contínuo','Mantém uma sessão diária contínua com distribuição pedagógica inteligente.')}
         ${modeButton('fragmented','Estudo fracionado','Distribui o estudo em vários blocos ao longo do dia.')}
         ${modeButton('12x36','Escala 12x36','Alterna automaticamente dias de trabalho e folga.')}
         ${modeButton('custom','Rotina personalizada','Permite montar janelas livres para uma rotina específica.')}
@@ -148,7 +148,7 @@
     const box=$('#mpcRoutineBuilder');if(!box)return;
     $$('.mpc-routine-mode').forEach(b=>b.classList.toggle('active',b.dataset.routineMode===config.mode));
     if(config.mode==='continuous'){
-      box.innerHTML='<p class="helper">O sistema continuará usando “horas disponíveis por dia”, “horário inicial” e “dias disponíveis” exatamente como já funciona hoje.</p>';
+      box.innerHTML='<p class="helper">O sistema usa as horas disponíveis como teto diário, preserva uma sessão contínua e distribui teoria, exercícios e revisões ao longo do período sem exigir o preenchimento de toda a capacidade.</p>';
       updateCapacity();return;
     }
     if(config.mode==='12x36'){
@@ -202,7 +202,8 @@
   function updateCapacity(){
     const box=$('#mpcRoutineCapacity');if(!box)return;
     if(config.mode==='continuous'){
-      box.innerHTML='<strong>Capacidade:</strong> controlada pelos campos atuais da área administrativa.';
+      const minutes=Math.max(15,Math.round((Number($('#adminHoursPerDay')?.value)||0)*60));
+      box.innerHTML=`<strong>Capacidade diária máxima:</strong> ${formatMinutes(minutes)}. No estudo contínuo, esse tempo funciona como teto: o cronograma pode planejar menos quando houver espaço suficiente até a prova.`;
       return;
     }
     const sum=arr=>arr.reduce((s,w)=>s+(Number(w.duration)||0),0);
@@ -312,12 +313,18 @@
     const range=planRange();if(!range)return [];
     const weekdays=studyWeekdays();
     const slots=[];
+    const continuousMinutes=Math.max(15,Math.round((Number($('#adminHoursPerDay')?.value)||1)*60));
+    const continuousStart=timeMinutes($('#adminPreferredStart')?.value||'19:00')??1140;
     for(let d=new Date(range.start);d<=range.end;d=addDays(d,1)){
       const key=dateKey(d);
       if(simDateKeys.has(key))continue;
       if(config.mode!=='12x36'){
         const mondayIndex=(d.getDay()+6)%7;
         if(!weekdays.has(mondayIndex))continue;
+      }
+      if(config.mode==='continuous'){
+        slots.push({date:key,start:continuousStart,duration:continuousMinutes,used:0,moment:'Sessão contínua',environment:'',types:[],videoOnly:false});
+        continue;
       }
       const windows=effectiveWindowsForDate(d);
       let fallback=timeMinutes($('#adminPreferredStart')?.value||'19:00')??1140;
@@ -360,8 +367,10 @@
     if(item.remaining<=0)return false;
     const category=taskCategory(item.task);
     if(!allowed(slot,category))return false;
-    if(item.task?.date&&date<String(item.task.date))return false;
     const key=topicKey(item.task);
+    const originalDate=String(item.task?.date||'');
+    const earliest=category==='theory'?(ctx.topicEarliest.get(key)||originalDate):originalDate;
+    if(earliest&&date<earliest)return false;
     if(category==='exercise'&&ctx.theoryTopics.has(key)){
       const completed=ctx.theoryCompleted.get(key);
       if(!completed)return false;
@@ -375,13 +384,13 @@
     const start=slot.start+slot.used;
     const segment={
       ...item.task,
-      id:`${item.task.id||'task'}-fr-${item.segments.length+1}-${Math.random().toString(36).slice(2,6)}`,
+      id:`${item.task.id||'task'}-${config.mode==='continuous'?'ct':'fr'}-${item.segments.length+1}-${Math.random().toString(36).slice(2,6)}`,
       date:slot.date,
       day:(parseDate(slot.date).getDay()+6)%7,
       start:timeText(start),
       end:timeText(start+take),
       activity:activityFor(item.task,slot),
-      notes:noteFor(slot,config.mode),
+      notes:config.mode==='continuous'?String(item.task.notes||''):noteFor(slot,config.mode),
       done:false,
       _source:item
     };
@@ -394,7 +403,7 @@
   function appendPartLabels(items){
     items.forEach(item=>{
       const n=item.segments.length;
-      if(n>1)item.segments.forEach((seg,i)=>{seg.activity=`${seg.activity} · Parte ${i+1} de ${n}`});
+      if(n>1)item.segments.forEach((seg,i)=>{seg.activity=`${seg.activity} · Bloco ${i+1} de ${n}`});
     });
   }
 
@@ -411,9 +420,16 @@
 
     const byDate=groupSlotsByDate(usableSlots);
     const theoryTopics=new Set(items.filter(x=>taskCategory(x.task)==='theory').map(x=>topicKey(x.task)));
-    const ctx={theoryTopics,theoryCompleted:new Map(),theoryStarted:new Set(),newTheoryTopicsToday:0,maxNewTopicsPerDay:Number.isFinite(options.maxNewTopicsPerDay)?options.maxNewTopicsPerDay:2,exerciseGapDays:Number(options.exerciseGapDays)||0};
+    const topicEarliest=new Map();
+    items.forEach(item=>{
+      const key=topicKey(item.task),date=String(item.task?.date||'');
+      if(date&&(!topicEarliest.has(key)||date<topicEarliest.get(key)))topicEarliest.set(key,date);
+    });
+    const ctx={theoryTopics,topicEarliest,theoryCompleted:new Map(),theoryStarted:new Set(),newTheoryTopicsToday:0,maxNewTopicsPerDay:Number.isFinite(options.maxNewTopicsPerDay)?options.maxNewTopicsPerDay:2,exerciseGapDays:Number(options.exerciseGapDays)||0};
     const created=[];
     let lastDate='';
+    const minDaily=config.mode==='continuous'?30:15;
+    const minSegment=config.mode==='continuous'?15:10;
     for(let di=0;di<usableDates.length&&remainingMinutes(items)>0;di++){
       const date=usableDates[di];
       const daySlots=byDate.get(date)||[];
@@ -422,7 +438,7 @@
       const remainingSlots=usableDates.slice(di).flatMap(d=>byDate.get(d)||[]);
       const remainingCapacity=Math.max(1,capacityFor(remainingSlots,['theory','exercise','study']));
       const dayCapacity=capacityFor(daySlots,['theory','exercise','study']);
-      const proportional=Math.max(15,Math.ceil(remainingNeed*dayCapacity/remainingCapacity));
+      const proportional=Math.max(minDaily,Math.ceil(remainingNeed*dayCapacity/remainingCapacity));
       let dayBudget=options.fillMode==='capacity'?dayCapacity:Math.min(dayCapacity,proportional);
       let placedToday=0;
       for(const slot of daySlots){
@@ -436,7 +452,7 @@
           const key=topicKey(item.task);
           if(category==='theory'&&!ctx.theoryStarted.has(key)){ctx.theoryStarted.add(key);ctx.newTheoryTopicsToday++;}
           const take=Math.min(item.remaining,slotRemaining(slot),dayBudget-placedToday);
-          if(take<10&&item.remaining>take)break;
+          if(take<minSegment&&item.remaining>take)break;
           if(take<=0)break;
           created.push(createSegment(item,slot,take));
           placedToday+=take;
@@ -475,7 +491,6 @@
   }
 
   function transformGeneratedSchedule(){
-    if(config.mode==='continuous')return false;
     const status=$('#adminGenerationStatus');
     if(!status||!status.classList.contains('success'))return false;
     let state;
@@ -487,7 +502,7 @@
     const acquisition=state.tasks.filter(t=>!String(t.type||'').toLowerCase().includes('simulado')&&taskCategory(t)!=='review').sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.start||'').localeCompare(String(b.start||'')));
     const simDates=new Set(simulations.map(t=>t.date).filter(Boolean));
     const slots=buildSlots(simDates);
-    if(!slots.length){alert('A rotina escolhida não possui janelas disponíveis dentro do período do cronograma.');return false}
+    if(!slots.length){alert('Não há períodos de estudo disponíveis dentro do intervalo configurado. O cronograma original foi mantido.');return false}
 
     const range=planRange();
     const strategies=[
@@ -533,7 +548,18 @@
     merged.forEach((t,i)=>t.cycleOrder=i);
     state.tasks=merged;
     state.studyRoutine=clone(config);
-    state.studyRoutine.planningStrategy={capacityIsCeiling:true,preferredMaxNewTheoryTopicsPerDay:2,appliedMaxNewTheoryTopicsPerDay:chosen.strategy.maxNewTopicsPerDay,theoryBeforeExercises:true,exerciseNextDayPreferred:chosen.strategy.exerciseGapDays===1,preserveOriginalTaskDateAsEarliest:true,protectedFinalReviewDays:chosen.protectedDays,distributionMode:chosen.strategy.label};
+    state.studyRoutine.planningStrategy={
+      capacityIsCeiling:true,
+      preferredMaxNewTheoryTopicsPerDay:2,
+      appliedMaxNewTheoryTopicsPerDay:chosen.strategy.maxNewTopicsPerDay,
+      theoryBeforeExercises:true,
+      exerciseNextDayPreferred:chosen.strategy.exerciseGapDays===1,
+      preserveTopicEarliestDate:true,
+      repairTheoryBeforeExerciseByTopic:true,
+      protectedFinalReviewDays:chosen.protectedDays,
+      distributionMode:chosen.strategy.label,
+      continuousSessionPreserved:config.mode==='continuous'
+    };
     try{localStorage.setItem(STATE_KEY,JSON.stringify(state))}catch{return false}
     return true;
   }
@@ -561,18 +587,21 @@
     const btn=$('#adminGenerateScheduleBtn');if(!btn)return;
     btn.addEventListener('click',()=>syncBaseCapacityBeforeGenerate(),true);
     btn.addEventListener('click',()=>{
-      if(config.mode==='continuous')return;
       setTimeout(()=>{
         if(transformGeneratedSchedule()){
-          try{sessionStorage.setItem('mpcRoutineJustApplied','1')}catch{}
+          try{sessionStorage.setItem('mpcRoutineJustApplied',config.mode)}catch{}
           location.reload();
         }
       },80);
     });
     try{
-      if(sessionStorage.getItem('mpcRoutineJustApplied')==='1'){
+      const applied=sessionStorage.getItem('mpcRoutineJustApplied');
+      if(applied){
         sessionStorage.removeItem('mpcRoutineJustApplied');
-        setTimeout(()=>alert('Rotina de estudo aplicada ao cronograma. Os horários foram reorganizados conforme as janelas configuradas.'),250);
+        const message=applied==='continuous'
+          ?'Distribuição pedagógica inteligente aplicada ao estudo contínuo. A carga diária foi tratada como teto e o conteúdo foi reorganizado ao longo do período.'
+          :'Rotina de estudo aplicada ao cronograma. Os horários foram reorganizados conforme as janelas configuradas.';
+        setTimeout(()=>alert(message),250);
       }
     }catch{}
   }
