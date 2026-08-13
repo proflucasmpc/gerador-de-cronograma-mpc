@@ -8,3 +8,6 @@
   Cache-Control: public, max-age=0, must-revalidate
 /plano.html
   Cache-Control: public, max-age=0, must-revalidate
+
+/admin-duplicate-plan.js
+  Cache-Control: public, max-age=0, must-revalidate
