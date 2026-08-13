@@ -360,10 +360,13 @@
     if(item.remaining<=0)return false;
     const category=taskCategory(item.task);
     if(!allowed(slot,category))return false;
+    if(item.task?.date&&date<String(item.task.date))return false;
     const key=topicKey(item.task);
     if(category==='exercise'&&ctx.theoryTopics.has(key)){
       const completed=ctx.theoryCompleted.get(key);
-      if(!completed||completed>=date)return false;
+      if(!completed)return false;
+      const gap=Number(ctx.exerciseGapDays)||0;
+      if(dayDiff(completed,date)<gap)return false;
     }
     if(category==='theory'&&!ctx.theoryStarted.has(key)&&ctx.newTheoryTopicsToday>=ctx.maxNewTopicsPerDay)return false;
     return true;
@@ -395,20 +398,20 @@
     });
   }
 
-  function scheduleAcquisition(items,slots,protectedDays){
+  function scheduleAcquisition(items,slots,protectedDays,options={}){
     const allDates=[...new Set(slots.map(s=>s.date))].sort();
-    if(!allDates.length)return {ok:false,created:[],lastDate:''};
+    if(!allDates.length)return {ok:false,created:[],lastDate:'',remaining:remainingMinutes(items)};
     const range=planRange();
     const protectedStart=range?.exam?dateKey(addDays(range.exam,-protectedDays)):'';
     const usableDates=protectedStart?allDates.filter(d=>d<protectedStart):allDates;
     const usableSlots=slots.filter(s=>usableDates.includes(s.date));
     const need=remainingMinutes(items);
     const theoreticalCapacity=capacityFor(usableSlots,['theory','exercise','study']);
-    if(theoreticalCapacity<need)return {ok:false,created:[],lastDate:'',capacity:theoreticalCapacity,need};
+    if(theoreticalCapacity<need)return {ok:false,created:[],lastDate:'',capacity:theoreticalCapacity,need,remaining:need-theoreticalCapacity,reason:'capacity'};
 
     const byDate=groupSlotsByDate(usableSlots);
     const theoryTopics=new Set(items.filter(x=>taskCategory(x.task)==='theory').map(x=>topicKey(x.task)));
-    const ctx={theoryTopics,theoryCompleted:new Map(),theoryStarted:new Set(),newTheoryTopicsToday:0,maxNewTopicsPerDay:2};
+    const ctx={theoryTopics,theoryCompleted:new Map(),theoryStarted:new Set(),newTheoryTopicsToday:0,maxNewTopicsPerDay:Number.isFinite(options.maxNewTopicsPerDay)?options.maxNewTopicsPerDay:2,exerciseGapDays:Number(options.exerciseGapDays)||0};
     const created=[];
     let lastDate='';
     for(let di=0;di<usableDates.length&&remainingMinutes(items)>0;di++){
@@ -419,55 +422,55 @@
       const remainingSlots=usableDates.slice(di).flatMap(d=>byDate.get(d)||[]);
       const remainingCapacity=Math.max(1,capacityFor(remainingSlots,['theory','exercise','study']));
       const dayCapacity=capacityFor(daySlots,['theory','exercise','study']);
-      let dayBudget=Math.min(dayCapacity,Math.max(15,Math.ceil(remainingNeed*dayCapacity/remainingCapacity)));
+      const proportional=Math.max(15,Math.ceil(remainingNeed*dayCapacity/remainingCapacity));
+      let dayBudget=options.fillMode==='capacity'?dayCapacity:Math.min(dayCapacity,proportional);
       let placedToday=0;
-
       for(const slot of daySlots){
         while(slotRemaining(slot)>0&&placedToday<dayBudget&&remainingMinutes(items)>0){
-          const index=items.findIndex(item=>itemEligible(item,slot,date,ctx));
-          if(index<0)break;
+          const eligible=items.map((item,index)=>({item,index,category:taskCategory(item.task)})).filter(x=>itemEligible(x.item,slot,date,ctx));
+          if(!eligible.length)break;
+          eligible.sort((a,b)=>{const rank=c=>c==='exercise'?0:c==='theory'?1:2;const ra=rank(a.category),rb=rank(b.category);if(ra!==rb)return ra-rb;return a.item.originalIndex-b.item.originalIndex;});
+          const index=eligible[0].index;
           const item=items[index];
           const category=taskCategory(item.task);
           const key=topicKey(item.task);
-          if(category==='theory'&&!ctx.theoryStarted.has(key)){
-            ctx.theoryStarted.add(key);
-            ctx.newTheoryTopicsToday++;
-          }
+          if(category==='theory'&&!ctx.theoryStarted.has(key)){ctx.theoryStarted.add(key);ctx.newTheoryTopicsToday++;}
           const take=Math.min(item.remaining,slotRemaining(slot),dayBudget-placedToday);
+          if(take<10&&item.remaining>take)break;
           if(take<=0)break;
           created.push(createSegment(item,slot,take));
           placedToday+=take;
           lastDate=date;
-          if(item.remaining<=0){
-            if(category==='theory')ctx.theoryCompleted.set(key,date);
-            items.splice(index,1);
-          }
+          if(item.remaining<=0){if(category==='theory')ctx.theoryCompleted.set(key,date);items.splice(index,1);}
         }
       }
     }
-    return {ok:remainingMinutes(items)===0,created,lastDate,remaining:remainingMinutes(items)};
+    return {ok:remainingMinutes(items)===0,created,lastDate,remaining:remainingMinutes(items),capacity:theoreticalCapacity,need};
   }
 
-  function scheduleReviews(items,slots,acquisitionLastDate,preferredStart){
+  function scheduleReviews(items,slots,preferredStart){
     const created=[];
-    if(!items.length)return {ok:true,created,lastDate:acquisitionLastDate};
-    const candidates=slots.filter(s=>slotRemaining(s)>0&&(!acquisitionLastDate||s.date>acquisitionLastDate));
-    const preferred=candidates.filter(s=>!preferredStart||s.date>=preferredStart);
-    const need=remainingMinutes(items);
-    const ordered=capacityFor(preferred,['review'])>=need?preferred:candidates;
-    let lastDate=acquisitionLastDate||'';
-    for(const slot of ordered){
-      while(slotRemaining(slot)>0&&items.length){
-        const index=items.findIndex(item=>allowed(slot,'review')&&item.remaining>0);
-        if(index<0)break;
-        const item=items[index];
-        const take=Math.min(item.remaining,slotRemaining(slot));
-        if(take<=0)break;
-        created.push(createSegment(item,slot,take));
-        lastDate=slot.date;
-        if(item.remaining<=0)items.splice(index,1);
+    if(!items.length)return {ok:true,created,lastDate:''};
+    const available=slots.filter(s=>slotRemaining(s)>0);
+    const validForItem=(item,slot)=>allowed(slot,'review')&&item.remaining>0&&(!item.task?.date||slot.date>=String(item.task.date));
+    const preferred=available.filter(s=>!preferredStart||s.date>=preferredStart);
+    const scheduleInto=pool=>{
+      for(const slot of pool){
+        while(slotRemaining(slot)>0&&items.length){
+          const index=items.findIndex(item=>validForItem(item,slot));
+          if(index<0)break;
+          const item=items[index];
+          const take=Math.min(item.remaining,slotRemaining(slot));
+          if(take<10&&item.remaining>take)break;
+          if(take<=0)break;
+          created.push(createSegment(item,slot,take));
+          if(item.remaining<=0)items.splice(index,1);
+        }
       }
-    }
+    };
+    scheduleInto(preferred);
+    if(items.length)scheduleInto(available.filter(s=>!preferred.includes(s)));
+    const lastDate=created.length?created[created.length-1].date:'';
     return {ok:items.length===0,created,lastDate,remaining:remainingMinutes(items)};
   }
 
@@ -481,44 +484,46 @@
 
     const simulations=state.tasks.filter(t=>String(t.type||'').toLowerCase().includes('simulado'));
     const reviews=state.tasks.filter(t=>taskCategory(t)==='review');
-    const acquisition=state.tasks.filter(t=>!String(t.type||'').toLowerCase().includes('simulado')&&taskCategory(t)!=='review')
-      .sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.start||'').localeCompare(String(b.start||'')));
+    const acquisition=state.tasks.filter(t=>!String(t.type||'').toLowerCase().includes('simulado')&&taskCategory(t)!=='review').sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.start||'').localeCompare(String(b.start||'')));
     const simDates=new Set(simulations.map(t=>t.date).filter(Boolean));
     const slots=buildSlots(simDates);
     if(!slots.length){alert('A rotina escolhida não possui janelas disponíveis dentro do período do cronograma.');return false}
 
-    const acquisitionItems=acquisition.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
-    const reviewItems=reviews.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
     const range=planRange();
-    let protectedDays=range?.exam?7:0;
-    let acquisitionResult=null;
-    while(protectedDays>=0){
-      const clonedSlots=slots.map(s=>({...s,used:0}));
-      const clonedItems=acquisition.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
-      const trial=scheduleAcquisition(clonedItems,clonedSlots,protectedDays);
-      if(trial.ok){acquisitionResult={trial,slots:clonedSlots,items:clonedItems};break}
-      protectedDays=protectedDays>3?protectedDays-1:(protectedDays===3?0:-1);
+    const strategies=[
+      {maxNewTopicsPerDay:2,exerciseGapDays:1,fillMode:'proportional',label:'preferencial'},
+      {maxNewTopicsPerDay:2,exerciseGapDays:0,fillMode:'proportional',label:'2 tópicos/dia'},
+      {maxNewTopicsPerDay:3,exerciseGapDays:0,fillMode:'proportional',label:'3 tópicos/dia'},
+      {maxNewTopicsPerDay:999,exerciseGapDays:0,fillMode:'capacity',label:'capacidade máxima'}
+    ];
+    let chosen=null;
+    let bestFailure=null;
+    for(let protectedDays=range?.exam?7:0;protectedDays>=0;protectedDays=protectedDays>3?protectedDays-1:(protectedDays===3?0:-1)){
+      for(const strategy of strategies){
+        const trialSlots=slots.map(s=>({...s,used:0}));
+        const trialItems=acquisition.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
+        const trial=scheduleAcquisition(trialItems,trialSlots,protectedDays,strategy);
+        if(!bestFailure||trial.remaining<bestFailure.trial.remaining)bestFailure={trial,protectedDays,strategy};
+        if(trial.ok){chosen={protectedDays,strategy};break}
+      }
+      if(chosen)break;
     }
-    if(!acquisitionResult){
-      alert('A rotina configurada não comporta teoria e exercícios com uma distribuição segura até a prova. O cronograma original foi mantido. Aumente as janelas ou reduza o conteúdo.');
+    if(!chosen){
+      const missing=Math.max(0,bestFailure?.trial?.remaining||0);
+      const suffix=missing?` Faltam aproximadamente ${formatMinutes(missing)} de capacidade compatível.`:'';
+      alert(`Mesmo usando toda a capacidade disponível, não foi possível encaixar teoria e exercícios até a prova sem quebrar a ordem pedagógica. O cronograma original foi mantido.${suffix}`);
       return false;
     }
 
     const actualItems=acquisition.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
     const actualSlots=slots.map(s=>({...s,used:0}));
-    const acquisitionScheduled=scheduleAcquisition(actualItems,actualSlots,protectedDays);
-    if(!acquisitionScheduled.ok){
-      alert('Não foi possível distribuir teoria e exercícios respeitando os pré-requisitos. O cronograma original foi mantido.');
-      return false;
-    }
+    const acquisitionScheduled=scheduleAcquisition(actualItems,actualSlots,chosen.protectedDays,chosen.strategy);
+    if(!acquisitionScheduled.ok){alert(`Não foi possível concluir a distribuição. Faltam aproximadamente ${formatMinutes(acquisitionScheduled.remaining||0)}. O cronograma original foi mantido.`);return false}
 
-    const reviewStart=range?.exam&&protectedDays>0?dateKey(addDays(range.exam,-protectedDays)):'';
+    const reviewStart=range?.exam&&chosen.protectedDays>0?dateKey(addDays(range.exam,-chosen.protectedDays)):'';
     const actualReviewItems=reviews.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
-    const reviewScheduled=scheduleReviews(actualReviewItems,actualSlots,acquisitionScheduled.lastDate,reviewStart);
-    if(!reviewScheduled.ok){
-      alert(`A teoria e os exercícios couberam, mas faltam aproximadamente ${formatMinutes(reviewScheduled.remaining||0)} para as revisões. O cronograma original foi mantido. Ajuste as janelas ou o período.`);
-      return false;
-    }
+    const reviewScheduled=scheduleReviews(actualReviewItems,actualSlots,reviewStart);
+    if(!reviewScheduled.ok){alert(`A teoria e os exercícios couberam, mas faltam aproximadamente ${formatMinutes(reviewScheduled.remaining||0)} para as revisões. O cronograma original foi mantido.`);return false}
 
     const created=[...acquisitionScheduled.created,...reviewScheduled.created];
     const usedSources=[...new Set(created.map(x=>x._source).filter(Boolean))];
@@ -528,12 +533,7 @@
     merged.forEach((t,i)=>t.cycleOrder=i);
     state.tasks=merged;
     state.studyRoutine=clone(config);
-    state.studyRoutine.planningStrategy={
-      capacityIsCeiling:true,
-      maxNewTheoryTopicsPerDay:2,
-      theoryBeforeExercises:true,
-      protectedFinalReviewDays:protectedDays
-    };
+    state.studyRoutine.planningStrategy={capacityIsCeiling:true,preferredMaxNewTheoryTopicsPerDay:2,appliedMaxNewTheoryTopicsPerDay:chosen.strategy.maxNewTopicsPerDay,theoryBeforeExercises:true,exerciseNextDayPreferred:chosen.strategy.exerciseGapDays===1,preserveOriginalTaskDateAsEarliest:true,protectedFinalReviewDays:chosen.protectedDays,distributionMode:chosen.strategy.label};
     try{localStorage.setItem(STATE_KEY,JSON.stringify(state))}catch{return false}
     return true;
   }
