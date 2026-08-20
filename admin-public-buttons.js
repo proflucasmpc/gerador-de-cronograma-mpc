@@ -21,11 +21,7 @@
     }));
   }
   function publishableItems(items){
-    return cleanDraftItems(items).map(item=>({
-      ...item,
-      text:item.text.trim(),
-      url:normalizeUrl(item.url).slice(0,1000)
-    })).filter(item=>item.text&&item.url);
+    return cleanDraftItems(items).map(item=>({...item,text:item.text.trim(),url:normalizeUrl(item.url).slice(0,1000)})).filter(item=>item.text&&item.url);
   }
   function save(items){
     const clean=cleanDraftItems(items);
@@ -66,14 +62,8 @@
     list.querySelectorAll('input,select').forEach(el=>{const persist=()=>{const row=el.closest('[data-index]'),i=Number(row?.dataset.index),arr=read();if(!arr[i])return;arr[i][el.dataset.field]=el.value;save(arr)};el.addEventListener('input',persist);el.addEventListener('change',persist)});
     list.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>{const arr=read();arr.splice(Number(btn.dataset.remove),1);save(arr);render()}));
   }
-  function loadPreEditalModule(){
-    if(document.querySelector('script[data-mpc-pre-edital]'))return;
-    const script=document.createElement('script');script.src='/admin-pre-edital.js?v=20260820-1';script.defer=true;script.dataset.mpcPreEdital='1';document.body.appendChild(script);
-  }
-  function loadCapacityFillModule(){
-    if(document.querySelector('script[data-mpc-capacity-fill]'))return;
-    const script=document.createElement('script');script.src='/admin-capacity-fill.js?v=20260820-1';script.defer=true;script.dataset.mpcCapacityFill='1';document.body.appendChild(script);
-  }
+  function loadPreEditalModule(){if(document.querySelector('script[data-mpc-pre-edital]'))return;const script=document.createElement('script');script.src='/admin-pre-edital.js?v=20260820-1';script.defer=true;script.dataset.mpcPreEdital='1';document.body.appendChild(script)}
+  function loadCapacityFillModule(){if(document.querySelector('script[data-mpc-capacity-fill]'))return;const script=document.createElement('script');script.src='/admin-capacity-fill.js?v=20260820-2';script.defer=true;script.dataset.mpcCapacityFill='1';document.body.appendChild(script)}
   function init(){restore();manager();render();loadPreEditalModule();loadCapacityFillModule()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
