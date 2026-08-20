@@ -37,15 +37,27 @@
   }
   function normalize(items){return (Array.isArray(items)?items:[]).filter(x=>x&&x.enabled!==false&&String(x.text||'').trim()&&String(x.url||'').trim()).slice(0,8).map(x=>({text:String(x.text).trim(),url:String(x.url).trim(),style:['primary','navy','gold','green','outline'].includes(x.style)?x.style:'primary'}))}
   function render(items){
-    const links=normalize(items);document.getElementById('mpcCustomLinksSection')?.remove();if(!links.length)return;
-    const hero=document.getElementById('plano')||document.querySelector('.hero');if(!hero)return;
+    const links=normalize(items);document.getElementById('mpcCustomLinksSection')?.remove();if(!links.length)return false;
+    const hero=document.getElementById('plano')||document.querySelector('.hero');if(!hero)return false;
     const section=document.createElement('section');section.id='mpcCustomLinksSection';section.className='mpc-custom-links-section';
     section.innerHTML=`<div class="mpc-custom-links-panel"><div class="mpc-custom-links-copy"><strong>Acessos rápidos</strong><span>Links selecionados pelo professor para este planejamento.</span></div><div class="mpc-custom-links-actions">${links.map(x=>`<a class="mpc-custom-link ${esc(x.style)}" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.text)}</a>`).join('')}</div></div>`;
     hero.insertAdjacentElement('afterend',section);
+    return true;
+  }
+  async function mountWhenReady(items){
+    for(let attempt=0;attempt<100;attempt++){
+      if(render(items))return true;
+      await new Promise(resolve=>setTimeout(resolve,100));
+    }
+    return false;
   }
   async function init(){
     addStyles();if(!id)return;
-    try{const r=await fetch(`/api/plan-buttons?id=${encodeURIComponent(id)}`,{cache:'no-store'});if(!r.ok)return;const data=await r.json();render(data.buttons)}catch{}
+    try{
+      const r=await fetch(`/api/plan-buttons?id=${encodeURIComponent(id)}`,{cache:'no-store'});if(!r.ok)return;
+      const data=await r.json();
+      await mountWhenReady(data.buttons);
+    }catch{}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
