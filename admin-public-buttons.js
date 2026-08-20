@@ -66,6 +66,10 @@
     list.querySelectorAll('input,select').forEach(el=>{const persist=()=>{const row=el.closest('[data-index]'),i=Number(row?.dataset.index),arr=read();if(!arr[i])return;arr[i][el.dataset.field]=el.value;save(arr)};el.addEventListener('input',persist);el.addEventListener('change',persist)});
     list.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>{const arr=read();arr.splice(Number(btn.dataset.remove),1);save(arr);render()}));
   }
-  function init(){restore();manager();render()}
+  function loadPreEditalModule(){
+    if(document.querySelector('script[data-mpc-pre-edital]'))return;
+    const script=document.createElement('script');script.src='/admin-pre-edital.js?v=20260820-1';script.defer=true;script.dataset.mpcPreEdital='1';document.body.appendChild(script);
+  }
+  function init(){restore();manager();render();loadPreEditalModule()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
