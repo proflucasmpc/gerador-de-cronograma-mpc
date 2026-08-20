@@ -3,6 +3,14 @@ import { getStore } from '@netlify/blobs';
 const STORE_NAME = 'mpc-public-plans';
 const MAX_BODY_BYTES = 900_000;
 const ID_RE = /^[A-Z0-9]{10}$/;
+const CONTEST_STAGES = new Set([
+  'estudo_vagas',
+  'previsao_orcamentaria',
+  'autorizacao',
+  'comissao_organizadora',
+  'escolha_banca',
+  'publicacao_edital'
+]);
 
 function json(data, status = 200) {
   return Response.json(data, {
@@ -24,6 +32,11 @@ function cleanMultiline(value, max = 16000) {
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ')
     .trim()
     .slice(0, max);
+}
+
+function cleanContestStage(value) {
+  const stage = cleanString(value, 80);
+  return CONTEST_STAGES.has(stage) ? stage : '';
 }
 
 function cleanRoutineWindow(window = {}) {
@@ -68,13 +81,17 @@ function cleanTask(task = {}) {
 function sanitizePlan(input = {}) {
   const tasks = Array.isArray(input.tasks) ? input.tasks.slice(0, 1600).map(cleanTask) : [];
   if (!tasks.length) throw new Error('O cronograma não possui atividades.');
+  const examDateUnknown = Boolean(input.examDateUnknown);
+  const contestStage = examDateUnknown ? cleanContestStage(input.contestStage) : '';
   return {
-    version: 4,
+    version: 5,
     studentName: cleanString(input.studentName, 180),
     createdByUser: Boolean(input.createdByUser),
     creatorName: cleanString(input.creatorName || input.studentName, 180),
     goal: cleanString(input.goal, 300),
-    examDate: cleanString(input.examDate, 20),
+    examDate: examDateUnknown ? '' : cleanString(input.examDate, 20),
+    examDateUnknown,
+    contestStage,
     startDate: cleanString(input.startDate, 20),
     endDate: cleanString(input.endDate, 20),
     hoursPerDay: Math.max(0, Math.min(24, Number(input.hoursPerDay) || 0)),
