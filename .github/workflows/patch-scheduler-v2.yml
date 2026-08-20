@@ -12,8 +12,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Aplicar patch base
-        run: python .github/scripts/patch_scheduler_v2.py
       - name: Distribuir revisoes ao longo do cronograma
         run: python .github/scripts/fix_review_distribution.py
       - name: Validar JavaScript
