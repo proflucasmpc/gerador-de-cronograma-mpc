@@ -2,18 +2,18 @@
   'use strict';
   const STATE_KEY='geradorCronogramaMpcData';
   const ROUTINE_KEY='mpcAdminStudyRoutineV1';
-  const PENDING_KEY='mpcCapacityFillPendingV1';
-  const APPLIED_KEY='mpcCapacityFillAppliedV1';
+  const PENDING_KEY='mpcCapacityFillPendingV2';
+  const APPLIED_KEY='mpcCapacityFillAppliedV2';
+  const FAILURE_KEY='mpcCapacityFillFailureV2';
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>[...r.querySelectorAll(s)];
-
   const readJson=(key,fallback=null)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}};
-  const parseDate=value=>{const d=new Date(`${value}T12:00:00`);return Number.isNaN(d.getTime())?null:d};
+  const parseDate=value=>{const d=new Date(`${String(value||'').slice(0,10)}T12:00:00`);return Number.isNaN(d.getTime())?null:d};
   const dateKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
   const timeMinutes=value=>{const m=String(value||'').match(/^(\d{1,2}):(\d{2})$/);return m?Number(m[1])*60+Number(m[2]):null};
   const timeText=n=>`${String(Math.floor(n/60)%24).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
-  const taskMinutes=task=>{const a=timeMinutes(task.start),b=timeMinutes(task.end);return a!==null&&b!==null&&b>a?b-a:30};
+  const taskMinutes=task=>{const a=timeMinutes(task?.start),b=timeMinutes(task?.end);return a!==null&&b!==null&&b>a?b-a:30};
   const cat=task=>{const text=`${task?.type||''} ${task?.activity||''}`.toLocaleLowerCase('pt-BR');if(/simulado/.test(text))return'simulation';if(/revis|resumo|flashcard|lei seca/.test(text))return'review';if(/exerc|quest/.test(text))return'exercise';if(/teoria|videoaula/.test(text))return'theory';return'study'};
   function cleanActivity(activity=''){
     return String(activity||'')
@@ -65,110 +65,146 @@
     if(mode==='continuous')return String(original||'');
     return [mode==='custom'?'Rotina personalizada':mode==='fragmented'?'Estudo fracionado':mode==='12x36'?'Escala 12x36':'Rotina personalizada',slot.moment,slot.environment].filter(Boolean).join(' · ');
   }
-  function buildSlots(state,config,simDates){
+  function subtractBusy(window,busy){
+    let pieces=[[window.start,window.start+window.duration]];
+    for(const [bs,be] of busy){
+      pieces=pieces.flatMap(([a,b])=>{
+        if(be<=a||bs>=b)return[[a,b]];
+        const out=[];if(bs>a)out.push([a,Math.min(bs,b)]);if(be<b)out.push([Math.max(be,a),b]);return out;
+      });
+    }
+    return pieces.filter(([a,b])=>b-a>=10).map(([a,b])=>({...window,start:a,duration:b-a,used:0}));
+  }
+  function buildSlots(state,config,simDates,reviews){
     const start=parseDate(state.startDate||$('#adminStartDate')?.value);if(!start)return[];
     const exam=parseDate(state.examDate||$('#adminExamDate')?.value);
     let end=parseDate(state.endDate||'');
     if(!end){const days=Math.max(1,Number($('#adminPlanDays')?.value)||1);end=addDays(start,days-1)}
     if(exam&&end>=exam)end=addDays(exam,-1);
     const weekdays=weekdaySet(state),slots=[];
+    const busyByDate=new Map();
+    for(const review of reviews){
+      const a=timeMinutes(review.start),b=timeMinutes(review.end);if(!review.date||a===null||b===null||b<=a)continue;
+      if(!busyByDate.has(review.date))busyByDate.set(review.date,[]);busyByDate.get(review.date).push([a,b]);
+    }
+    for(const busy of busyByDate.values())busy.sort((a,b)=>a[0]-b[0]);
     for(let d=new Date(start);d<=end;d=addDays(d,1)){
       const key=dateKey(d);if(simDates.has(key))continue;
       const mondayIndex=(d.getDay()+6)%7;
       if(config?.mode!=='12x36'&&!weekdays.has(mondayIndex))continue;
-      for(const w of windowsForDate(d,config,state))slots.push({date:key,start:w.start,duration:w.duration,used:0,...w});
+      const busy=busyByDate.get(key)||[];
+      for(const w of windowsForDate(d,config,state))slots.push(...subtractBusy({...w,used:0},busy).map(piece=>({date:key,...piece})));
     }
     return slots;
   }
   function segment(item,slot,take,mode){
     const start=slot.start+slot.used;
-    const seg={...item.task,id:`${item.task.id||'task'}-fill-${item.parts+1}-${Math.random().toString(36).slice(2,6)}`,date:slot.date,day:(parseDate(slot.date).getDay()+6)%7,start:timeText(start),end:timeText(start+take),notes:noteFor(slot,mode,item.task.notes),done:false};
-    if(slot.videoOnly){const body=cleanActivity(seg.activity),c=cat(seg);seg.activity=c==='theory'?`Videoaula de teoria - ${body}`:c==='exercise'?`Videoaula de exercícios corrigidos - ${body}`:c==='review'?`Videoaula de revisão ou resumo - ${body}`:`Videoaula - ${body}`}
+    const seg={...item.task,id:`${item.task.id||'task'}-fill2-${item.parts+1}-${Math.random().toString(36).slice(2,6)}`,date:slot.date,day:(parseDate(slot.date).getDay()+6)%7,start:timeText(start),end:timeText(start+take),notes:noteFor(slot,mode,item.task.notes),done:false};
+    if(slot.videoOnly){const body=cleanActivity(seg.activity),c=cat(seg);seg.activity=c==='theory'?`Videoaula de teoria - ${body}`:c==='exercise'?`Videoaula de exercícios corrigidos - ${body}`:`Videoaula - ${body}`}
     slot.used+=take;item.remaining-=take;item.parts+=1;item.segments.push(seg);return seg;
   }
-  function distribute(state,config){
+  function redistribute(state,config){
     const simulations=state.tasks.filter(t=>cat(t)==='simulation');
+    const reviews=state.tasks.filter(t=>cat(t)==='review');
+    const acquisitionTasks=state.tasks.filter(t=>!['simulation','review'].includes(cat(t)));
     const simDates=new Set(simulations.map(t=>t.date).filter(Boolean));
-    const slots=buildSlots(state,config,simDates);if(!slots.length)return null;
-    const items=state.tasks.filter(t=>cat(t)!=='simulation').map((task,index)=>({task,category:cat(task),key:topicKey(task),remaining:taskMinutes(task),originalIndex:index,due:String(task.date||''),parts:0,segments:[]}));
+    const slots=buildSlots(state,config,simDates,reviews);if(!slots.length)return{ok:false,reason:'Não há janelas livres de estudo no período.'};
+    const items=acquisitionTasks.map((task,index)=>({task,category:cat(task),key:topicKey(task),remaining:taskMinutes(task),originalIndex:index,parts:0,segments:[]}));
     const theoryKeys=new Set(items.filter(x=>x.category==='theory').map(x=>x.key));
     const theoryComplete=new Map();
+    const theoryStarted=new Set();
     const created=[];
     const dates=[...new Set(slots.map(s=>s.date))].sort();
     const byDate=new Map(dates.map(d=>[d,slots.filter(s=>s.date===d)]));
     const totalRemaining=()=>items.reduce((s,x)=>s+Math.max(0,x.remaining),0);
-    const eligible=(item,slot,date,allowSameDayExercise=false)=>{
+    const acquisitionMinutes=totalRemaining();
+    const freeMinutes=slots.reduce((s,x)=>s+x.duration,0);
+    if(freeMinutes<acquisitionMinutes)return{ok:false,reason:`A aquisição exige ${Math.round(acquisitionMinutes/60*10)/10}h e restaram ${Math.round(freeMinutes/60*10)/10}h após reservar revisões e simulados.`};
+    const keyDone=key=>!items.some(x=>x.category==='theory'&&x.key===key&&x.remaining>0);
+    const markTheoryComplete=(key,date)=>{if(keyDone(key))theoryComplete.set(key,date)};
+    const eligible=(item,slot,date,mode='any')=>{
       if(item.remaining<=0||!allows(slot,item.category))return false;
-      if(item.category==='review'&&item.due&&date<item.due)return false;
       if(item.category==='exercise'&&theoryKeys.has(item.key)){
         const completed=theoryComplete.get(item.key);if(!completed)return false;
-        if(!allowSameDayExercise&&completed===date)return false;
+        if(mode==='previous'&&completed>=date)return false;
       }
       return true;
     };
-    const placeFrom=(slot,date,predicate,allowSameDayExercise=false)=>{
-      let progressed=false;
-      while(slot.used<slot.duration){
-        const candidates=items.filter(x=>predicate(x)&&eligible(x,slot,date,allowSameDayExercise)).sort((a,b)=>a.originalIndex-b.originalIndex);
-        if(!candidates.length)break;
-        const item=candidates[0],take=Math.min(item.remaining,slot.duration-slot.used);
-        if(take<10&&item.remaining>take)break;
-        created.push(segment(item,slot,take,config?.mode||'continuous'));progressed=true;
-        if(item.remaining<=0&&item.category==='theory')theoryComplete.set(item.key,date);
-      }
-      return progressed;
+    const placeOne=(slot,date,predicate,mode='any')=>{
+      const candidates=items.filter(x=>predicate(x)&&eligible(x,slot,date,mode)).sort((a,b)=>a.originalIndex-b.originalIndex);
+      if(!candidates.length)return false;
+      const item=candidates[0],remainingSlot=slot.duration-slot.used,take=Math.min(item.remaining,remainingSlot);
+      if(take<10&&item.remaining>take)return false;
+      const wasNewTheory=item.category==='theory'&&!theoryStarted.has(item.key);
+      if(wasNewTheory)theoryStarted.add(item.key);
+      created.push(segment(item,slot,take,config?.mode||'continuous'));
+      if(item.category==='theory'&&item.remaining<=0)markTheoryComplete(item.key,date);
+      return {item,wasNewTheory};
     };
     for(const date of dates){
       let newTheoryCount=0;
-      const daySlots=byDate.get(date)||[];
-      for(const slot of daySlots){
-        // 1) Use the beginning of the day for exercises whose theory was completed earlier.
-        placeFrom(slot,date,x=>x.category==='exercise',false);
-        // 2) Then do reviews that are already due.
-        placeFrom(slot,date,x=>x.category==='review',false);
-        // 3) Introduce up to two new theory topics as the preferred daily limit.
-        while(slot.used<slot.duration&&newTheoryCount<2){
-          const before=created.length;
-          const candidates=items.filter(x=>x.category==='theory'&&x.remaining>0&&!theoryComplete.has(x.key)&&allows(slot,'theory')).sort((a,b)=>a.originalIndex-b.originalIndex);
-          if(!candidates.length)break;
-          const item=candidates[0],wasNew=item.parts===0,take=Math.min(item.remaining,slot.duration-slot.used);
-          if(take<10&&item.remaining>take)break;
-          created.push(segment(item,slot,take,config?.mode||'continuous'));
-          if(wasNew)newTheoryCount++;
-          if(item.remaining<=0)theoryComplete.set(item.key,date);
-          if(created.length===before)break;
+      for(const slot of byDate.get(date)||[]){
+        while(slot.used<slot.duration&&totalRemaining()>0){
+          let result=false;
+          // 1. Exercícios de conteúdos cuja teoria terminou em dia anterior.
+          result=placeOne(slot,date,x=>x.category==='exercise','previous');
+          if(result)continue;
+          // 2. Até dois tópicos novos por dia como preferência pedagógica.
+          if(newTheoryCount<2){
+            result=placeOne(slot,date,x=>x.category==='theory'&&!theoryStarted.has(x.key));
+            if(result){if(result.wasNewTheory)newTheoryCount++;continue}
+          }
+          // 3. Exercícios de reforço, inclusive após teoria concluída no mesmo dia.
+          result=placeOne(slot,date,x=>x.category==='exercise','any');
+          if(result)continue;
+          // 4. Continuação de teoria já iniciada ou outros blocos de estudo.
+          result=placeOne(slot,date,x=>x.category==='theory'&&theoryStarted.has(x.key));
+          if(result)continue;
+          result=placeOne(slot,date,x=>x.category==='study');
+          if(result)continue;
+          // 5. Se ainda houver tempo e conteúdo pendente, novo tópico adicional em vez de deixar a janela ociosa.
+          result=placeOne(slot,date,x=>x.category==='theory');
+          if(result)continue;
+          break;
         }
-        // 4) Fill remaining time with exercises, including same-day reinforcement when appropriate.
-        placeFrom(slot,date,x=>x.category==='exercise',true);
-        // 5) Use any due reviews/other study blocks before adding more new content.
-        placeFrom(slot,date,x=>x.category==='review'||x.category==='study',true);
-        // 6) If there is still unused capacity and substantial pending content, allow extra theory instead of wasting the study window.
-        if(slot.used<slot.duration&&totalRemaining()>0)placeFrom(slot,date,x=>x.category==='theory',true);
       }
     }
-    if(totalRemaining()>0)return null;
-    const usedSources=items.filter(x=>x.parts>1);usedSources.forEach(item=>item.segments.forEach((seg,i)=>{seg.activity=`${seg.activity} · Bloco ${i+1} de ${item.segments.length}`}));
-    const merged=[...created,...simulations].sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.start||'').localeCompare(String(b.start||'')));
+    const missing=totalRemaining();
+    if(missing>0)return{ok:false,reason:`Restaram aproximadamente ${Math.round(missing/60*10)/10}h de teoria/exercícios sem encaixe compatível.`};
+    items.filter(x=>x.parts>1).forEach(item=>item.segments.forEach((seg,i)=>{seg.activity=`${seg.activity} · Bloco ${i+1} de ${item.segments.length}`}));
+    const merged=[...created,...reviews,...simulations].sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.start||'').localeCompare(String(b.start||'')));
     merged.forEach((t,i)=>t.cycleOrder=i);
-    return merged;
+    return{ok:true,tasks:merged,stats:{acquisitionMinutes,freeMinutes,firstDate:created[0]?.date||'',lastDate:created.at(-1)?.date||''}};
   }
   function apply(){
-    const state=readJson(STATE_KEY,null);if(!state||!Array.isArray(state.tasks)||!state.tasks.length)return false;
+    const state=readJson(STATE_KEY,null);if(!state||!Array.isArray(state.tasks)||!state.tasks.length)return{ok:false,reason:'O cronograma ainda não foi encontrado no armazenamento local.'};
     const config=readJson(ROUTINE_KEY,{mode:'continuous'});
-    const redistributed=distribute(state,config);if(!redistributed)return false;
-    state.tasks=redistributed;
+    const result=redistribute(state,config);if(!result.ok)return result;
+    state.tasks=result.tasks;
     state.studyRoutine=state.studyRoutine||config;
-    state.studyRoutine.planningStrategy={...(state.studyRoutine.planningStrategy||{}),capacityIsCeiling:true,preferredMaxNewTheoryTopicsPerDay:2,fillAvailableStudyWindow:true,priorityOrder:['exercícios pendentes','revisões vencidas','até 2 tópicos novos','exercícios de reforço','tópico novo adicional se houver tempo livre'],unusedCapacityAvoidedWhenPendingContent:true};
-    try{localStorage.setItem(STATE_KEY,JSON.stringify(state));sessionStorage.setItem(APPLIED_KEY,'1');return true}catch{return false}
+    state.studyRoutine.planningStrategy={...(state.studyRoutine.planningStrategy||{}),capacityIsCeiling:true,preferredMaxNewTheoryTopicsPerDay:2,fillAvailableStudyWindow:true,preserveScheduledReviews:true,priorityOrder:['exercícios pendentes','até 2 tópicos novos','exercícios de reforço','continuação de teoria','tópico novo adicional se houver tempo livre'],unusedCapacityAvoidedWhenPendingContent:true,capacityFillVersion:2};
+    try{localStorage.setItem(STATE_KEY,JSON.stringify(state));sessionStorage.setItem(APPLIED_KEY,JSON.stringify(result.stats||{}));sessionStorage.removeItem(FAILURE_KEY);return{ok:true}}catch{return{ok:false,reason:'Não foi possível salvar a redistribuição no navegador.'}}
+  }
+  function attemptAfterGeneration(tries=0){
+    const result=apply();
+    if(result.ok){sessionStorage.removeItem(PENDING_KEY);location.reload();return}
+    if(tries<12){setTimeout(()=>attemptAfterGeneration(tries+1),100);return}
+    sessionStorage.removeItem(PENDING_KEY);sessionStorage.setItem(FAILURE_KEY,result.reason||'A redistribuição não pôde ser concluída.');
   }
   function bind(){
-    $('#adminGenerateScheduleBtn')?.addEventListener('click',()=>{try{sessionStorage.setItem(PENDING_KEY,'1');sessionStorage.removeItem(APPLIED_KEY)}catch{}},true);
-    if(sessionStorage.getItem(PENDING_KEY)==='1'){
-      sessionStorage.removeItem(PENDING_KEY);
-      setTimeout(()=>{if(apply()){location.reload()}},220);
-    }else if(sessionStorage.getItem(APPLIED_KEY)==='1'){
-      sessionStorage.removeItem(APPLIED_KEY);
-      setTimeout(()=>alert('Capacidade diária reorganizada: o sistema mantém até 2 novos tópicos como preferência, mas usa o restante da janela com exercícios, revisões e, quando necessário, conteúdo adicional.'),260);
+    const btn=$('#adminGenerateScheduleBtn');
+    btn?.addEventListener('click',()=>{
+      try{sessionStorage.setItem(PENDING_KEY,'1');sessionStorage.removeItem(APPLIED_KEY);sessionStorage.removeItem(FAILURE_KEY)}catch{}
+      // Se o gerador principal não recarregar a página, ainda tentamos aplicar após ele concluir.
+      setTimeout(()=>{if(sessionStorage.getItem(PENDING_KEY)==='1')attemptAfterGeneration(0)},450);
+    },true);
+    if(sessionStorage.getItem(PENDING_KEY)==='1')setTimeout(()=>attemptAfterGeneration(0),120);
+    else if(sessionStorage.getItem(APPLIED_KEY)){
+      const stats=readJson(APPLIED_KEY,{});sessionStorage.removeItem(APPLIED_KEY);
+      setTimeout(()=>alert(`Capacidade diária reorganizada com sucesso. O sistema preservou as revisões e passou a usar as janelas disponíveis com teoria e exercícios até o limite configurado${stats.lastDate?`, concentrando a aquisição de conteúdo até ${new Date(`${stats.lastDate}T12:00:00`).toLocaleDateString('pt-BR')}`:''}.`),260);
+    }else if(sessionStorage.getItem(FAILURE_KEY)){
+      const reason=sessionStorage.getItem(FAILURE_KEY);sessionStorage.removeItem(FAILURE_KEY);
+      setTimeout(()=>alert(`A reorganização da capacidade diária não foi aplicada: ${reason}`),260);
     }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
