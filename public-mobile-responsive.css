@@ -40,7 +40,7 @@
 
   .hero{width:100%!important;margin:12px 0 18px!important;overflow:hidden!important}
   .hero-grid{width:100%!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important;padding:26px 18px 20px!important;overflow:hidden!important}
-  .hero-grid>*{min-width:0!important;max-width:100%!important}
+  .hero-grid>*{min-width:0!important;max-width:100%!important;width:100%!important}
   .hero-grid:before{left:18px!important;top:20px!important;height:30px!important;width:4px!important}
   .hero .eyebrow{padding-left:14px!important;font-size:10px!important;overflow-wrap:anywhere!important}
   .hero h1{max-width:100%!important;font-size:clamp(30px,9vw,38px)!important;line-height:1.01!important;margin:12px 0 14px!important;letter-spacing:-.02em!important;overflow-wrap:break-word!important;word-break:normal!important}
@@ -53,13 +53,15 @@
   .hero-actions .btn-primary,.hero-actions .btn-ghost,.hero-actions .btn-free{width:100%!important;min-width:0!important;min-height:46px!important;padding:11px 10px!important;font-size:12px!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important}
   .hero-actions .btn-free{grid-column:1/-1!important}
 
-  .hero-side{width:100%!important;margin:0!important}
-  .countdown-card{width:100%!important;max-width:100%!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;grid-template-areas:"label label" "number copy" "exam exam"!important;align-items:end!important;column-gap:14px!important;padding:14px 16px!important;border-radius:13px!important;overflow:hidden!important}
-  .countdown-card>small{grid-area:label!important;font-size:9px!important;margin:0 0 5px!important}
-  .countdown-number{grid-area:number!important;font-size:46px!important;line-height:.9!important;margin:0!important;white-space:nowrap!important}
-  .countdown-card>p{grid-area:copy!important;min-width:0!important;font-size:12px!important;line-height:1.25!important;padding-bottom:2px!important;overflow-wrap:anywhere!important}
-  .exam-strip{grid-area:exam!important;min-width:0!important;margin-top:10px!important;padding-top:9px!important;font-size:11px!important;gap:8px!important}
-  .exam-strip>*{min-width:0!important;overflow-wrap:anywhere!important}
+  .hero-side{width:100%!important;max-width:100%!important;margin:0!important;display:block!important;min-width:0!important}
+  .countdown-card{width:100%!important;max-width:100%!important;min-width:0!important;display:block!important;padding:16px!important;border-radius:13px!important;overflow:hidden!important}
+  .countdown-card>small{display:block!important;font-size:9px!important;margin:0 0 8px!important;line-height:1.25!important;white-space:normal!important;overflow-wrap:break-word!important}
+  .countdown-number{font-size:46px!important;line-height:.9!important;margin:0 0 5px!important;white-space:nowrap!important}
+  .countdown-card>p{display:block!important;width:100%!important;min-width:0!important;font-size:12px!important;line-height:1.35!important;margin:8px 0 0!important;padding:0!important;white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important}
+  .countdown-card .mpc-pre-edital-title{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;font-size:28px!important;line-height:1.08!important;margin:8px 0 10px!important;white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important}
+  .exam-strip{display:flex!important;width:100%!important;max-width:100%!important;min-width:0!important;margin-top:12px!important;padding-top:10px!important;font-size:11px!important;gap:8px!important;align-items:flex-start!important;justify-content:space-between!important;flex-wrap:wrap!important}
+  .exam-strip>*{min-width:0!important;max-width:100%!important;white-space:normal!important;word-break:normal!important;overflow-wrap:break-word!important}
+  .exam-strip strong{flex:1 1 160px!important;text-align:right!important}
 
   .section{width:100%!important;margin:20px 0!important;scroll-margin-top:116px!important;overflow:visible!important}
   .section-heading{max-width:100%!important;padding-left:12px!important;margin-bottom:12px!important}
@@ -102,7 +104,7 @@
 @media(max-width:430px){
   .topbar-inner{height:56px!important;padding-left:10px!important;padding-right:10px!important}
   .mentoria-fixed{top:56px!important}
-  .brand-logo{width:40px!important;height:40px!important}
+  .brand-logo{width:40px!important;height:40px!important;border-radius:10px!important}
   .brand-copy span:first-child{font-size:12px!important}
   .brand-copy span:last-child{font-size:11px!important}
   .header-generator-cta{flex-basis:145px!important;max-width:145px!important;font-size:8px!important;padding:8px 7px!important}
@@ -114,6 +116,8 @@
   .hero-actions{grid-template-columns:minmax(0,1fr)!important}
   .hero-actions .btn-free{grid-column:auto!important}
   .countdown-number{font-size:42px!important}
+  .countdown-card .mpc-pre-edital-title{font-size:26px!important}
+  .exam-strip strong{text-align:left!important;flex-basis:100%!important}
   .section-heading h2{font-size:25px!important}
   .mobile-nav a{font-size:8.5px!important}
 }
@@ -125,7 +129,7 @@
   .mentoria-copy strong{font-size:10px!important}
   .mentoria-cta{font-size:8px!important;padding:7px 8px!important}
   .hero h1{font-size:28px!important}
-  .countdown-card{column-gap:9px!important;padding:13px!important}
+  .countdown-card{padding:13px!important}
   .countdown-number{font-size:38px!important}
   .mobile-nav{left:5px!important;right:5px!important}
 }
