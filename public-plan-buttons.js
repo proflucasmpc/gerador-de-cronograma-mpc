@@ -45,7 +45,7 @@
   }
   async function init(){
     addStyles();if(!id)return;
-    try{const r=await fetch(`/api/plans?id=${encodeURIComponent(id)}`,{cache:'no-store'});if(!r.ok)return;const plan=await r.json();render(plan.publicPageButtons)}catch{}
+    try{const r=await fetch(`/api/plan-buttons?id=${encodeURIComponent(id)}`,{cache:'no-store'});if(!r.ok)return;const data=await r.json();render(data.buttons)}catch{}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
