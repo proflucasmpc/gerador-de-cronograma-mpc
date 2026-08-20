@@ -11,8 +11,24 @@
   const normalizeUrl=value=>{const raw=String(value||'').trim();if(!raw)return'';if(/^(https?:\/\/|mailto:|tel:)/i.test(raw))return raw;return `https://${raw}`};
   function readJson(key,fallback=null){try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}}
   function read(){const v=readJson(STORAGE_KEY,[]);return Array.isArray(v)?v.slice(0,MAX_BUTTONS):[]}
+  function cleanDraftItems(items){
+    return (items||[]).slice(0,MAX_BUTTONS).map((item,index)=>({
+      id:String(item?.id||`link-${Date.now()}-${index}`),
+      text:String(item?.text||'').slice(0,80),
+      url:String(item?.url||'').slice(0,1000),
+      style:cleanStyle(item?.style),
+      enabled:item?.enabled!==false
+    }));
+  }
+  function publishableItems(items){
+    return cleanDraftItems(items).map(item=>({
+      ...item,
+      text:item.text.trim(),
+      url:normalizeUrl(item.url).slice(0,1000)
+    })).filter(item=>item.text&&item.url);
+  }
   function save(items){
-    const clean=(items||[]).slice(0,MAX_BUTTONS).map((item,index)=>({id:String(item.id||`link-${Date.now()}-${index}`),text:String(item.text||'').trim().slice(0,80),url:normalizeUrl(item.url).slice(0,1000),style:cleanStyle(item.style),enabled:item.enabled!==false})).filter(item=>item.text||item.url);
+    const clean=cleanDraftItems(items);
     try{localStorage.setItem(STORAGE_KEY,JSON.stringify(clean))}catch{}
     try{const draft=readJson(DRAFT_KEY,null);if(draft&&typeof draft==='object'){draft.publicPageButtons=clean;localStorage.setItem(DRAFT_KEY,JSON.stringify(draft))}}catch{}
     try{const state=readJson(STATE_KEY,null);if(state&&typeof state==='object'){state.publicPageButtons=clean;localStorage.setItem(STATE_KEY,JSON.stringify(state))}}catch{}
@@ -24,9 +40,11 @@
   async function saveToPublishedPage(){
     const editing=readJson(EDITING_KEY,null);const id=planId(editing?.path);const key=String(editing?.manageKey||'');
     if(!id||!key)return alert('Primeiro carregue ou publique a página do aluno que receberá estes botões.');
+    const items=publishableItems(read());
+    if(!items.length)return alert('Preencha pelo menos um botão com texto e link antes de salvar.');
     const button=$('#mpcSavePublicButtons');if(button){button.disabled=true;button.textContent='Salvando...'}
     try{
-      const response=await fetch(`/api/plan-buttons?id=${encodeURIComponent(id)}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Plan-Key':key},body:JSON.stringify({buttons:save(read())})});
+      const response=await fetch(`/api/plan-buttons?id=${encodeURIComponent(id)}`,{method:'PUT',headers:{'Content-Type':'application/json','X-Plan-Key':key},body:JSON.stringify({buttons:items})});
       const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Não foi possível salvar os botões.');
       alert(`Botões da página de ${editing.name||'aluno'} atualizados com sucesso.`);
     }catch(error){alert(error.message||'Erro ao salvar os botões da página.')}finally{if(button){button.disabled=false;button.textContent='Salvar botões nesta página'}}
@@ -36,8 +54,8 @@
     box=document.createElement('section');box.id='mpcPublicButtonsManager';box.className='mpc-public-buttons-manager';
     box.innerHTML=`<div class="mpc-public-buttons-manager-head"><div><h4>Botões da página do aluno</h4><p>Crie até ${MAX_BUTTONS} links para materiais, cursos, grupos ou outras páginas. Cada botão pode ter texto, link e estilo próprios.</p></div><div class="mpc-public-buttons-actions"><button type="button" id="mpcImportPdfButton">Importar botão do PDF</button><button type="button" id="mpcAddPublicButton">+ Adicionar botão</button><button type="button" class="primary" id="mpcSavePublicButtons">Salvar botões nesta página</button></div></div><div id="mpcPublicButtonsList" class="mpc-public-buttons-list"></div><div class="mpc-public-buttons-note">O botão configurado no bloco acima continua exclusivo do PDF. Estes botões aparecem na página online do aluno.</div>`;
     anchor.insertAdjacentElement('afterend',box);
-    $('#mpcAddPublicButton',box)?.addEventListener('click',()=>{const items=read();if(items.length>=MAX_BUTTONS)return alert(`É possível adicionar até ${MAX_BUTTONS} botões por página.`);items.push({id:`link-${Date.now()}`,text:'',url:'',style:'primary',enabled:true});save(items);render()});
-    $('#mpcImportPdfButton',box)?.addEventListener('click',()=>{const text=String($('#adminPdfButtonText')?.value||'').trim(),url=String($('#adminPdfButtonUrl')?.value||'').trim();if(!text||!url)return alert('Preencha primeiro o texto e o link do botão do PDF.');const items=read();if(items.length>=MAX_BUTTONS)return alert(`É possível adicionar até ${MAX_BUTTONS} botões por página.`);if(items.some(x=>x.text===text&&normalizeUrl(x.url)===normalizeUrl(url)))return alert('Este botão já está na lista.');items.push({id:`link-${Date.now()}`,text,url,style:'primary',enabled:true});save(items);render()});
+    $('#mpcAddPublicButton',box)?.addEventListener('click',()=>{const items=read();if(items.length>=MAX_BUTTONS)return alert(`É possível adicionar até ${MAX_BUTTONS} botões por página.`);items.push({id:`link-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,text:'',url:'',style:'primary',enabled:true});save(items);render()});
+    $('#mpcImportPdfButton',box)?.addEventListener('click',()=>{const text=String($('#adminPdfButtonText')?.value||'').trim(),url=String($('#adminPdfButtonUrl')?.value||'').trim();if(!text||!url)return alert('Preencha primeiro o texto e o link do botão do PDF.');const items=read();if(items.length>=MAX_BUTTONS)return alert(`É possível adicionar até ${MAX_BUTTONS} botões por página.`);if(items.some(x=>String(x.text||'').trim()===text&&normalizeUrl(x.url)===normalizeUrl(url)))return alert('Este botão já está na lista.');items.push({id:`link-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,text,url,style:'primary',enabled:true});save(items);render()});
     $('#mpcSavePublicButtons',box)?.addEventListener('click',saveToPublishedPage);
     return box;
   }
@@ -45,7 +63,7 @@
     const box=manager();if(!box)return;const list=$('#mpcPublicButtonsList',box),items=read();
     if(!items.length){list.innerHTML='<div class="mpc-public-buttons-empty">Nenhum botão configurado para a página do aluno.</div>';return}
     list.innerHTML=items.map((item,index)=>`<div class="mpc-public-button-row" data-index="${index}"><label>Texto<input type="text" data-field="text" maxlength="80" value="${esc(item.text)}" placeholder="Ex.: Acesse todos os materiais"></label><label>Link<input type="url" data-field="url" value="${esc(item.url)}" placeholder="https://..."></label><label>Estilo<select data-field="style"><option value="primary" ${item.style==='primary'?'selected':''}>Azul destaque</option><option value="navy" ${item.style==='navy'?'selected':''}>Azul-marinho</option><option value="gold" ${item.style==='gold'?'selected':''}>Dourado</option><option value="green" ${item.style==='green'?'selected':''}>Verde</option><option value="outline" ${item.style==='outline'?'selected':''}>Contorno</option></select></label><button type="button" class="remove" data-remove="${index}">Remover</button></div>`).join('');
-    list.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>{const row=el.closest('[data-index]'),i=Number(row?.dataset.index),arr=read();if(!arr[i])return;arr[i][el.dataset.field]=el.value;save(arr)}));
+    list.querySelectorAll('input,select').forEach(el=>{const persist=()=>{const row=el.closest('[data-index]'),i=Number(row?.dataset.index),arr=read();if(!arr[i])return;arr[i][el.dataset.field]=el.value;save(arr)};el.addEventListener('input',persist);el.addEventListener('change',persist)});
     list.querySelectorAll('[data-remove]').forEach(btn=>btn.addEventListener('click',()=>{const arr=read();arr.splice(Number(btn.dataset.remove),1);save(arr);render()}));
   }
   function init(){restore();manager();render()}
