@@ -4,6 +4,7 @@
   const id=location.pathname.match(/\/plano\/([A-Z0-9]{10})/i)?.[1]?.toUpperCase()||'';
   const STAGE_LABELS={estudo_vagas:'Estudo de vagas',previsao_orcamentaria:'Previsão orçamentária',autorizacao:'Autorização',comissao_organizadora:'Comissão organizadora',escolha_banca:'Escolha da banca',publicacao_edital:'Publicação do edital'};
   function loadMobileStyles(){if(document.querySelector('link[href*="public-mobile-responsive.css"]'))return;const link=document.createElement('link');link.rel='stylesheet';link.href='/public-mobile-responsive.css?v=20260820-2';document.head.appendChild(link)}
+  function loadPublicButtons(){if(document.querySelector('script[data-mpc-public-buttons]')||document.querySelector('script[src*="public-plan-buttons.js"]'))return;const script=document.createElement('script');script.src='/public-plan-buttons.js?v=20260820-4';script.dataset.mpcPublicButtons='1';document.head.appendChild(script)}
   function styles(){if(document.getElementById('mpcPublicLinksStyles'))return;const s=document.createElement('style');s.id='mpcPublicLinksStyles';s.textContent=`.mpc-pre-edital-title{font-family:Georgia,"Times New Roman",serif;font-size:30px;line-height:1.08;margin:14px 0 8px;color:#fff}`;document.head.appendChild(s)}
   function ptDate(value){if(!value)return'—';const d=new Date(`${value}T12:00:00`);return Number.isNaN(d.getTime())?'—':d.toLocaleDateString('pt-BR')}
   function applyPreEdital(plan){
@@ -21,7 +22,7 @@
     const final=document.querySelector('.final-banner p');if(final)final.textContent='Acompanhe seu planejamento, avance bloco a bloco e mantenha a constância enquanto o concurso evolui para as próximas etapas.';
   }
   async function init(){
-    loadMobileStyles();styles();if(!id)return;
+    loadMobileStyles();loadPublicButtons();styles();if(!id)return;
     try{const planResponse=await fetch(`/api/plans?id=${encodeURIComponent(id)}`,{cache:'no-store'});if(planResponse.ok){const plan=await planResponse.json();applyPreEdital(plan)}}catch{}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
