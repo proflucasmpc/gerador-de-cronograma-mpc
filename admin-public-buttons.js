@@ -70,6 +70,10 @@
     if(document.querySelector('script[data-mpc-pre-edital]'))return;
     const script=document.createElement('script');script.src='/admin-pre-edital.js?v=20260820-1';script.defer=true;script.dataset.mpcPreEdital='1';document.body.appendChild(script);
   }
-  function init(){restore();manager();render();loadPreEditalModule()}
+  function loadCapacityFillModule(){
+    if(document.querySelector('script[data-mpc-capacity-fill]'))return;
+    const script=document.createElement('script');script.src='/admin-capacity-fill.js?v=20260820-1';script.defer=true;script.dataset.mpcCapacityFill='1';document.body.appendChild(script);
+  }
+  function init(){restore();manager();render();loadPreEditalModule();loadCapacityFillModule()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
