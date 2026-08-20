@@ -3533,7 +3533,7 @@
       const fits=preview.requiredMinutes<=preview.availableMinutes;
       label.className=`helper ${fits?'admin-capacity-ok':'admin-capacity-error'}`;
       const reserved=adminReservedReviewDays(draft,preview.window);
-      label.textContent=`Período: ${preview.window.days} dias corridos, ${preview.studyDates.length} dias de estudo e ${preview.simDates.length} dias exclusivos de simulado. Capacidade aproximada: ${formatHours(preview.availableMinutes)}; atividades previstas: ${preview.units.length}, com cerca de ${formatHours(preview.requiredMinutes)}.${reserved?` Os últimos ${reserved} dia(s) do período serão priorizados para revisões, questões e simulados.`:''}${preview.examEveProtected?' O simulado completo que cairia na véspera da prova será substituído automaticamente por preparação leve.':''}${fits?' O plano cabe no período e será distribuído ao longo das datas disponíveis.':' O plano não cabe no período com as configurações atuais.'}`;
+      label.textContent=`Período: ${preview.window.days} dias corridos, ${preview.studyDates.length} dias de estudo e ${preview.simDates.length} dias exclusivos de simulado. Capacidade aproximada: ${formatHours(preview.availableMinutes)}; atividades previstas: ${preview.units.length}, com cerca de ${formatHours(preview.requiredMinutes)}.${reserved?` As revisões normais serão distribuídas ao longo do ciclo; os últimos ${reserved} dia(s) serão protegidos para reta final, questões e simulados.`:''}${preview.examEveProtected?' O simulado completo que cairia na véspera da prova será substituído automaticamente por preparação leve.':''}${fits?' O plano cabe no período e será distribuído ao longo das datas disponíveis.':' O plano não cabe no período com as configurações atuais.'}`;
       renderAdminDistributionPreview(preview);
     }
 
@@ -3554,8 +3554,9 @@
         : [];
       const contentDates=regularDates.length?regularDates:allStudyDates;
 
-      const regularUnits=allUnits.filter(unit=>!adminIsRevisionUnit(unit));
-      const reviewUnits=allUnits.filter(adminIsRevisionUnit);
+      // Mantém teoria, exercícios e revisões na sequência pedagógica original.
+      // As revisões comuns acompanham o avanço do conteúdo em vez de serem acumuladas na reta final.
+      const sequencedUnits=[...allUnits];
       const lastByTopic=new Map();
       const usedByDate=new Map();
       const countByDate=new Map();
@@ -3600,12 +3601,10 @@
         return null;
       };
 
-      const regularError=distribute(regularUnits,contentDates);
-      if(regularError) return regularError;
-
-      const revisionDates=finalDates.length?finalDates:contentDates.slice(Math.max(0,contentDates.length-Math.min(7,contentDates.length)));
-      const reviewError=distribute(reviewUnits,revisionDates);
-      if(reviewError) return reviewError;
+      // Distribui o ciclo completo antes da reta final: teoria -> exercícios -> revisões intermediárias.
+      // Os últimos dias continuam protegidos e não viram um depósito de todas as revisões do cronograma.
+      const sequenceError=distribute(sequencedUnits,contentDates);
+      if(sequenceError) return sequenceError;
 
       preview.simDates.forEach((date,simulationIndex)=>{
         if(draft.examDate&&localDateKey(date)===draft.examDate) return;

@@ -535,10 +535,11 @@
     const acquisitionScheduled=scheduleAcquisition(actualItems,actualSlots,chosen.protectedDays,chosen.strategy);
     if(!acquisitionScheduled.ok){alert(`Não foi possível concluir a distribuição. Faltam aproximadamente ${formatMinutes(acquisitionScheduled.remaining||0)}. O cronograma original foi mantido.`);return false}
 
-    const reviewStart=range?.exam&&chosen.protectedDays>0?dateKey(addDays(range.exam,-chosen.protectedDays)):'';
+    // As datas-base das revisões já acompanham o avanço dos conteúdos.
+    // Aqui apenas adaptamos essas revisões às janelas reais do aluno, sem concentrá-las nos últimos dias.
     const actualReviewItems=reviews.map((task,index)=>({task,remaining:durationOf(task),originalIndex:index,segments:[]}));
-    const reviewScheduled=scheduleReviews(actualReviewItems,actualSlots,reviewStart);
-    if(!reviewScheduled.ok){alert(`A teoria e os exercícios couberam, mas faltam aproximadamente ${formatMinutes(reviewScheduled.remaining||0)} para as revisões. O cronograma original foi mantido.`);return false}
+    const reviewScheduled=scheduleReviews(actualReviewItems,actualSlots,'');
+    if(!reviewScheduled.ok){alert(`A teoria e os exercícios couberam, mas faltam aproximadamente ${formatMinutes(reviewScheduled.remaining||0)} para as revisões distribuídas. O cronograma original foi mantido.`);return false}
 
     const created=[...acquisitionScheduled.created,...reviewScheduled.created];
     const usedSources=[...new Set(created.map(x=>x._source).filter(Boolean))];
@@ -556,6 +557,7 @@
       exerciseNextDayPreferred:chosen.strategy.exerciseGapDays===1,
       preserveTopicEarliestDate:true,
       repairTheoryBeforeExerciseByTopic:true,
+      routineReviewsDistributed:true,
       protectedFinalReviewDays:chosen.protectedDays,
       distributionMode:chosen.strategy.label,
       continuousSessionPreserved:config.mode==='continuous'
