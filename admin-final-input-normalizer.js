@@ -48,7 +48,7 @@
     return dates.map((d,index)=>{
       const source=subjects[index%Math.max(1,subjects.length)];
       const name=bySubject&&subjects.length?String(source?.name||source||'Matéria'):'Simulado completo';
-      return{id:`sim-v6-${dateKey(d)}-${index}`,day:dayIndex(d),date:dateKey(d),cycleOrder:0,start:toTime(start),end:toTime(start+duration),subject:bySubject?`Simulado - ${name}`:'Simulado completo',activity:bySubject?`Simulado por matéria - ${name}`:`Simulado completo - ${state.goal||''}`,type:bySubject?'Simulado por matéria':'Simulado completo',notes:'O simulado ocupa somente este horário; o restante do dia continua disponível para estudo.',done:false};
+      return{id:`sim-v7-${dateKey(d)}-${index}`,day:dayIndex(d),date:dateKey(d),cycleOrder:0,start:toTime(start),end:toTime(start+duration),subject:bySubject?`Simulado - ${name}`:'Simulado completo',activity:bySubject?`Simulado por matéria - ${name}`:`Simulado completo - ${state.goal||''}`,type:bySubject?'Simulado por matéria':'Simulado completo',notes:'Dia reservado exclusivamente para a realização do simulado. Não há estudo regular programado nesta data.',done:false};
     });
   }
 
@@ -65,10 +65,10 @@
     });
     const sims=currentSimulations(state);
     state.tasks=[...tasks,...sims];
-    state.adminPersonalization={...(state.adminPersonalization||{}),simulationCount:sims.length,simulationScheduleRebuilt:true,reviewDatesReleased:true};
-    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),reviewDatesAreAdvisory:true,simulationScheduleRebuilt:true,finalInputNormalizerVersion:6}};
+    state.adminPersonalization={...(state.adminPersonalization||{}),simulationCount:sims.length,simulationScheduleRebuilt:true,simulationDaysExclusive:true,reviewDatesReleased:true};
+    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),reviewDatesAreAdvisory:true,simulationScheduleRebuilt:true,simulationDaysExclusive:true,finalInputNormalizerVersion:7}};
     save(STATE_KEY,state);
-    try{sessionStorage.setItem('mpcFinalInputNormalizerStatsV6',JSON.stringify({reviewsReleased,oldSimulationsRemoved,simulationsCreated:sims.length}))}catch{}
+    try{sessionStorage.setItem('mpcFinalInputNormalizerStatsV7',JSON.stringify({reviewsReleased,oldSimulationsRemoved,simulationsCreated:sims.length}))}catch{}
     return true;
   }
 
