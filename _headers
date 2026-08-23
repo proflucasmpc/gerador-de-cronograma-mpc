@@ -25,6 +25,8 @@
   Cache-Control: public, max-age=0, must-revalidate
 /admin-simulation-capacity.js
   Cache-Control: public, max-age=0, must-revalidate
+/admin-simulation-selection-guard.js
+  Cache-Control: public, max-age=0, must-revalidate
 /admin-update-sync.js
   Cache-Control: public, max-age=0, must-revalidate
 /admin-publish-guard.js
