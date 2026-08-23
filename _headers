@@ -27,6 +27,8 @@
   Cache-Control: public, max-age=0, must-revalidate
 /admin-final-consolidation.js
   Cache-Control: public, max-age=0, must-revalidate
+/admin-new-plan-button.js
+  Cache-Control: public, max-age=0, must-revalidate
 /admin-simulation-capacity.js
   Cache-Control: public, max-age=0, must-revalidate
 /admin-simulation-selection-guard.js
