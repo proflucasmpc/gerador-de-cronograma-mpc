@@ -24,15 +24,8 @@
     if(exam){const eve=addDays(exam,-1);if(end>eve)end=eve}
     return{start,end,exam};
   }
-
-  function selectedStudyDays(){
-    return new Set($$('#adminAvailableDays input:checked').map(input=>Number(input.value)).filter(n=>n>=0&&n<=6));
-  }
-
-  function selectedSimulationDays(){
-    return $$('#adminSimulationWeekdays input[data-weekday]:checked').map(input=>Number(input.value)).filter(n=>n>=0&&n<=6);
-  }
-
+  function selectedStudyDays(){return new Set($$('#adminAvailableDays input:checked').map(input=>Number(input.value)).filter(n=>n>=0&&n<=6))}
+  function selectedSimulationDays(){return $$('#adminSimulationWeekdays input[data-weekday]:checked').map(input=>Number(input.value)).filter(n=>n>=0&&n<=6)}
   function routineWindows(dateValue){
     const routine=read(ROUTINE_KEY,null);
     const preferred=toMin($('#adminPreferredStart')?.value)||0;
@@ -40,21 +33,14 @@
     if(!routine||routine.mode==='continuous')return[{start:preferred,duration:Math.round(hours*60)}];
     let source=[];
     if(routine.mode==='12x36'){
-      const ref=date(routine.referenceDate||$('#adminStartDate')?.value);
-      if(!ref)return[];
+      const ref=date(routine.referenceDate||$('#adminStartDate')?.value);if(!ref)return[];
       const same=Math.abs(diffDays(ref,dateValue))%2===0;
       const status=same?(routine.referenceStatus||'work'):((routine.referenceStatus||'work')==='work'?'off':'work');
       source=status==='work'?(routine.workWindows||[]):(routine.offWindows||[]);
     }else source=routine.windows||[];
     let fallback=preferred;
-    return [...source].sort((a,b)=>(toMin(a.time)??9999)-(toMin(b.time)??9999)).map(w=>{
-      const start=toMin(w.time)??fallback;
-      const duration=Math.max(0,Number(w.duration)||30);
-      fallback=start+duration;
-      return{start,duration};
-    }).filter(w=>w.duration>0);
+    return [...source].sort((a,b)=>(toMin(a.time)??9999)-(toMin(b.time)??9999)).map(w=>{const start=toMin(w.time)??fallback,duration=Math.max(0,Number(w.duration)||30);fallback=start+duration;return{start,duration}}).filter(w=>w.duration>0);
   }
-
   function simulationDates(window){
     if(!$('#adminSimulationEnabled')?.checked)return[];
     const mode=$('#adminSimulationMode')?.value||'interval_days';
@@ -76,93 +62,55 @@
     }
     return all.filter((_,index)=>(index+1)%interval===0);
   }
-
-  function overlapMinutes(aStart,aEnd,bStart,bEnd){return Math.max(0,Math.min(aEnd,bEnd)-Math.max(aStart,bStart))}
-
   function calculate(){
     const window=planWindow();if(!window)return null;
-    const routine=read(ROUTINE_KEY,null);
-    const studyDays=selectedStudyDays();
-    const sims=simulationDates(window),simKeys=new Set(sims.map(key));
-    const simStart=toMin($('#adminSimulationStart')?.value)||0;
-    const simDuration=Math.max(0,num('#adminSimulationMinutes',0));
-    const simEnd=simStart+simDuration;
-    let configuredDates=0,residualDates=0,baseMinutes=0,studyMinutes=0,overlap=0;
+    const routine=read(ROUTINE_KEY,null),studyDays=selectedStudyDays(),sims=simulationDates(window),simKeys=new Set(sims.map(key));
+    let configuredDates=0,studyDates=0,baseMinutes=0,studyMinutes=0,reservedMinutes=0;
     for(let d=new Date(window.start);d<=window.end;d=addDays(d,1)){
       if(window.exam&&key(d)===key(window.exam))continue;
       if(routine?.mode!=='12x36'&&!studyDays.has(dayIndex(d)))continue;
       const windows=routineWindows(d);if(!windows.length)continue;
       configuredDates++;
-      let dayBase=0,dayStudy=0;
-      for(const w of windows){
-        dayBase+=w.duration;
-        const occupied=simKeys.has(key(d))?overlapMinutes(w.start,w.start+w.duration,simStart,simEnd):0;
-        overlap+=occupied;
-        dayStudy+=Math.max(0,w.duration-occupied);
-      }
-      baseMinutes+=dayBase;studyMinutes+=dayStudy;
-      if(dayStudy>=15)residualDates++;
+      const dayMinutes=windows.reduce((sum,w)=>sum+w.duration,0);
+      baseMinutes+=dayMinutes;
+      if(simKeys.has(key(d))){reservedMinutes+=dayMinutes;continue}
+      studyDates++;studyMinutes+=dayMinutes;
     }
-    return{window,sims,configuredDates,residualDates,baseMinutes,studyMinutes,overlap};
+    return{window,sims,configuredDates,studyDates,baseMinutes,studyMinutes,reservedMinutes};
   }
-
   function extractDemand(text=''){
     const count=String(text).match(/atividades previstas:\s*(\d+)/i)?.[1]||'';
     const hours=String(text).match(/com cerca de\s*(\d+)h(?:(\d{1,2}))?/i);
     return{count,minutes:hours?Number(hours[1])*60+Number(hours[2]||0):null};
   }
-
   function renderWeekdayWarning(calc){
-    let box=$('#mpcSimulationSelectionWarning');
-    const host=$('#adminSimulationWeekdayField')||$('#adminSimulationFields');
-    if(!host)return;
+    let box=$('#mpcSimulationSelectionWarning');const host=$('#adminSimulationWeekdayField')||$('#adminSimulationFields');if(!host)return;
     if(!box){box=document.createElement('div');box.id='mpcSimulationSelectionWarning';box.style.cssText='margin-top:10px;padding:10px 12px;border-radius:10px;font-size:.82rem;line-height:1.45;font-weight:750;';host.appendChild(box)}
     const enabled=$('#adminSimulationEnabled')?.checked,mode=$('#adminSimulationMode')?.value;
     if(!enabled||mode!=='weekday_occurrence'){box.hidden=true;return}
-    const selected=selectedSimulationDays(),interval=Math.max(1,Math.round(num('#adminSimulationInterval',1)));
-    box.hidden=false;
+    const selected=selectedSimulationDays(),interval=Math.max(1,Math.round(num('#adminSimulationInterval',1)));box.hidden=false;
     if(!selected.length){box.style.background='#fff3cd';box.style.color='#664d03';box.textContent='Selecione pelo menos um dia da semana para os simulados.';return}
     const names=selected.map(n=>DAY_NAMES[n]).join(', ');
-    if(selected.length>1){
-      box.style.background='#fff3cd';box.style.color='#664d03';
-      box.textContent=`Atenção: ${selected.length} dias estão marcados (${names}). A cada ${interval} semana${interval===1?'':'s'}, haverá simulado em TODOS esses dias. Se a intenção for simulado quinzenal apenas no domingo, deixe somente Domingo marcado e use “2” em Repetir a cada.`;
-    }else{
-      box.style.background='#e8f5e9';box.style.color='#1b5e20';
-      box.textContent=`Configuração: simulado em ${names}, a cada ${interval} semana${interval===1?'':'s'}. O simulado ocupa apenas o próprio horário; o restante da disponibilidade do dia continua utilizável.`;
-    }
-    if(calc&&calc.sims.length)box.textContent+=` Total previsto no período: ${calc.sims.length} simulado${calc.sims.length===1?'':'s'}.`;
+    if(selected.length>1){box.style.background='#fff3cd';box.style.color='#664d03';box.textContent=`Atenção: ${selected.length} dias estão marcados (${names}). A cada ${interval} semana${interval===1?'':'s'}, haverá simulado em TODOS esses dias.`}
+    else{box.style.background='#e8f5e9';box.style.color='#1b5e20';box.textContent=`Configuração: simulado em ${names}, a cada ${interval} semana${interval===1?'':'s'}. Cada data de simulado fica reservada exclusivamente para o simulado, sem estudo regular.`}
+    if(calc?.sims?.length)box.textContent+=` Total previsto no período: ${calc.sims.length} simulado${calc.sims.length===1?'':'s'}.`;
   }
-
   function rewritePreview(){
-    if(rewriting)return;
-    const label=$('#adminCapacityPreview');if(!label)return;
-    const current=String(label.textContent||'');
-    if(!/Período:/i.test(current))return;
-    const calc=calculate();if(!calc)return;
-    const demand=extractDemand(current);
-    const fits=demand.minutes==null?true:demand.minutes<=calc.studyMinutes;
-    rewriting=true;
+    if(rewriting)return;const label=$('#adminCapacityPreview');if(!label)return;const current=String(label.textContent||'');if(!/Período:/i.test(current))return;
+    const calc=calculate();if(!calc)return;const demand=extractDemand(current),fits=demand.minutes==null?true:demand.minutes<=calc.studyMinutes;rewriting=true;
     label.className=`helper ${fits?'admin-capacity-ok':'admin-capacity-error'}`;
     const activityText=demand.count?` Atividades previstas: ${demand.count}${demand.minutes!=null?`, com cerca de ${formatMinutes(demand.minutes)}`:''}.`:'';
-    const simText=calc.sims.length
-      ? ` Há ${calc.sims.length} data${calc.sims.length===1?'':'s'} com simulado; elas NÃO são dias automaticamente exclusivos. Os simulados ocupam ${formatMinutes(calc.overlap)} dentro das janelas de estudo e o restante do dia permanece disponível.`
-      : ' Não há simulados programados.';
-    label.textContent=`Período: ${Math.max(1,diffDays(calc.window.start,calc.window.end)+1)} dias corridos, ${calc.configuredDates} dias com disponibilidade configurada e ${calc.residualDates} dias com pelo menos 15 min de estudo após considerar simulados. Capacidade de estudo: ${formatMinutes(calc.studyMinutes)} após reservar os horários dos simulados.${activityText}${simText}${fits?' O plano cabe na capacidade calculada.':' O plano não cabe na capacidade calculada com as configurações atuais.'}`;
-    rewriting=false;
-    renderWeekdayWarning(calc);
+    const simText=calc.sims.length?` Há ${calc.sims.length} data${calc.sims.length===1?'':'s'} reservada${calc.sims.length===1?'':'s'} exclusivamente para simulados. Essas datas retiram ${formatMinutes(calc.reservedMinutes)} da capacidade regular de estudo.`:' Não há simulados programados.';
+    label.textContent=`Período: ${Math.max(1,diffDays(calc.window.start,calc.window.end)+1)} dias corridos, ${calc.studyDates} dias efetivos de estudo e ${calc.sims.length} dias exclusivos de simulado. Capacidade de estudo regular: ${formatMinutes(calc.studyMinutes)}.${activityText}${simText}${fits?' O plano cabe na capacidade calculada.':' O plano não cabe na capacidade calculada com as configurações atuais.'}`;
+    rewriting=false;renderWeekdayWarning(calc);
   }
-
   function rewriteGenerationStatus(){
-    const status=$('#adminGenerationStatus');if(!status)return;
-    const text=String(status.textContent||'');if(!/Cronograma criado para/i.test(text))return;
-    const calc=calculate();if(!calc)return;
-    let next=text.replace(/\d+\s+dias de estudo,\s*\d+\s+dias exclusivos para simulados/i,`${calc.configuredDates} dias com disponibilidade de estudo, ${calc.sims.length} datas com simulado`);
-    next=next.replace(/dias exclusivos para simulados/gi,'datas com simulado');
+    const status=$('#adminGenerationStatus');if(!status)return;const text=String(status.textContent||'');if(!/Cronograma criado para/i.test(text))return;const calc=calculate();if(!calc)return;
+    let next=text.replace(/\d+\s+dias de estudo,\s*\d+\s+dias exclusivos para simulados/i,`${calc.studyDates} dias de estudo, ${calc.sims.length} dias exclusivos para simulados`);
+    next=next.replace(/\d+\s+dias com disponibilidade de estudo,\s*\d+\s+datas com simulado/i,`${calc.studyDates} dias de estudo, ${calc.sims.length} dias exclusivos para simulados`);
     if(next!==text){rewriting=true;status.textContent=next;rewriting=false}
   }
-
   function refresh(){setTimeout(()=>{rewritePreview();rewriteGenerationStatus()},25)}
-
   function bind(){
     refresh();setTimeout(refresh,350);setTimeout(refresh,1000);
     document.addEventListener('input',event=>{if(event.target?.closest?.('#adminPanel'))refresh()},true);
