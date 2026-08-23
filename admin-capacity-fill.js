@@ -115,19 +115,6 @@
     if(mode==='continuous')return String(original||'');
     return [mode==='custom'?'Rotina personalizada':mode==='fragmented'?'Estudo fracionado':mode==='12x36'?'Escala 12x36':'Rotina personalizada',slot.moment,slot.environment].filter(Boolean).join(' · ');
   }
-  function subtractBusy(window,busy){
-    let pieces=[[window.start,window.start+window.duration]];
-    for(const [bs,be] of busy){
-      pieces=pieces.flatMap(([a,b])=>{
-        if(be<=a||bs>=b)return[[a,b]];
-        const out=[];
-        if(bs>a)out.push([a,Math.min(bs,b)]);
-        if(be<b)out.push([Math.max(be,a),b]);
-        return out;
-      });
-    }
-    return pieces.filter(([a,b])=>b-a>=MIN_BLOCK).map(([a,b])=>({...window,start:a,duration:b-a,used:0}));
-  }
   function buildSlots(state,routine,simulations){
     const start=parseDate(state.startDate||$('#adminStartDate')?.value);if(!start)return[];
     const exam=parseDate(state.examDate||$('#adminExamDate')?.value);
@@ -135,23 +122,14 @@
     if(!end){const days=Math.max(1,Number($('#adminPlanDays')?.value)||1);end=addDays(start,days-1)}
     if(exam&&end>=exam)end=addDays(exam,-1);
     const weekdays=availableWeekdays(state),slots=[];
-    const simBusy=new Map();
-    for(const sim of simulations||[]){
-      const a=toMin(sim.start),b=toMin(sim.end);
-      if(!sim.date||a===null||b===null||b<=a)continue;
-      if(!simBusy.has(sim.date))simBusy.set(sim.date,[]);
-      simBusy.get(sim.date).push([a,b]);
-    }
-    for(const list of simBusy.values())list.sort((a,b)=>a[0]-b[0]);
+    const simulationDates=new Set((simulations||[]).map(sim=>String(sim?.date||'')).filter(Boolean));
     for(let d=new Date(start);d<=end;d=addDays(d,1)){
       const key=dateKey(d);
       const mondayIndex=(d.getDay()+6)%7;
       if(routine?.mode!=='12x36'&&!weekdays.has(mondayIndex))continue;
-      const busy=simBusy.get(key)||[];
-      for(const w of windowsForDate(d,routine,state)){
-        const base={date:key,used:0,...w};
-        slots.push(...(busy.length?subtractBusy(base,busy):[base]));
-      }
+      // Regra pedagógica: data com simulado é exclusiva do simulado.
+      if(simulationDates.has(key))continue;
+      for(const w of windowsForDate(d,routine,state))slots.push({date:key,used:0,...w});
     }
     return slots;
   }
@@ -174,7 +152,7 @@
   }
   function redistribute(state,routine){
     const collapsed=collapseFragments(state.tasks),items=collapsed.items,simulations=collapsed.simulations;
-    const slots=buildSlots(state,routine,simulations);if(!slots.length)return{ok:false,reason:'Não há janelas de estudo disponíveis no período.'};
+    const slots=buildSlots(state,routine,simulations);if(!slots.length)return{ok:false,reason:'Não há janelas de estudo disponíveis no período fora dos dias reservados para simulados.'};
     const exam=parseDate(state.examDate||$('#adminExamDate')?.value);
     const protectedStart=exam?dateKey(addDays(exam,-PROTECTED_FINAL_DAYS)):'';
     const theoryKeys=new Set(items.filter(x=>x.category==='theory').map(x=>x.key));
@@ -229,7 +207,7 @@
       }
     }
     const missing=remaining();
-    if(missing>0)return{ok:false,reason:`Restaram aproximadamente ${Math.round(missing/60*10)/10}h sem encaixe compatível antes da reta final ou nas janelas permitidas.`};
+    if(missing>0)return{ok:false,reason:`Restaram aproximadamente ${Math.round(missing/60*10)/10}h sem encaixe compatível nos dias de estudo disponíveis. Os dias de simulado são reservados exclusivamente para simulados.`};
     for(const item of items){
       const count=item.segments.length;
       if(count>1)item.segments.forEach((seg,index)=>{seg.activity=`${stripPartLabels(seg.activity)} · Bloco ${index+1} de ${count}`});
@@ -238,14 +216,14 @@
     merged.forEach((task,index)=>task.cycleOrder=index);
     const tiny=merged.filter(t=>category(t)!=='simulation'&&minutes(t)<MIN_BLOCK);
     if(tiny.length)return{ok:false,reason:`A validação encontrou ${tiny.length} bloco(s) com menos de ${MIN_BLOCK} minutos; o cronograma anterior foi preservado.`};
-    return{ok:true,tasks:merged,stats:{activities:merged.length,collapsedFragments:items.reduce((sum,x)=>sum+Math.max(0,x.collapsedParts-1),0),firstDate:created[0]?.date||'',lastDate:created.at(-1)?.date||'',minBlock:MIN_BLOCK}};
+    return{ok:true,tasks:merged,stats:{activities:merged.length,collapsedFragments:items.reduce((sum,x)=>sum+Math.max(0,x.collapsedParts-1),0),simulationDays:simulations.length,firstDate:created[0]?.date||'',lastDate:created.at(-1)?.date||'',minBlock:MIN_BLOCK}};
   }
   function apply(options={}){
     const state=read(STATE_KEY,null);if(!state||!Array.isArray(state.tasks)||!state.tasks.length)return{ok:false,reason:'O cronograma ainda não foi encontrado no armazenamento local.'};
     const routine=read(ROUTINE_KEY,state.studyRoutine||{mode:'continuous'})||{mode:'continuous'};
     const result=redistribute(state,routine);if(!result.ok)return result;
     state.tasks=result.tasks;
-    state.studyRoutine={...routine,planningStrategy:{...(state.studyRoutine?.planningStrategy||routine.planningStrategy||{}),singleFinalPlanner:true,plannerVersion:4,capacityIsCeiling:true,fillAvailableStudyWindow:true,preferredMaxNewTheoryTopicsPerDay:PREFERRED_NEW_TOPICS,minStudyBlockMinutes:MIN_BLOCK,protectedFinalDays:PROTECTED_FINAL_DAYS,fragmentationNormalized:true,simulationUsesOnlyItsOwnTime:true,finalReviewAllowsExercises:true}};
+    state.studyRoutine={...routine,planningStrategy:{...(state.studyRoutine?.planningStrategy||routine.planningStrategy||{}),singleFinalPlanner:true,plannerVersion:4,capacityIsCeiling:true,fillAvailableStudyWindow:true,preferredMaxNewTheoryTopicsPerDay:PREFERRED_NEW_TOPICS,minStudyBlockMinutes:MIN_BLOCK,protectedFinalDays:PROTECTED_FINAL_DAYS,fragmentationNormalized:true,simulationDaysExclusive:true,simulationUsesOnlyItsOwnTime:false,finalReviewAllowsExercises:true}};
     if(!write(STATE_KEY,state))return{ok:false,reason:'Não foi possível salvar o cronograma reorganizado no navegador.'};
     if(!options.silent){try{sessionStorage.setItem(APPLIED_KEY,JSON.stringify(result.stats||{}));sessionStorage.removeItem(FAILURE_KEY)}catch{}}
     return result;
@@ -268,7 +246,7 @@
     if(sessionStorage.getItem(PENDING_KEY)==='1')setTimeout(()=>attemptAfterGeneration(0),160);
     else if(sessionStorage.getItem(APPLIED_KEY)){
       const stats=read(APPLIED_KEY,{});sessionStorage.removeItem(APPLIED_KEY);
-      setTimeout(()=>alert(`Cronograma reorganizado com o planejador final. ${stats.activities||0} atividades foram distribuídas; blocos inferiores a ${stats.minBlock||MIN_BLOCK} minutos foram eliminados${stats.collapsedFragments?` e ${stats.collapsedFragments} fragmento(s) duplicado(s) foram consolidados`:''}.`),260);
+      setTimeout(()=>alert(`Cronograma reorganizado com o planejador final. ${stats.activities||0} atividades foram distribuídas; ${stats.simulationDays||0} dia(s) ficaram reservados exclusivamente para simulados; blocos inferiores a ${stats.minBlock||MIN_BLOCK} minutos foram eliminados${stats.collapsedFragments?` e ${stats.collapsedFragments} fragmento(s) duplicado(s) foram consolidados`:''}.`),260);
     }else if(sessionStorage.getItem(FAILURE_KEY)){
       const reason=sessionStorage.getItem(FAILURE_KEY);sessionStorage.removeItem(FAILURE_KEY);
       setTimeout(()=>alert(`A reorganização final não foi aplicada: ${reason}`),260);
