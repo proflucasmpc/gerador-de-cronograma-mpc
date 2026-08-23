@@ -21,6 +21,8 @@
   Cache-Control: public, max-age=0, must-revalidate
 /admin-capacity-fill.js
   Cache-Control: public, max-age=0, must-revalidate
+/admin-generation-finalizer.js
+  Cache-Control: public, max-age=0, must-revalidate
 /admin-update-sync.js
   Cache-Control: public, max-age=0, must-revalidate
 /admin-publish-guard.js
