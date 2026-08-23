@@ -14,6 +14,7 @@
     if(!document.querySelector('script[src*="admin-public-buttons.js"]')){const script=document.createElement('script');script.src='/admin-public-buttons.js?v=20260823-1';script.defer=true;document.head.appendChild(script)}
     if(!document.querySelector('script[src*="admin-capacity-fill.js"]')){const script=document.createElement('script');script.src='/admin-capacity-fill.js?v=20260823-2';script.defer=true;document.head.appendChild(script)}
     if(!document.querySelector('script[src*="admin-generation-finalizer.js"]')){const script=document.createElement('script');script.src='/admin-generation-finalizer.js?v=20260823-1';script.defer=true;document.head.appendChild(script)}
+    if(!document.querySelector('script[src*="admin-simulation-capacity.js"]')){const script=document.createElement('script');script.src='/admin-simulation-capacity.js?v=20260823-1';script.defer=true;document.head.appendChild(script)}
     if(!document.querySelector('script[src*="admin-update-sync.js"]')){const script=document.createElement('script');script.src='/admin-update-sync.js?v=20260820-2';script.defer=true;document.head.appendChild(script)}
     if(!document.querySelector('script[src*="admin-publish-guard.js"]')){const script=document.createElement('script');script.src='/admin-publish-guard.js?v=20260823-2';script.defer=true;document.head.appendChild(script)}
   }
