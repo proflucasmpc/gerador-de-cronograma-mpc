@@ -27,8 +27,20 @@
     return Boolean(strategy.singleFinalPlanner)&&Number(strategy.plannerVersion)===4;
   }
 
+  function hasGeneratedTasks(){
+    const state=read(STATE_KEY,{})||{};
+    return Array.isArray(state.tasks)&&state.tasks.length>0;
+  }
+
   function isCreatePageButton(target){
     return target?.closest?.('#publicPageBtn,#exportPublicPageBtn');
+  }
+
+  function finalizeExistingSchedule(){
+    if(plannerReady())return{ok:true,already:true};
+    if(!hasGeneratedTasks())return{ok:false,reason:'O cronograma ainda não possui atividades geradas.'};
+    if(typeof window.mpcApplyCapacityFill!=='function')return{ok:false,reason:'O Planejador Final ainda está carregando. Aguarde um instante e tente novamente.'};
+    return window.mpcApplyCapacityFill({silent:true})||{ok:false,reason:'Não foi possível finalizar o cronograma.'};
   }
 
   function guardNewPublication(event){
@@ -38,7 +50,15 @@
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
-    alert('Antes de criar a página do aluno, gere o cronograma novamente e aguarde a confirmação do Planejador Final V4. Isso garante que a página use toda a disponibilidade configurada e não publique uma distribuição intermediária.');
+
+    const result=finalizeExistingSchedule();
+    if(result.ok){
+      try{sessionStorage.setItem('mpcPublishAfterFinalizerMessageV1','1')}catch{}
+      alert('Seu cronograma já estava gerado. O sistema apenas concluiu agora a etapa final de distribuição. A página será recarregada; depois clique em “Criar página” novamente. Não é necessário gerar o cronograma outra vez.');
+      location.reload();
+      return;
+    }
+    alert(result.reason||'Não foi possível concluir o Planejador Final.');
   }
 
   function capacityHint(){
@@ -60,6 +80,14 @@
     }
   }
 
+  function showFinalizerMessage(){
+    try{
+      if(sessionStorage.getItem('mpcPublishAfterFinalizerMessageV1')!=='1')return;
+      sessionStorage.removeItem('mpcPublishAfterFinalizerMessageV1');
+      setTimeout(()=>alert('Planejador Final V4 concluído. Agora você pode clicar em “Criar página”. Não precisa gerar o cronograma novamente.'),180);
+    }catch{}
+  }
+
   function bind(){
     document.addEventListener('pointerdown',event=>{if(event.target?.closest?.('#adminGenerateScheduleBtn'))rememberDeclaredHours()},true);
     document.addEventListener('mousedown',event=>{if(event.target?.closest?.('#adminGenerateScheduleBtn'))rememberDeclaredHours()},true);
@@ -68,6 +96,7 @@
       guardNewPublication(event);
     },true);
     setTimeout(capacityHint,300);
+    showFinalizerMessage();
     document.addEventListener('change',event=>{if(event.target?.closest?.('#adminHoursPerDay,#mpcRoutineBuilder'))setTimeout(capacityHint,50)},true);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
