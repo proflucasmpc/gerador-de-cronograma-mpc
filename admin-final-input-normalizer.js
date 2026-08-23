@@ -1,7 +1,6 @@
 (()=>{
   'use strict';
   const STATE_KEY='geradorCronogramaMpcData';
-  const MAP_KEY='mpcFinalReviewRestoreV5';
   const $=(s,r=document)=>r.querySelector(s);
   const $$=(s,r=document)=>[...r.querySelectorAll(s)];
   const read=(key,fallback=null)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}};
@@ -20,7 +19,7 @@
     if(!$('#adminSimulationEnabled')?.checked)return[];
     const start=parseDate($('#adminStartDate')?.value||state.startDate);if(!start)return[];
     const exam=parseDate($('#adminExamDate')?.value||state.examDate);
-    let end=parseDate(state.endDate||'');
+    let end=parseDate(state.endDate||state.adminPersonalization?.endDate||'');
     if(!end)end=addDays(start,Math.max(1,Number($('#adminPlanDays')?.value)||1)-1);
     if(exam&&end>=exam)end=addDays(exam,-1);
     const mode=$('#adminSimulationMode')?.value||'interval_days';
@@ -47,49 +46,35 @@
     const bySubject=($('#adminSimulationType')?.value||'full')==='subject';
     const subjects=Array.isArray(state.subjects)?state.subjects:[];
     return dates.map((d,index)=>{
-      const name=bySubject&&subjects.length?String(subjects[index%subjects.length]?.name||subjects[index%subjects.length]||'Matéria'):'Simulado completo';
-      return{id:`sim-v5-${dateKey(d)}-${index}`,day:dayIndex(d),date:dateKey(d),cycleOrder:0,start:toTime(start),end:toTime(start+duration),subject:bySubject?`Simulado - ${name}`:'Simulado completo',activity:bySubject?`Simulado por matéria - ${name}`:`Simulado completo - ${state.goal||''}`,type:bySubject?'Simulado por matéria':'Simulado completo',notes:'O simulado ocupa somente este horário; o restante do dia continua disponível para estudo.',done:false};
+      const source=subjects[index%Math.max(1,subjects.length)];
+      const name=bySubject&&subjects.length?String(source?.name||source||'Matéria'):'Simulado completo';
+      return{id:`sim-v6-${dateKey(d)}-${index}`,day:dayIndex(d),date:dateKey(d),cycleOrder:0,start:toTime(start),end:toTime(start+duration),subject:bySubject?`Simulado - ${name}`:'Simulado completo',activity:bySubject?`Simulado por matéria - ${name}`:`Simulado completo - ${state.goal||''}`,type:bySubject?'Simulado por matéria':'Simulado completo',notes:'O simulado ocupa somente este horário; o restante do dia continua disponível para estudo.',done:false};
     });
   }
 
   function normalize(){
-    const state=read(STATE_KEY,null);if(!state?.tasks?.length)return;
-    const map={};
+    const state=read(STATE_KEY,null);if(!state?.tasks?.length)return false;
     const tasks=[];
-    state.tasks.forEach((task,index)=>{
-      if(isSimulation(task))return;
+    let reviewsReleased=0,oldSimulationsRemoved=0;
+    state.tasks.forEach(task=>{
+      if(isSimulation(task)){oldSimulationsRemoved++;return}
       if(isReview(task)){
-        const id=String(task.id||`rev-${index}`);
-        map[id]={type:task.type,activity:task.activity,notes:task.notes};
-        const body=String(task.activity||'').replace(/^\s*(?:Revisão|Resumo)\s*[-:–—]?\s*/i,'');
-        tasks.push({...task,id,date:'',type:'Exercícios de consolidação',activity:`Questões de consolidação - ${body}`});
+        reviewsReleased++;
+        tasks.push({...task,date:''});
       }else tasks.push(task);
     });
     const sims=currentSimulations(state);
     state.tasks=[...tasks,...sims];
-    state.adminPersonalization={...(state.adminPersonalization||{}),simulationCount:sims.length,simulationScheduleRebuilt:true};
+    state.adminPersonalization={...(state.adminPersonalization||{}),simulationCount:sims.length,simulationScheduleRebuilt:true,reviewDatesReleased:true};
+    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),reviewDatesAreAdvisory:true,simulationScheduleRebuilt:true,finalInputNormalizerVersion:6}};
     save(STATE_KEY,state);
-    try{sessionStorage.setItem(MAP_KEY,JSON.stringify(map))}catch{}
+    try{sessionStorage.setItem('mpcFinalInputNormalizerStatsV6',JSON.stringify({reviewsReleased,oldSimulationsRemoved,simulationsCreated:sims.length}))}catch{}
+    return true;
   }
 
-  function restore(){
-    let map={};try{map=JSON.parse(sessionStorage.getItem(MAP_KEY)||'{}')}catch{}
-    if(!Object.keys(map).length)return;
-    const state=read(STATE_KEY,null);if(!state?.tasks?.length)return;
-    let changed=false;
-    state.tasks=state.tasks.map(task=>{
-      const base=String(task.id||'').replace(/-final-\d+-[a-z0-9]+$/i,'');
-      const original=map[base]||map[String(task.id||'')];
-      if(!original)return task;
-      changed=true;
-      return{...task,type:original.type||'Revisão',activity:original.activity||task.activity,notes:original.notes||task.notes};
-    });
-    if(changed){state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),plannerVersion:5,reviewDatesRebuilt:true,simulationScheduleRebuilt:true}};save(STATE_KEY,state)}
-    try{sessionStorage.removeItem(MAP_KEY)}catch{}
-  }
+  window.mpcNormalizeFinalPlannerInput=normalize;
 
   function bind(){
-    restore();
     document.addEventListener('click',event=>{
       if(event.target?.closest?.('#adminGenerateScheduleBtn,#publicPageBtn,#exportPublicPageBtn'))normalize();
     },true);
