@@ -14,6 +14,14 @@
   function finalizeGenerated(){
     const status=$('#adminGenerationStatus');
     if(!status?.classList.contains('success'))return false;
+
+    // A geração-base acabou de recriar as tarefas. Portanto, o normalizador precisa
+    // rodar AGORA (pós-geração), antes do Planejador Final, para retirar datas
+    // indisponíveis recém-recriadas e reconstruir simulados/revisões corretamente.
+    if(typeof window.mpcNormalizeFinalPlannerInput==='function'){
+      window.mpcNormalizeFinalPlannerInput();
+    }
+
     if(plannerReady())return true;
     if(typeof window.mpcApplyCapacityFill!=='function')return false;
     const result=window.mpcApplyCapacityFill({silent:true});
@@ -37,7 +45,6 @@
       // O gerador-base é síncrono. Rodamos no próximo ciclo, antes do antigo
       // transformador de rotina (80 ms), para que o V4 seja a única saída final.
       setTimeout(()=>{
-        if(plannerReady())return;
         finalizeGenerated();
       },0);
     });
