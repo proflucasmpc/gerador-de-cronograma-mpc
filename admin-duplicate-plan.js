@@ -15,7 +15,7 @@
     loadScript('/admin-public-buttons.js?v=20260823-1');
     loadScript('/admin-public-theme.js?v=20260825-1');
     loadScript('/admin-blackout-dates.js?v=20260825-1');
-    loadScript('/admin-capacity-fill.js?v=20260823-3');
+    loadScript('/admin-capacity-fill.js?v=20260825-5');
     loadScript('/admin-final-input-normalizer.js?v=20260825-4');
     loadScript('/admin-final-consolidation.js?v=20260825-4');
     loadScript('/admin-pedagogy-guard.js?v=20260825-2');
