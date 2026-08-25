@@ -13,29 +13,31 @@
   function addStyles(){
     if(document.getElementById('mpcPublicExperienceStyles'))return;
     const style=document.createElement('style');style.id='mpcPublicExperienceStyles';style.textContent=`
-      .mpc-personal-fixed{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:120;width:min(920px,calc(100% - 28px));display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,var(--navy3),var(--navy2));color:#fff;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 48px rgba(7,18,37,.28)}
+      .mpc-personal-fixed{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:120;width:min(950px,calc(100% - 28px));display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,var(--navy3),var(--navy2));color:#fff;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 48px rgba(7,18,37,.28)}
       .mpc-personal-fixed-copy{min-width:0}
-      .mpc-personal-fixed strong{display:block;font-size:15px;line-height:1.25}.mpc-personal-fixed span{display:block;margin-top:4px;font-size:12px;line-height:1.4;opacity:.9}
+      .mpc-personal-fixed strong{display:block;font-size:15px;line-height:1.25}.mpc-personal-fixed-copy>span{display:block;margin-top:4px;font-size:12px;line-height:1.4;opacity:.9}
       .mpc-personal-fixed a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 18px;border-radius:11px;background:#25D366;color:#071225;font-size:12px;font-weight:950;text-align:center;white-space:nowrap;box-shadow:0 9px 22px rgba(37,211,102,.22)}
       .mpc-personal-fixed a:hover{filter:brightness(.97)}.mpc-free-explainer{font-weight:900}
       .mpc-wa-icon{font-size:17px;line-height:1}
       body[data-public-theme="aulacerta"] .mpc-personal-fixed{background:linear-gradient(145deg,#10234A,#315EFB)}
       .final-banner{display:none!important}
       body{padding-bottom:92px!important}
+      @media(min-width:1200px){.mpc-personal-fixed{left:calc(50% + 100px);width:min(950px,calc(100% - 330px))}}
       @media(max-width:880px){
         .whatsapp-float{display:none!important}
-        .mpc-personal-fixed{bottom:9px;width:calc(100% - 18px);grid-template-columns:1fr;padding:14px 14px 13px;gap:11px;text-align:center;border-radius:18px}
-        .mpc-personal-fixed-copy{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
-        .mpc-personal-fixed strong{font-size:16px;line-height:1.28;text-align:center;max-width:560px;margin:0 auto}
-        .mpc-personal-fixed span{display:none}
-        .mpc-personal-fixed a{width:100%;min-height:48px;white-space:normal;font-size:12px;line-height:1.2;padding:13px 12px}
-        .shell{padding-bottom:142px!important}
+        .mpc-personal-fixed{left:50%;bottom:9px;width:calc(100% - 18px);grid-template-columns:1fr;padding:13px 14px 12px;gap:10px;text-align:center;border-radius:18px}
+        .mpc-personal-fixed-copy{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;overflow:hidden}
+        .mpc-personal-fixed strong{font-size:13px;line-height:1.2;text-align:center;max-width:100%;margin:0 auto;white-space:nowrap}
+        .mpc-personal-fixed-copy>span{display:none}
+        .mpc-personal-fixed a{width:100%;min-height:48px;white-space:normal;font-size:12px;line-height:1.2;padding:13px 10px}
+        .mpc-personal-fixed a span{display:inline!important}
+        .shell{padding-bottom:140px!important}
         .mobile-nav{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;margin:26px 0 12px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;border-radius:15px!important;box-shadow:0 10px 28px rgba(7,18,37,.16)!important}
       }
-      @media(max-width:520px){
-        .mpc-personal-fixed{padding:13px 12px 12px}
-        .mpc-personal-fixed strong{font-size:15px;max-width:300px}
-        .mpc-personal-fixed a{font-size:11.5px;border-radius:10px}
+      @media(max-width:380px){
+        .mpc-personal-fixed{padding-left:10px;padding-right:10px}
+        .mpc-personal-fixed strong{font-size:12px;letter-spacing:-.015em}
+        .mpc-personal-fixed a{font-size:10.5px;letter-spacing:-.01em}
       }
     `;document.head.appendChild(style);
   }
