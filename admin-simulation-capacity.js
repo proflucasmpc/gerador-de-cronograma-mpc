@@ -5,6 +5,7 @@
   const $$=(s,r=document)=>[...r.querySelectorAll(s)];
   const DAY_NAMES=['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
   let rewriting=false;
+  let refreshTimer=null;
 
   const read=(key,fallback=null)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}};
   const num=(selector,fallback=0)=>{const n=Number($(selector)?.value);return Number.isFinite(n)?n:fallback};
@@ -91,21 +92,33 @@
     const enabled=$('#adminSimulationEnabled')?.checked,mode=$('#adminSimulationMode')?.value;
     if(!enabled||mode!=='weekday_occurrence'){box.hidden=true;return}
     const selected=selectedSimulationDays(),interval=Math.max(1,Math.round(num('#adminSimulationInterval',1)));box.hidden=false;
-    if(!selected.length){box.style.background='#fff3cd';box.style.color='#664d03';box.textContent='Selecione pelo menos um dia da semana para os simulados.';return}
-    const names=selected.map(n=>DAY_NAMES[n]).join(', ');
-    if(selected.length>1){box.style.background='#fff3cd';box.style.color='#664d03';box.textContent=`Atenção: ${selected.length} dias estão marcados (${names}). A cada ${interval} semana${interval===1?'':'s'}, haverá simulado em TODOS esses dias.`}
-    else{box.style.background='#e8f5e9';box.style.color='#1b5e20';box.textContent=`Configuração: simulado em ${names}, a cada ${interval} semana${interval===1?'':'s'}. Cada data de simulado fica reservada exclusivamente para o simulado, sem estudo regular.`}
-    if(calc?.sims?.length)box.textContent+=` Total previsto no período: ${calc.sims.length} simulado${calc.sims.length===1?'':'s'}.`;
+    let text='';let background='';let color='';
+    if(!selected.length){background='#fff3cd';color='#664d03';text='Selecione pelo menos um dia da semana para os simulados.'}
+    else{
+      const names=selected.map(n=>DAY_NAMES[n]).join(', ');
+      if(selected.length>1){background='#fff3cd';color='#664d03';text=`Atenção: ${selected.length} dias estão marcados (${names}). A cada ${interval} semana${interval===1?'':'s'}, haverá simulado em TODOS esses dias.`}
+      else{background='#e8f5e9';color='#1b5e20';text=`Configuração: simulado em ${names}, a cada ${interval} semana${interval===1?'':'s'}. Cada data de simulado fica reservada exclusivamente para o simulado, sem estudo regular.`}
+      if(calc?.sims?.length)text+=` Total previsto no período: ${calc.sims.length} simulado${calc.sims.length===1?'':'s'}.`;
+    }
+    if(box.style.background!==background)box.style.background=background;
+    if(box.style.color!==color)box.style.color=color;
+    if(box.textContent!==text)box.textContent=text;
   }
   function rewritePreview(){
     if(rewriting)return;const label=$('#adminCapacityPreview');if(!label)return;const current=String(label.textContent||'');if(!/Período:/i.test(current))return;
-    const calc=calculate();if(!calc)return;const demand=extractDemand(current),fits=demand.minutes==null?true:demand.minutes<=calc.studyMinutes;rewriting=true;
-    label.className=`helper ${fits?'admin-capacity-ok':'admin-capacity-error'}`;
+    const calc=calculate();if(!calc)return;const demand=extractDemand(current),fits=demand.minutes==null?true:demand.minutes<=calc.studyMinutes;
     const activityText=demand.count?` Atividades previstas: ${demand.count}${demand.minutes!=null?`, com cerca de ${formatMinutes(demand.minutes)}`:''}.`:'';
     const simText=calc.sims.length?` Há ${calc.sims.length} data${calc.sims.length===1?'':'s'} reservada${calc.sims.length===1?'':'s'} exclusivamente para simulados, retirando ${formatMinutes(calc.reservedMinutes)} da capacidade regular.`:' Não há simulados programados.';
     const blackoutText=calc.blackoutDates?` Há também ${calc.blackoutDates} dia${calc.blackoutDates===1?'':'s'} de indisponibilidade, retirando ${formatMinutes(calc.blackoutMinutes)} da capacidade de estudo.`:'';
-    label.textContent=`Período: ${Math.max(1,diffDays(calc.window.start,calc.window.end)+1)} dias corridos, ${calc.studyDates} dias efetivos de estudo, ${calc.sims.length} dias exclusivos de simulado e ${calc.blackoutDates} dias sem estudo. Capacidade de estudo regular: ${formatMinutes(calc.studyMinutes)}.${activityText}${simText}${blackoutText}${fits?' O plano cabe na capacidade calculada.':' O plano não cabe na capacidade calculada com as configurações atuais.'}`;
-    rewriting=false;renderWeekdayWarning(calc);
+    const nextText=`Período: ${Math.max(1,diffDays(calc.window.start,calc.window.end)+1)} dias corridos, ${calc.studyDates} dias efetivos de estudo, ${calc.sims.length} dias exclusivos de simulado e ${calc.blackoutDates} dias sem estudo. Capacidade de estudo regular: ${formatMinutes(calc.studyMinutes)}.${activityText}${simText}${blackoutText}${fits?' O plano cabe na capacidade calculada.':' O plano não cabe na capacidade calculada com as configurações atuais.'}`;
+    const nextClass=`helper ${fits?'admin-capacity-ok':'admin-capacity-error'}`;
+    if(label.textContent!==nextText||label.className!==nextClass){
+      rewriting=true;
+      if(label.className!==nextClass)label.className=nextClass;
+      if(label.textContent!==nextText)label.textContent=nextText;
+      rewriting=false;
+    }
+    renderWeekdayWarning(calc);
   }
   function rewriteGenerationStatus(){
     const status=$('#adminGenerationStatus');if(!status)return;const text=String(status.textContent||'');if(!/Cronograma criado para/i.test(text))return;const calc=calculate();if(!calc)return;
@@ -113,15 +126,18 @@
     next=next.replace(/\d+\s+dias com disponibilidade de estudo,\s*\d+\s+datas com simulado/i,`${calc.studyDates} dias de estudo, ${calc.sims.length} dias exclusivos para simulados e ${calc.blackoutDates} dias sem estudo`);
     if(next!==text){rewriting=true;status.textContent=next;rewriting=false}
   }
-  function refresh(){setTimeout(()=>{rewritePreview();rewriteGenerationStatus()},25)}
+  function refresh(delay=25){
+    clearTimeout(refreshTimer);
+    refreshTimer=setTimeout(()=>{refreshTimer=null;rewritePreview();rewriteGenerationStatus()},delay);
+  }
   function bind(){
-    refresh();setTimeout(refresh,350);setTimeout(refresh,1000);
+    refresh(0);setTimeout(()=>refresh(0),350);setTimeout(()=>refresh(0),1000);
     document.addEventListener('input',event=>{if(event.target?.closest?.('#adminPanel'))refresh()},true);
     document.addEventListener('change',event=>{if(event.target?.closest?.('#adminPanel'))refresh()},true);
-    document.addEventListener('mpc:blackout-changed',refresh);
+    document.addEventListener('mpc:blackout-changed',()=>refresh());
     const preview=$('#adminCapacityPreview'),status=$('#adminGenerationStatus');
     if(preview)new MutationObserver(()=>{if(!rewriting)refresh()}).observe(preview,{childList:true,subtree:true,characterData:true});
-    if(status)new MutationObserver(()=>{if(!rewriting)rewriteGenerationStatus()}).observe(status,{childList:true,subtree:true,characterData:true});
+    if(status)new MutationObserver(()=>{if(!rewriting)refresh()}).observe(status,{childList:true,subtree:true,characterData:true});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
 })();
