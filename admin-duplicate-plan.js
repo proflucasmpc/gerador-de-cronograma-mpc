@@ -17,9 +17,10 @@
     loadScript('/admin-blackout-dates.js?v=20260825-1');
     loadScript('/admin-capacity-fill.js?v=20260823-3');
     loadScript('/admin-final-input-normalizer.js?v=20260825-4');
-    loadScript('/admin-final-consolidation.js?v=20260825-1');
+    loadScript('/admin-final-consolidation.js?v=20260825-4');
     loadScript('/admin-pedagogy-guard.js?v=20260825-2');
     loadScript('/admin-final-capacity-guarantee.js?v=20260825-1');
+    loadScript('/admin-final-pipeline-authority.js?v=20260825-1');
     loadScript('/admin-generation-finalizer.js?v=20260825-3');
     loadScript('/admin-new-plan-button.js?v=20260823-1');
     loadScript('/admin-package-import.js?v=20260825-1');
@@ -27,8 +28,8 @@
     loadScript('/admin-package-autofit.js?v=20260825-1');
     loadScript('/admin-simulation-capacity.js?v=20260825-3');
     loadScript('/admin-simulation-selection-guard.js?v=20260823-1');
-    loadScript('/admin-update-sync.js?v=20260820-2');
-    loadScript('/admin-publish-guard.js?v=20260823-2');
+    loadScript('/admin-update-sync.js?v=20260825-4');
+    loadScript('/admin-publish-guard.js?v=20260825-4');
   }
   function resetPersonalDraft(draft){if(!draft||typeof draft!=='object')return{};return {...draft,studentName:'',startDate:'',hoursPerDay:0,sessionMinutes:60,preferredStart:'',availableDays:[],workSchedule:'',studyMaterial:'',generalGuidance:'',replaceSchedule:true}}
   function convertLoadedCopy(){
