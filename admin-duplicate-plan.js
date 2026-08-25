@@ -12,6 +12,7 @@
   function loadUiUpgrades(){
     if(!document.querySelector('link[href*="admin-layout-links.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='/admin-layout-links.css?v=20260813-1';document.head.appendChild(link)}
     if(!document.querySelector('script[src*="admin-public-buttons.js"]')){const script=document.createElement('script');script.src='/admin-public-buttons.js?v=20260823-1';script.defer=true;document.head.appendChild(script)}
+    if(!document.querySelector('script[src*="admin-public-theme.js"]')){const script=document.createElement('script');script.src='/admin-public-theme.js?v=20260825-1';script.defer=true;document.head.appendChild(script)}
     if(!document.querySelector('script[src*="admin-blackout-dates.js"]')){const script=document.createElement('script');script.src='/admin-blackout-dates.js?v=20260825-1';script.defer=true;document.head.appendChild(script)}
     if(!document.querySelector('script[src*="admin-capacity-fill.js"]')){const script=document.createElement('script');script.src='/admin-capacity-fill.js?v=20260823-3';script.defer=true;document.head.appendChild(script)}
     if(!document.querySelector('script[src*="admin-final-input-normalizer.js"]')){const script=document.createElement('script');script.src='/admin-final-input-normalizer.js?v=20260825-4';script.defer=true;document.head.appendChild(script)}
