@@ -6,6 +6,7 @@ const ID_RE = /^[A-Z0-9]{10}$/;
 const CONTEST_STAGES = new Set([
   'estudo_vagas','previsao_orcamentaria','autorizacao','comissao_organizadora','escolha_banca','publicacao_edital'
 ]);
+const PUBLIC_THEMES = new Set(['masculino','feminino','aulacerta']);
 
 function json(data, status = 200) {
   return Response.json(data, { status, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
@@ -15,6 +16,7 @@ function cleanMultiline(value, max = 16000) {
   return String(value ?? '').replace(/\r\n?/g, '\n').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ').trim().slice(0, max);
 }
 function cleanContestStage(value) { const stage = cleanString(value, 80); return CONTEST_STAGES.has(stage) ? stage : ''; }
+function cleanPublicTheme(value) { const theme = cleanString(value, 40); return PUBLIC_THEMES.has(theme) ? theme : 'masculino'; }
 function cleanRoutineWindow(window = {}) {
   return { moment: cleanString(window.moment, 120), time: cleanString(window.time, 10), duration: Math.max(5, Math.min(240, Number(window.duration) || 30)), environment: cleanString(window.environment, 80), types: Array.isArray(window.types) ? window.types.slice(0, 12).map(type => cleanString(type, 80)).filter(Boolean) : [], videoOnly: Boolean(window.videoOnly) };
 }
@@ -45,8 +47,8 @@ function sanitizePlan(input = {}) {
   const examDateUnknown = Boolean(input.examDateUnknown);
   const contestStage = examDateUnknown ? cleanContestStage(input.contestStage) : '';
   return {
-    version: 6,
-    studentName: cleanString(input.studentName, 180), createdByUser: Boolean(input.createdByUser), creatorName: cleanString(input.creatorName || input.studentName, 180), goal: cleanString(input.goal, 300), examDate: examDateUnknown ? '' : cleanString(input.examDate, 20), examDateUnknown, contestStage, startDate: cleanString(input.startDate, 20), endDate: cleanString(input.endDate, 20), hoursPerDay: Math.max(0, Math.min(24, Number(input.hoursPerDay) || 0)), scheduleStyle: cleanString(input.scheduleStyle, 40), generalGuidance: cleanMultiline(input.generalGuidance, 16000), studyRoutine: cleanStudyRoutine(input.studyRoutine),
+    version: 7,
+    studentName: cleanString(input.studentName, 180), createdByUser: Boolean(input.createdByUser), creatorName: cleanString(input.creatorName || input.studentName, 180), goal: cleanString(input.goal, 300), examDate: examDateUnknown ? '' : cleanString(input.examDate, 20), examDateUnknown, contestStage, startDate: cleanString(input.startDate, 20), endDate: cleanString(input.endDate, 20), hoursPerDay: Math.max(0, Math.min(24, Number(input.hoursPerDay) || 0)), scheduleStyle: cleanString(input.scheduleStyle, 40), publicTheme: cleanPublicTheme(input.publicTheme), generalGuidance: cleanMultiline(input.generalGuidance, 16000), studyRoutine: cleanStudyRoutine(input.studyRoutine),
     subjects: Array.isArray(input.subjects) ? input.subjects.slice(0, 80).map(s => ({ name: cleanString(s?.name, 220), priority: Number(s?.priority) || 0, level: cleanString(s?.level, 40) })) : [],
     tasks, createdAt: new Date().toISOString(), brand: 'Professor Lucas MPC'
   };
