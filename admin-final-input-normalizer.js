@@ -14,6 +14,7 @@
   const toTime=n=>`${String(Math.floor(n/60)%24).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
   const isSimulation=t=>/simulado/i.test(`${t?.type||''} ${t?.activity||''}`);
   const isReview=t=>/revis|resumo|flashcard|lei seca/i.test(`${t?.type||''} ${t?.activity||''}`);
+  const isBlackout=value=>typeof window.mpcIsBlackoutDate==='function'&&window.mpcIsBlackoutDate(value);
 
   function simulationDates(state){
     if(!$('#adminSimulationEnabled')?.checked)return[];
@@ -29,8 +30,7 @@
     const eve=exam?dateKey(addDays(exam,-1)):'';
     const all=[];
     for(let d=new Date(start);d<=end;d=addDays(d,1)){
-      if(type!=='subject'&&dateKey(d)===eve)continue;
-      all.push(new Date(d));
+      const k=dateKey(d);if(type!=='subject'&&k===eve)continue;if(isBlackout(k))continue;all.push(new Date(d));
     }
     if(mode==='weekday_occurrence'){
       const monday=new Date(start);monday.setDate(monday.getDate()-dayIndex(monday));
@@ -48,36 +48,21 @@
     return dates.map((d,index)=>{
       const source=subjects[index%Math.max(1,subjects.length)];
       const name=bySubject&&subjects.length?String(source?.name||source||'Matéria'):'Simulado completo';
-      return{id:`sim-v7-${dateKey(d)}-${index}`,day:dayIndex(d),date:dateKey(d),cycleOrder:0,start:toTime(start),end:toTime(start+duration),subject:bySubject?`Simulado - ${name}`:'Simulado completo',activity:bySubject?`Simulado por matéria - ${name}`:`Simulado completo - ${state.goal||''}`,type:bySubject?'Simulado por matéria':'Simulado completo',notes:'Dia reservado exclusivamente para a realização do simulado. Não há estudo regular programado nesta data.',done:false};
+      return{id:`sim-v8-${dateKey(d)}-${index}`,day:dayIndex(d),date:dateKey(d),cycleOrder:0,start:toTime(start),end:toTime(start+duration),subject:bySubject?`Simulado - ${name}`:'Simulado completo',activity:bySubject?`Simulado por matéria - ${name}`:`Simulado completo - ${state.goal||''}`,type:bySubject?'Simulado por matéria':'Simulado completo',notes:'Dia reservado exclusivamente para a realização do simulado. Não há estudo regular programado nesta data.',done:false};
     });
   }
 
   function normalize(){
+    if(typeof window.mpcSyncBlackoutRanges==='function')window.mpcSyncBlackoutRanges();
     const state=read(STATE_KEY,null);if(!state?.tasks?.length)return false;
-    const tasks=[];
-    let reviewsReleased=0,oldSimulationsRemoved=0;
-    state.tasks.forEach(task=>{
-      if(isSimulation(task)){oldSimulationsRemoved++;return}
-      if(isReview(task)){
-        reviewsReleased++;
-        tasks.push({...task,date:''});
-      }else tasks.push(task);
-    });
-    const sims=currentSimulations(state);
-    state.tasks=[...tasks,...sims];
-    state.adminPersonalization={...(state.adminPersonalization||{}),simulationCount:sims.length,simulationScheduleRebuilt:true,simulationDaysExclusive:true,reviewDatesReleased:true};
-    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),reviewDatesAreAdvisory:true,simulationScheduleRebuilt:true,simulationDaysExclusive:true,finalInputNormalizerVersion:7}};
-    save(STATE_KEY,state);
-    try{sessionStorage.setItem('mpcFinalInputNormalizerStatsV7',JSON.stringify({reviewsReleased,oldSimulationsRemoved,simulationsCreated:sims.length}))}catch{}
-    return true;
+    const tasks=[];let reviewsReleased=0,oldSimulationsRemoved=0;
+    state.tasks.forEach(task=>{if(isSimulation(task)){oldSimulationsRemoved++;return}if(isReview(task)){reviewsReleased++;tasks.push({...task,date:''})}else tasks.push(task)});
+    const sims=currentSimulations(state);state.tasks=[...tasks,...sims];
+    state.adminPersonalization={...(state.adminPersonalization||{}),simulationCount:sims.length,simulationScheduleRebuilt:true,simulationDaysExclusive:true,reviewDatesReleased:true,blackoutDatesExclusive:true};
+    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),reviewDatesAreAdvisory:true,simulationScheduleRebuilt:true,simulationDaysExclusive:true,blackoutDatesExclusive:true,finalInputNormalizerVersion:8}};
+    save(STATE_KEY,state);return true;
   }
-
   window.mpcNormalizeFinalPlannerInput=normalize;
-
-  function bind(){
-    document.addEventListener('click',event=>{
-      if(event.target?.closest?.('#adminGenerateScheduleBtn,#publicPageBtn,#exportPublicPageBtn'))normalize();
-    },true);
-  }
+  function bind(){document.addEventListener('click',event=>{if(event.target?.closest?.('#adminGenerateScheduleBtn,#publicPageBtn,#exportPublicPageBtn'))normalize()},true)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
 })();
