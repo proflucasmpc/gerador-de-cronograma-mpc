@@ -5,6 +5,7 @@
   const STAGE_LABELS={estudo_vagas:'Estudo de vagas',previsao_orcamentaria:'Previsão orçamentária',autorizacao:'Autorização',comissao_organizadora:'Comissão organizadora',escolha_banca:'Escolha da banca',publicacao_edital:'Publicação do edital'};
   function loadMobileStyles(){if(document.querySelector('link[href*="public-mobile-responsive.css"]'))return;const link=document.createElement('link');link.rel='stylesheet';link.href='/public-mobile-responsive.css?v=20260820-2';document.head.appendChild(link)}
   function loadPublicButtons(){if(document.querySelector('script[data-mpc-public-buttons]')||document.querySelector('script[src*="public-plan-buttons.js"]'))return;const script=document.createElement('script');script.src='/public-plan-buttons.js?v=20260820-4';script.dataset.mpcPublicButtons='1';document.head.appendChild(script)}
+  function loadPublicExperience(){if(document.querySelector('script[data-mpc-public-experience]')||document.querySelector('script[src*="public-page-experience.js"]'))return;const script=document.createElement('script');script.src='/public-page-experience.js?v=20260825-1';script.dataset.mpcPublicExperience='1';document.head.appendChild(script)}
   function styles(){if(document.getElementById('mpcPublicLinksStyles'))return;const s=document.createElement('style');s.id='mpcPublicLinksStyles';s.textContent=`.mpc-pre-edital-title{font-family:Georgia,"Times New Roman",serif;font-size:30px;line-height:1.08;margin:14px 0 8px;color:#fff}`;document.head.appendChild(s)}
   function ptDate(value){if(!value)return'—';const d=new Date(`${value}T12:00:00`);return Number.isNaN(d.getTime())?'—':d.toLocaleDateString('pt-BR')}
   function applyPreEdital(plan){
@@ -18,12 +19,12 @@
     const heading=[...document.querySelectorAll('.section-heading h2')].find(h=>/prepara[cç][aã]o até a prova/i.test(h.textContent||''));
     if(heading){heading.textContent='Sua preparação no pré-edital';const p=heading.closest('.section-heading')?.querySelector('p');if(p)p.textContent='Acompanhe a evolução do plano enquanto o concurso avança para as próximas etapas.'}
     const milestones=[...document.querySelectorAll('.timeline .milestone')];const names=['Início','Base','Consolidação','Revisão','Horizonte atual'];milestones.forEach((m,i)=>{const strong=m.querySelector('strong');if(strong&&names[i])strong.textContent=names[i]});
-    const generator=document.querySelector('.generator-cta p');if(generator)generator.textContent='Use o Gerador de Cronograma MPC gratuitamente e organize sua preparação mesmo antes da definição da data da prova.';
+    const generator=document.querySelector('.generator-cta p');if(generator)generator.textContent='Use a ferramenta automática gratuita para montar seu próprio cronograma mesmo antes da definição da data da prova.';
     const final=document.querySelector('.final-banner p');if(final)final.textContent='Acompanhe seu planejamento, avance bloco a bloco e mantenha a constância enquanto o concurso evolui para as próximas etapas.';
   }
   async function init(){
-    loadMobileStyles();loadPublicButtons();styles();if(!id)return;
-    try{const planResponse=await fetch(`/api/plans?id=${encodeURIComponent(id)}`,{cache:'no-store'});if(planResponse.ok){const plan=await planResponse.json();applyPreEdital(plan)}}catch{}
+    loadMobileStyles();loadPublicButtons();loadPublicExperience();styles();if(!id)return;
+    try{const planResponse=await fetch(`/api/plans?id=${encodeURIComponent(id)}`,{cache:'no-store'});if(planResponse.ok){const plan=await planResponse.json();applyPreEdital(plan);if(typeof window.mpcApplyPublicExperience==='function')window.mpcApplyPublicExperience(plan)}}catch{}
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
