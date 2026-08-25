@@ -48,6 +48,24 @@
   window.mpcIsBlackoutDate=value=>dateSet().has(String(value||'').slice(0,10));
   window.mpcSyncBlackoutRanges=()=>syncMirrors(rangesFromState(),false);
 
+  function injectPlannerBlocks(){
+    const state=read(STATE_KEY,null);if(!state?.tasks)return;
+    const dates=[...dateSet()];if(!dates.length)return;
+    const sentinels=dates.map((date,index)=>({id:`blackout-sentinel-${date}-${index}`,date,day:(parse(date).getDay()+6)%7,start:'00:00',end:'23:59',subject:'Indisponibilidade',activity:'Simulado técnico - data indisponível',type:'Simulado técnico',notes:'Marcador interno para impedir o agendamento nesta data.',done:false,_blackoutSentinel:true}));
+    state.tasks=[...state.tasks.filter(t=>!t?._blackoutSentinel),...sentinels];write(STATE_KEY,state);
+  }
+  function removePlannerBlocks(){
+    const state=read(STATE_KEY,null);if(!state?.tasks)return;
+    state.tasks=state.tasks.filter(t=>!t?._blackoutSentinel&&!String(t?.id||'').startsWith('blackout-sentinel-'));
+    const ranges=rangesFromState();state.studyRoutine={...(state.studyRoutine||{}),blackoutRanges:ranges,planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),blackoutDatesExclusive:true}};
+    state.adminPersonalization={...(state.adminPersonalization||{}),blackoutRanges:ranges,blackoutDatesExclusive:true};write(STATE_KEY,state);
+  }
+  function wrapPlanner(){
+    const original=window.mpcApplyCapacityFill;if(typeof original!=='function'||original._blackoutWrapped)return false;
+    const wrapped=function(options){syncMirrors(rangesFromState(),false);injectPlannerBlocks();let result;try{result=original(options)}finally{removePlannerBlocks()}return result};
+    wrapped._blackoutWrapped=true;window.mpcApplyCapacityFill=wrapped;return true;
+  }
+
   function renderList(){
     const list=$('#mpcBlackoutList');if(!list)return;
     const ranges=rangesFromState();
@@ -66,7 +84,7 @@
     const panel=$('#adminPanel'),anchor=findAnchor();if(!panel||!anchor)return;
     const section=document.createElement('section');section.id='mpcBlackoutSection';
     section.style.cssText='margin:0 0 18px;padding:20px 22px;border:1px solid #dbe3ef;border-radius:18px;background:#fff;box-shadow:0 4px 18px rgba(15,23,42,.04)';
-    section.innerHTML=`<div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap"><div><h3 style="margin:0 0 6px;font-size:1.05rem">Datas sem estudo / indisponibilidades</h3><p style="margin:0;color:#64748b;font-size:.88rem;line-height:1.5">Cadastre um dia isolado ou um intervalo. Nessas datas o planejador não agenda teoria, exercícios, revisões, consolidação nem simulados.</p></div></div><div style="display:grid;grid-template-columns:minmax(145px,1fr) minmax(145px,1fr) minmax(180px,1.4fr) auto;gap:10px;margin-top:16px;align-items:end"><label style="font-size:.8rem;font-weight:800;color:#334155">De<input id="mpcBlackoutStart" type="date" style="display:block;width:100%;margin-top:5px;padding:10px;border:1px solid #cbd5e1;border-radius:9px"></label><label style="font-size:.8rem;font-weight:800;color:#334155">Até<input id="mpcBlackoutEnd" type="date" style="display:block;width:100%;margin-top:5px;padding:10px;border:1px solid #cbd5e1;border-radius:9px"></label><label style="font-size:.8rem;font-weight:800;color:#334155">Motivo<input id="mpcBlackoutReason" type="text" maxlength="120" placeholder="Ex.: Viagem" style="display:block;width:100%;margin-top:5px;padding:10px;border:1px solid #cbd5e1;border-radius:9px"></label><button id="mpcAddBlackout" type="button" style="border:0;border-radius:10px;background:#0D1B33;color:#fff;padding:11px 15px;font-weight:900;cursor:pointer">Adicionar</button></div><div id="mpcBlackoutList" style="display:grid;gap:8px;margin-top:14px"></div>`;
+    section.innerHTML=`<div><h3 style="margin:0 0 6px;font-size:1.05rem">Datas sem estudo / indisponibilidades</h3><p style="margin:0;color:#64748b;font-size:.88rem;line-height:1.5">Cadastre um dia isolado ou um intervalo. Nessas datas o planejador não agenda teoria, exercícios, revisões, consolidação nem simulados.</p></div><div style="display:grid;grid-template-columns:minmax(145px,1fr) minmax(145px,1fr) minmax(180px,1.4fr) auto;gap:10px;margin-top:16px;align-items:end"><label style="font-size:.8rem;font-weight:800;color:#334155">De<input id="mpcBlackoutStart" type="date" style="display:block;width:100%;margin-top:5px;padding:10px;border:1px solid #cbd5e1;border-radius:9px"></label><label style="font-size:.8rem;font-weight:800;color:#334155">Até<input id="mpcBlackoutEnd" type="date" style="display:block;width:100%;margin-top:5px;padding:10px;border:1px solid #cbd5e1;border-radius:9px"></label><label style="font-size:.8rem;font-weight:800;color:#334155">Motivo<input id="mpcBlackoutReason" type="text" maxlength="120" placeholder="Ex.: Viagem" style="display:block;width:100%;margin-top:5px;padding:10px;border:1px solid #cbd5e1;border-radius:9px"></label><button id="mpcAddBlackout" type="button" style="border:0;border-radius:10px;background:#0D1B33;color:#fff;padding:11px 15px;font-weight:900;cursor:pointer">Adicionar</button></div><div id="mpcBlackoutList" style="display:grid;gap:8px;margin-top:14px"></div>`;
     anchor.parentNode.insertBefore(section,anchor);
     const start=$('#mpcBlackoutStart'),end=$('#mpcBlackoutEnd');
     start?.addEventListener('change',()=>{if(start.value&&!end.value)end.value=start.value});
@@ -79,7 +97,9 @@
     renderList();
   }
   function bind(){
-    syncMirrors(rangesFromState(),false);mount();setTimeout(mount,250);setTimeout(mount,900);
+    syncMirrors(rangesFromState(),false);mount();wrapPlanner();
+    let tries=0;const timer=setInterval(()=>{mount();if(wrapPlanner()||tries++>40)clearInterval(timer)},100);
+    setTimeout(mount,250);setTimeout(mount,900);
     document.addEventListener('click',event=>{if(event.target?.closest?.('#adminGenerateScheduleBtn,#publicPageBtn,#exportPublicPageBtn,[data-update-plan]'))syncMirrors(rangesFromState(),false)},true);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
