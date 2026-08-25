@@ -12,12 +12,16 @@
   Cache-Control: public, max-age=0, must-revalidate
 /public-plan-buttons.js
   Cache-Control: public, max-age=0, must-revalidate
+/public-page-experience.js
+  Cache-Control: public, max-age=0, must-revalidate
 /plano.html
   Cache-Control: public, max-age=0, must-revalidate
 
 /admin-duplicate-plan.js
   Cache-Control: public, max-age=0, must-revalidate
 /admin-public-buttons.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-public-theme.js
   Cache-Control: public, max-age=0, must-revalidate
 /admin-blackout-dates.js
   Cache-Control: public, max-age=0, must-revalidate
