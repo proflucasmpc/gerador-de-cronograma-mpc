@@ -48,18 +48,25 @@
     return dates.map((d,index)=>{
       const source=subjects[index%Math.max(1,subjects.length)];
       const name=bySubject&&subjects.length?String(source?.name||source||'Matéria'):'Simulado completo';
-      return{id:`sim-v8-${dateKey(d)}-${index}`,day:dayIndex(d),date:dateKey(d),cycleOrder:0,start:toTime(start),end:toTime(start+duration),subject:bySubject?`Simulado - ${name}`:'Simulado completo',activity:bySubject?`Simulado por matéria - ${name}`:`Simulado completo - ${state.goal||''}`,type:bySubject?'Simulado por matéria':'Simulado completo',notes:'Dia reservado exclusivamente para a realização do simulado. Não há estudo regular programado nesta data.',done:false};
+      return{id:`sim-v9-${dateKey(d)}-${index}`,day:dayIndex(d),date:dateKey(d),cycleOrder:0,start:toTime(start),end:toTime(start+duration),subject:bySubject?`Simulado - ${name}`:'Simulado completo',activity:bySubject?`Simulado por matéria - ${name}`:`Simulado completo - ${state.goal||''}`,type:bySubject?'Simulado por matéria':'Simulado completo',notes:'Dia reservado exclusivamente para a realização do simulado. Não há estudo regular programado nesta data.',done:false};
     });
   }
 
   function normalize(){
     if(typeof window.mpcSyncBlackoutRanges==='function')window.mpcSyncBlackoutRanges();
     const state=read(STATE_KEY,null);if(!state?.tasks?.length)return false;
-    const tasks=[];let reviewsReleased=0,oldSimulationsRemoved=0;
-    state.tasks.forEach(task=>{if(isSimulation(task)){oldSimulationsRemoved++;return}if(isReview(task)){reviewsReleased++;tasks.push({...task,date:''})}else tasks.push(task)});
+    const tasks=[];let reviewsReleased=0,oldSimulationsRemoved=0,blackoutTasksReleased=0;
+    state.tasks.forEach(task=>{
+      if(isSimulation(task)){oldSimulationsRemoved++;return}
+      const blocked=task?.date&&isBlackout(task.date);
+      if(blocked){blackoutTasksReleased++;tasks.push({...task,date:''});return}
+      if(isReview(task)){reviewsReleased++;tasks.push({...task,date:''});return}
+      tasks.push(task);
+    });
     const sims=currentSimulations(state);state.tasks=[...tasks,...sims];
-    state.adminPersonalization={...(state.adminPersonalization||{}),simulationCount:sims.length,simulationScheduleRebuilt:true,simulationDaysExclusive:true,reviewDatesReleased:true,blackoutDatesExclusive:true};
-    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),reviewDatesAreAdvisory:true,simulationScheduleRebuilt:true,simulationDaysExclusive:true,blackoutDatesExclusive:true,finalInputNormalizerVersion:8}};
+    state.adminPersonalization={...(state.adminPersonalization||{}),simulationCount:sims.length,simulationScheduleRebuilt:true,simulationDaysExclusive:true,reviewDatesReleased:true,blackoutDatesExclusive:true,blackoutTasksReleased};
+    const previousStrategy=state.studyRoutine?.planningStrategy||{};
+    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...previousStrategy,singleFinalPlanner:false,plannerVersion:0,reviewDatesAreAdvisory:true,simulationScheduleRebuilt:true,simulationDaysExclusive:true,blackoutDatesExclusive:true,blackoutTasksReleased,finalInputNormalizerVersion:9}};
     save(STATE_KEY,state);return true;
   }
   window.mpcNormalizeFinalPlannerInput=normalize;
