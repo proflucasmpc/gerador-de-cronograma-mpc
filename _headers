@@ -19,6 +19,8 @@
   Cache-Control: public, max-age=0, must-revalidate
 /admin-public-buttons.js
   Cache-Control: public, max-age=0, must-revalidate
+/admin-blackout-dates.js
+  Cache-Control: public, max-age=0, must-revalidate
 /admin-capacity-fill.js
   Cache-Control: public, max-age=0, must-revalidate
 /admin-final-input-normalizer.js
