@@ -1,6 +1,8 @@
 (()=>{
   'use strict';
-  const PERSONAL_URL='https://hotm.io/falarcomproflucasmpc';
+  const WHATSAPP_NUMBER='5511960189699';
+  const PERSONAL_MESSAGE='Olá, Prof. Lucas MPC. Vi um cronograma de estudos e quero solicitar um cronograma personalizado feito para a minha rotina, objetivo e prova.';
+  const PERSONAL_URL=`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(PERSONAL_MESSAGE)}`;
   const id=location.pathname.match(/\/plano\/([A-Z0-9]{10})/i)?.[1]?.toUpperCase()||'';
   const THEMES={
     masculino:{navy:'#0D1B33',navy2:'#18365E',navy3:'#071225',gold:'#D7AE50',cyan:'#24C8FF',purple:'#8A5CFF',blue:'#4C7DFF',green:'#31B77A',teal:'#2DB7B3',orange:'#F0A23B',coral:'#E86C7C',bg:'#F5F7FB',paper:'#FFFFFF',text:'#172033',muted:'#657086',line:'#E4E8F0',track:'#E9EDF4'},
@@ -12,12 +14,29 @@
     if(document.getElementById('mpcPublicExperienceStyles'))return;
     const style=document.createElement('style');style.id='mpcPublicExperienceStyles';style.textContent=`
       .mpc-personal-fixed{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:120;width:min(920px,calc(100% - 28px));display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,var(--navy3),var(--navy2));color:#fff;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 48px rgba(7,18,37,.28)}
-      .mpc-personal-fixed strong{display:block;font-size:15px;line-height:1.2}.mpc-personal-fixed span{display:block;margin-top:3px;font-size:12px;opacity:.9}.mpc-personal-fixed a{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 16px;border-radius:10px;background:var(--gold);color:var(--navy3);font-size:12px;font-weight:950;text-align:center;white-space:nowrap}.mpc-free-explainer{font-weight:900}
+      .mpc-personal-fixed-copy{min-width:0}
+      .mpc-personal-fixed strong{display:block;font-size:15px;line-height:1.25}.mpc-personal-fixed span{display:block;margin-top:4px;font-size:12px;line-height:1.4;opacity:.9}
+      .mpc-personal-fixed a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 18px;border-radius:11px;background:#25D366;color:#071225;font-size:12px;font-weight:950;text-align:center;white-space:nowrap;box-shadow:0 9px 22px rgba(37,211,102,.22)}
+      .mpc-personal-fixed a:hover{filter:brightness(.97)}.mpc-free-explainer{font-weight:900}
+      .mpc-wa-icon{font-size:17px;line-height:1}
       body[data-public-theme="aulacerta"] .mpc-personal-fixed{background:linear-gradient(145deg,#10234A,#315EFB)}
       .final-banner{display:none!important}
       body{padding-bottom:92px!important}
-      @media(max-width:880px){.whatsapp-float{display:none!important}.mpc-personal-fixed{bottom:10px;width:calc(100% - 18px);grid-template-columns:1fr;padding:11px 12px;gap:8px}.mpc-personal-fixed span{display:none}.mpc-personal-fixed a{width:100%;min-height:44px;white-space:normal}.shell{padding-bottom:120px!important}.mobile-nav{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;margin:26px 0 12px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;border-radius:15px!important;box-shadow:0 10px 28px rgba(7,18,37,.16)!important}}
-      @media(max-width:520px){.mpc-personal-fixed strong{font-size:13px}.mpc-personal-fixed a{font-size:11px}}
+      @media(max-width:880px){
+        .whatsapp-float{display:none!important}
+        .mpc-personal-fixed{bottom:9px;width:calc(100% - 18px);grid-template-columns:1fr;padding:14px 14px 13px;gap:11px;text-align:center;border-radius:18px}
+        .mpc-personal-fixed-copy{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
+        .mpc-personal-fixed strong{font-size:16px;line-height:1.28;text-align:center;max-width:560px;margin:0 auto}
+        .mpc-personal-fixed span{display:none}
+        .mpc-personal-fixed a{width:100%;min-height:48px;white-space:normal;font-size:12px;line-height:1.2;padding:13px 12px}
+        .shell{padding-bottom:142px!important}
+        .mobile-nav{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;margin:26px 0 12px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;border-radius:15px!important;box-shadow:0 10px 28px rgba(7,18,37,.16)!important}
+      }
+      @media(max-width:520px){
+        .mpc-personal-fixed{padding:13px 12px 12px}
+        .mpc-personal-fixed strong{font-size:15px;max-width:300px}
+        .mpc-personal-fixed a{font-size:11.5px;border-radius:10px}
+      }
     `;document.head.appendChild(style);
   }
   function applyTheme(theme){const name=cleanTheme(theme),vars=THEMES[name];document.body.dataset.publicTheme=name;Object.entries(vars).forEach(([key,value])=>document.documentElement.style.setProperty(`--${key}`,value))}
@@ -31,7 +50,7 @@
   function fixedCta(){
     let cta=document.getElementById('mpcPersonalScheduleFixed');if(cta)return cta;
     cta=document.createElement('div');cta.id='mpcPersonalScheduleFixed';cta.className='mpc-personal-fixed';
-    cta.innerHTML=`<div><strong>Quer um cronograma feito especificamente para você?</strong><span>Serviço personalizado: o Prof. Lucas analisa sua rotina, objetivo e conteúdo da prova.</span></div><a href="${PERSONAL_URL}" target="_blank" rel="noopener">SOLICITAR MEU CRONOGRAMA PERSONALIZADO</a>`;
+    cta.innerHTML=`<div class="mpc-personal-fixed-copy"><strong>Quer um cronograma feito especificamente para você?</strong><span>Serviço personalizado: o Prof. Lucas analisa sua rotina, objetivo e conteúdo da prova.</span></div><a href="${PERSONAL_URL}" target="_blank" rel="noopener"><span class="mpc-wa-icon">✆</span><span>SOLICITAR MEU CRONOGRAMA PERSONALIZADO</span></a>`;
     document.body.appendChild(cta);return cta;
   }
   function normalizeMobileMenu(){const nav=document.querySelector('.mobile-nav'),shell=document.querySelector('main.shell');if(!nav||!shell)return;if(nav.parentElement!==shell)shell.appendChild(nav)}
