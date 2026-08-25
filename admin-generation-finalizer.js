@@ -11,6 +11,14 @@
     return Boolean(strategy.singleFinalPlanner)&&Number(strategy.plannerVersion)===4;
   }
 
+  function loadPedagogyGuard(){
+    if(document.querySelector('script[src*="admin-pedagogy-guard.js"]'))return;
+    const script=document.createElement('script');
+    script.src='/admin-pedagogy-guard.js?v=20260825-1';
+    script.defer=true;
+    document.head.appendChild(script);
+  }
+
   function finalizeGenerated(){
     const status=$('#adminGenerationStatus');
     if(!status?.classList.contains('success'))return false;
@@ -54,10 +62,12 @@
     let data=null;
     try{data=JSON.parse(sessionStorage.getItem(MESSAGE_KEY)||'null');sessionStorage.removeItem(MESSAGE_KEY)}catch{}
     if(!data)return;
-    setTimeout(()=>alert(`Cronograma finalizado com o Planejador Final V4. ${data.activities||0} atividades foram distribuídas com aproveitamento da disponibilidade e bloco mínimo de ${data.minBlock||15} minutos.`),220);
+    const extra=data.finalConsolidationMinutes?` A consolidação final também preencheu aproximadamente ${Math.round(data.finalConsolidationMinutes/60*10)/10}h livres até o fim do período.`:'';
+    setTimeout(()=>alert(`Cronograma finalizado com o Planejador Final V4. ${data.activities||0} atividades foram distribuídas com aproveitamento da disponibilidade e bloco mínimo de ${data.minBlock||15} minutos.${extra}`),220);
   }
 
   function init(){
+    loadPedagogyGuard();
     bindGenerate();
     setTimeout(bindGenerate,250);
     setTimeout(bindGenerate,800);
