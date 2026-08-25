@@ -9,23 +9,26 @@
   const BLACKOUT_KEY='mpcAdminBlackoutRangesV1';
   const read=(key,fallback=null)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}};
   const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch{}};
+  function loadScript(src){if(document.querySelector(`script[src*="${src.split('?')[0]}"]`))return;const script=document.createElement('script');script.src=src;script.defer=true;document.head.appendChild(script)}
   function loadUiUpgrades(){
     if(!document.querySelector('link[href*="admin-layout-links.css"]')){const link=document.createElement('link');link.rel='stylesheet';link.href='/admin-layout-links.css?v=20260813-1';document.head.appendChild(link)}
-    if(!document.querySelector('script[src*="admin-public-buttons.js"]')){const script=document.createElement('script');script.src='/admin-public-buttons.js?v=20260823-1';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-public-theme.js"]')){const script=document.createElement('script');script.src='/admin-public-theme.js?v=20260825-1';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-blackout-dates.js"]')){const script=document.createElement('script');script.src='/admin-blackout-dates.js?v=20260825-1';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-capacity-fill.js"]')){const script=document.createElement('script');script.src='/admin-capacity-fill.js?v=20260823-3';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-final-input-normalizer.js"]')){const script=document.createElement('script');script.src='/admin-final-input-normalizer.js?v=20260825-4';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-generation-finalizer.js"]')){const script=document.createElement('script');script.src='/admin-generation-finalizer.js?v=20260825-2';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-final-consolidation.js"]')){const script=document.createElement('script');script.src='/admin-final-consolidation.js?v=20260825-1';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-new-plan-button.js"]')){const script=document.createElement('script');script.src='/admin-new-plan-button.js?v=20260823-1';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-package-import.js"]')){const script=document.createElement('script');script.src='/admin-package-import.js?v=20260825-1';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-package-compat.js"]')){const script=document.createElement('script');script.src='/admin-package-compat.js?v=20260825-1';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-package-autofit.js"]')){const script=document.createElement('script');script.src='/admin-package-autofit.js?v=20260825-1';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-simulation-capacity.js"]')){const script=document.createElement('script');script.src='/admin-simulation-capacity.js?v=20260825-3';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-simulation-selection-guard.js"]')){const script=document.createElement('script');script.src='/admin-simulation-selection-guard.js?v=20260823-1';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-update-sync.js"]')){const script=document.createElement('script');script.src='/admin-update-sync.js?v=20260820-2';script.defer=true;document.head.appendChild(script)}
-    if(!document.querySelector('script[src*="admin-publish-guard.js"]')){const script=document.createElement('script');script.src='/admin-publish-guard.js?v=20260823-2';script.defer=true;document.head.appendChild(script)}
+    loadScript('/admin-public-buttons.js?v=20260823-1');
+    loadScript('/admin-public-theme.js?v=20260825-1');
+    loadScript('/admin-blackout-dates.js?v=20260825-1');
+    loadScript('/admin-capacity-fill.js?v=20260823-3');
+    loadScript('/admin-final-input-normalizer.js?v=20260825-4');
+    loadScript('/admin-final-consolidation.js?v=20260825-1');
+    loadScript('/admin-pedagogy-guard.js?v=20260825-2');
+    loadScript('/admin-final-capacity-guarantee.js?v=20260825-1');
+    loadScript('/admin-generation-finalizer.js?v=20260825-3');
+    loadScript('/admin-new-plan-button.js?v=20260823-1');
+    loadScript('/admin-package-import.js?v=20260825-1');
+    loadScript('/admin-package-compat.js?v=20260825-1');
+    loadScript('/admin-package-autofit.js?v=20260825-1');
+    loadScript('/admin-simulation-capacity.js?v=20260825-3');
+    loadScript('/admin-simulation-selection-guard.js?v=20260823-1');
+    loadScript('/admin-update-sync.js?v=20260820-2');
+    loadScript('/admin-publish-guard.js?v=20260823-2');
   }
   function resetPersonalDraft(draft){if(!draft||typeof draft!=='object')return{};return {...draft,studentName:'',startDate:'',hoursPerDay:0,sessionMinutes:60,preferredStart:'',availableDays:[],workSchedule:'',studyMaterial:'',generalGuidance:'',replaceSchedule:true}}
   function convertLoadedCopy(){
