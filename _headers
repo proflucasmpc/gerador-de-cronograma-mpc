@@ -35,6 +35,8 @@
   Cache-Control: public, max-age=0, must-revalidate
 /admin-pedagogy-guard.js
   Cache-Control: public, max-age=0, must-revalidate
+/admin-final-capacity-guarantee.js
+  Cache-Control: public, max-age=0, must-revalidate
 /admin-new-plan-button.js
   Cache-Control: public, max-age=0, must-revalidate
 /admin-package-import.js
