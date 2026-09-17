@@ -24,4 +24,10 @@
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+  <url>
+    <loc>https://gerador-de-cronograma-mpc.netlify.app/gerador-de-cronograma-de-estudos-para-concurso</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
 </urlset>
