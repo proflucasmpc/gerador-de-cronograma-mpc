@@ -16,7 +16,7 @@
 [[headers]]
   for = "/acesso.html"
   [headers.values]
-    X-Robots-Tag = "noindex, follow"
+    X-Robots-Tag = "noindex, nofollow"
 
 [[headers]]
   for = "/area-usuario.html"
@@ -32,6 +32,43 @@
   for = "/premium-pdf.html"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
+
+# Fluxo do cliente desativado: novos e antigos visitantes não montam o cronograma sozinhos.
+[[redirects]]
+  from = "/acesso.html"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/acesso"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/area-usuario.html"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/area-usuario"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/area-usuario-preview.html"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/area-usuario-preview"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
 
 [[redirects]]
   from = "/cronograma-de-estudos-para-concurso"
