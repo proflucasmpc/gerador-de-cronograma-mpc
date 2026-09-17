@@ -54,6 +54,11 @@
   status = 200
 
 [[redirects]]
+  from = "/gerador-de-cronograma-de-estudos-para-concurso"
+  to = "/gerador-de-cronograma-de-estudos-para-concurso.html"
+  status = 200
+
+[[redirects]]
   from = "/plano/*"
   to = "/plano.html"
   status = 200
