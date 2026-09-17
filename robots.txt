@@ -7,4 +7,4 @@ Disallow: /area-usuario-preview.html
 Disallow: /premium-pdf.html
 Disallow: /.netlify/
 
-Sitemap: https://gerador-de-cronograma-mpc.netlify.app/sitemap.xml
+Sitemap: https://lucasmpc.com.br/sitemap.xml

@@ -119,3 +119,8 @@
   from = "/plano/*"
   to = "/plano.html"
   status = 200
+
+[[redirects]]
+  from = "/vantagens-de-estudar-com-cronograma"
+  to = "/vantagens-de-estudar-com-cronograma.html"
+  status = 200
