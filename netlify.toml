@@ -59,6 +59,21 @@
   status = 200
 
 [[redirects]]
+  from = "/cronograma-de-estudos-2-horas-por-dia"
+  to = "/cronograma-de-estudos-2-horas-por-dia.html"
+  status = 200
+
+[[redirects]]
+  from = "/como-dividir-materias-do-edital"
+  to = "/como-dividir-materias-do-edital.html"
+  status = 200
+
+[[redirects]]
+  from = "/cronograma-de-estudos-12x36"
+  to = "/cronograma-de-estudos-12x36.html"
+  status = 200
+
+[[redirects]]
   from = "/plano/*"
   to = "/plano.html"
   status = 200
