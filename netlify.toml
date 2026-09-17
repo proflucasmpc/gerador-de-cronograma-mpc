@@ -49,6 +49,11 @@
   status = 200
 
 [[redirects]]
+  from = "/plano-de-estudos-a-partir-do-edital"
+  to = "/plano-de-estudos-a-partir-do-edital.html"
+  status = 200
+
+[[redirects]]
   from = "/plano/*"
   to = "/plano.html"
   status = 200
