@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /acesso.html
+Disallow: /area-usuario.html
+Disallow: /area-usuario-preview.html
+Disallow: /premium-pdf.html
+Disallow: /.netlify/
+
+Sitemap: https://gerador-de-cronograma-mpc.netlify.app/sitemap.xml
