@@ -39,6 +39,16 @@
   status = 200
 
 [[redirects]]
+  from = "/como-montar-cronograma-de-estudos-para-concurso"
+  to = "/como-montar-cronograma-de-estudos-para-concurso.html"
+  status = 200
+
+[[redirects]]
+  from = "/cronograma-de-estudos-para-quem-trabalha"
+  to = "/cronograma-de-estudos-para-quem-trabalha.html"
+  status = 200
+
+[[redirects]]
   from = "/plano/*"
   to = "/plano.html"
   status = 200
