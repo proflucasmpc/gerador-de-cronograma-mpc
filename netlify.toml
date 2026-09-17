@@ -33,6 +33,19 @@
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
+# Migração permanente: qualquer URL antiga do subdomínio Netlify mantém o mesmo caminho no domínio definitivo.
+[[redirects]]
+  from = "https://gerador-de-cronograma-mpc.netlify.app/*"
+  to = "https://lucasmpc.com.br/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://gerador-de-cronograma-mpc.netlify.app/*"
+  to = "https://lucasmpc.com.br/:splat"
+  status = 301
+  force = true
+
 # Fluxo do cliente desativado: novos e antigos visitantes não montam o cronograma sozinhos.
 [[redirects]]
   from = "/acesso.html"
