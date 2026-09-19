@@ -137,3 +137,8 @@
   from = "/vantagens-de-estudar-com-cronograma"
   to = "/vantagens-de-estudar-com-cronograma.html"
   status = 200
+
+[[redirects]]
+  from = "/academia-da-matematica"
+  to = "/academia-da-matematica.html"
+  status = 200
