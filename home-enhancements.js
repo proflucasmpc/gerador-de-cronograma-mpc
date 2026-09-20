@@ -7,7 +7,10 @@
     const restart=()=>{clearInterval(timer);play()};
     document.querySelector('.hero-prev')?.addEventListener('click',()=>{show(active-1);restart()});document.querySelector('.hero-next')?.addEventListener('click',()=>{show(active+1);restart()});dots.forEach((dot,i)=>dot.addEventListener('click',()=>{show(i);restart()}));
     const toggle=document.querySelector('.hero-toggle');toggle?.addEventListener('click',()=>{manualPaused=!manualPaused;toggle.textContent=manualPaused?'▶':'Ⅱ';toggle.setAttribute('aria-label',manualPaused?'Reproduzir destaques':'Pausar destaques');play()});
-    const carousel=document.querySelector('.hero-carousel');carousel?.addEventListener('mouseenter',()=>clearInterval(timer));carousel?.addEventListener('mouseleave',play);carousel?.addEventListener('focusin',()=>clearInterval(timer));carousel?.addEventListener('focusout',play);show(0);play();
+    const carousel=document.querySelector('.hero-carousel');let touchStart=0;
+    carousel?.addEventListener('mouseenter',()=>clearInterval(timer));carousel?.addEventListener('mouseleave',play);carousel?.addEventListener('focusin',()=>clearInterval(timer));carousel?.addEventListener('focusout',play);
+    carousel?.addEventListener('touchstart',event=>{touchStart=event.changedTouches[0].clientX;clearInterval(timer)},{passive:true});carousel?.addEventListener('touchend',event=>{const distance=event.changedTouches[0].clientX-touchStart;if(Math.abs(distance)>45)show(active+(distance<0?1:-1));play()},{passive:true});
+    document.addEventListener('visibilitychange',()=>document.hidden?clearInterval(timer):play());show(0);play();
   }
   const productInfo={
     '80-simulados':{tag:'Mais vendido',cat:'matematica',text:'Treine Matemática com simulados organizados para aumentar ritmo e segurança.'},
