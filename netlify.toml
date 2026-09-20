@@ -46,6 +46,46 @@
   status = 301
   force = true
 
+[[redirects]]
+  from = "/80-simulados"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/metodo-ia"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/como-passar-em-concursos"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/interpretacao-matematica"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/manual-do-chute"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/portugues-para-concursos"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/combo-matematica"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/combo-estrategia"
+  to = "/produto.html"
+  status = 200
+
 # Fluxo do cliente desativado: novos e antigos visitantes não montam o cronograma sozinhos.
 [[redirects]]
   from = "/acesso.html"
@@ -141,4 +181,14 @@
 [[redirects]]
   from = "/academia-da-matematica"
   to = "/academia-da-matematica.html"
+  status = 200
+
+[[redirects]]
+  from = "/politica-de-privacidade"
+  to = "/politica-de-privacidade.html"
+  status = 200
+
+[[redirects]]
+  from = "/termos-de-uso"
+  to = "/termos-de-uso.html"
   status = 200

@@ -1,5 +1,13 @@
 /admin-study-routine.js
   Cache-Control: public, max-age=0, must-revalidate
+/home-enhancements.css
+  Cache-Control: public, max-age=0, must-revalidate
+/home-enhancements.js
+  Cache-Control: public, max-age=0, must-revalidate
+/produto.css
+  Cache-Control: public, max-age=0, must-revalidate
+/produto.js
+  Cache-Control: public, max-age=0, must-revalidate
 /admin-enhancements.js
   Cache-Control: public, max-age=0, must-revalidate
 /user-plan-attribution.js

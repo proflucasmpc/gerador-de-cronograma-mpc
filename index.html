@@ -13,7 +13,16 @@
 <meta property="og:title" content="Lucas MPC | Cursos, Concursos, Materiais e Ferramentas">
 <meta property="og:description" content="Conheça os cursos, materiais, ferramentas e projetos do Prof. Lucas MPC para concursos e estudos.">
 <meta property="og:url" content="https://lucasmpc.com.br/">
+<meta property="og:image" content="https://lucasmpc.com.br/assets/club/banner-academia.webp">
+<meta property="og:image:width" content="1440">
+<meta property="og:image:height" content="480">
+<meta property="og:image:alt" content="Cursos, materiais e ferramentas do Prof. Lucas MPC">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Lucas MPC | Cursos, Concursos, Materiais e Ferramentas">
+<meta name="twitter:description" content="Encontre cursos, simulados, ferramentas e conteúdos gratuitos para sua preparação.">
+<meta name="twitter:image" content="https://lucasmpc.com.br/assets/club/banner-academia.webp">
 <meta name="theme-color" content="#010817">
+<link rel="icon" type="image/svg+xml" href="/assets/brand/mpc-mark.svg">
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
@@ -75,6 +84,12 @@ button{font:inherit}
 .nav{margin-left:auto;display:flex;align-items:center;gap:18px}
 .nav a{font-size:13px;color:#c8d2e2}
 .nav a:hover{color:white}
+.mobile-nav{display:none;margin-left:auto;position:relative}
+.mobile-nav summary{list-style:none;width:42px;height:42px;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;cursor:pointer;font-size:20px}
+.mobile-nav summary::-webkit-details-marker{display:none}
+.mobile-menu{position:absolute;right:0;top:50px;width:240px;padding:10px;border:1px solid var(--line);border-radius:14px;background:#071225;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.mobile-menu a{display:block;padding:11px 12px;border-radius:9px;color:#dce5f2;font-size:14px}
+.mobile-menu a:hover{background:rgba(255,255,255,.06)}
 .whatsapp{background:var(--green);color:#082d1b!important;border-radius:9px;padding:10px 13px;font-weight:900}
 .hero{position:relative;overflow:hidden;padding:62px 0 38px;background:
 radial-gradient(circle at 76% 16%,rgba(214,169,40,.16),transparent 26%),
@@ -93,8 +108,11 @@ linear-gradient(180deg,#030b1c,#010817)}
 linear-gradient(145deg,rgba(214,169,40,.14),rgba(10,20,44,.7)),
 radial-gradient(circle at 75% 15%,rgba(214,169,40,.25),transparent 32%),
 #0a142c;box-shadow:0 30px 80px rgba(0,0,0,.35)}
-.feature:before{content:"Σ";position:absolute;right:24px;top:2px;font:180px Georgia,serif;color:rgba(214,169,40,.075)}
+.feature img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:.7;transition:transform .35s ease}
+.feature:hover img{transform:scale(1.025)}
+.feature:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(1,8,23,.04) 16%,rgba(1,8,23,.94) 92%);z-index:1}
 .feature-content{position:absolute;inset:auto 24px 26px 24px}
+.feature-content{z-index:2}
 .badge{display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(214,169,40,.13);border:1px solid rgba(214,169,40,.28);color:var(--gold2);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.1em}
 .feature h2{font-size:34px;line-height:1.02;margin:12px 0 8px}
 .feature p{margin:0;color:#bcc8d9;font-size:14px}
@@ -109,6 +127,10 @@ radial-gradient(circle at 75% 15%,rgba(214,169,40,.25),transparent 32%),
 .tile{scroll-snap-align:start;min-height:250px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#0a1429;display:flex;flex-direction:column;transition:.2s;box-shadow:0 12px 34px rgba(0,0,0,.18)}
 .tile:hover{transform:translateY(-3px);border-color:rgba(214,169,40,.35)}
 .cover{position:relative;height:145px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .3s ease}
+.tile:hover .cover img{transform:scale(1.04)}
+.cover.has-image:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(1,8,23,.12),rgba(1,8,23,.9));z-index:1}
+.cover.has-image .mini,.cover.has-image strong{z-index:2;text-shadow:0 2px 12px rgba(0,0,0,.8)}
 .cover:after{content:"";position:absolute;inset:auto -25px -55px auto;width:145px;height:145px;border-radius:50%;background:rgba(255,255,255,.055)}
 .cover .mini{font-size:10px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;opacity:.85}
 .cover strong{font-size:22px;line-height:1.02;max-width:190px;position:relative;z-index:2}
@@ -133,6 +155,13 @@ radial-gradient(circle at 75% 15%,rgba(214,169,40,.25),transparent 32%),
 .utility-card h3{margin:10px 0 7px;font-size:18px}
 .utility-card p{margin:0 0 14px;color:var(--muted);font-size:13px}
 .utility-card a{color:var(--gold2);font-weight:900;font-size:12px}
+.free-grid{display:grid;grid-template-columns:1.35fr repeat(2,1fr);gap:14px}
+.free-card{position:relative;overflow:hidden;min-height:220px;border:1px solid var(--line);border-radius:18px;padding:24px;background:linear-gradient(145deg,#091831,#071021)}
+.free-card:first-child{background:radial-gradient(circle at 90% 10%,rgba(66,201,255,.16),transparent 32%),linear-gradient(145deg,#0a2035,#071021)}
+.free-card .tag{font-size:10px;color:var(--gold2);font-weight:900;letter-spacing:.13em;text-transform:uppercase}
+.free-card h3{font-size:22px;line-height:1.08;margin:40px 0 9px;max-width:320px}
+.free-card p{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:440px}
+.free-card a{color:var(--gold2);font-size:12px;font-weight:900}
 .about{margin-top:38px;padding:34px 0 46px;border-top:1px solid var(--line)}
 .aboutbox{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:26px;background:linear-gradient(135deg,#071126,#091630)}
 .about h2{margin:0 0 8px;font-size:26px}
@@ -140,60 +169,137 @@ radial-gradient(circle at 75% 15%,rgba(214,169,40,.25),transparent 32%),
 .footer{border-top:1px solid var(--line);background:#010510;color:#8493a8;padding:26px 0 34px;font-size:12px}
 .footerin{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
 .footer a{color:#bdc8d8}
-@media(min-width:1050px){.rail{grid-auto-columns:calc((100% - 42px)/4)}}
-@media(max-width:900px){.hero-grid{grid-template-columns:1fr}.feature{min-height:300px}.utility{grid-template-columns:1fr}.nav a:not(.whatsapp){display:none}}
-@media(max-width:640px){.wrap{width:min(100% - 24px,1180px)}.topin{min-height:62px}.brand strong{font-size:13px}.logo{width:34px;height:34px}.whatsapp{font-size:10px;padding:9px 10px}.hero{padding-top:42px}.hero h1{font-size:44px}.hero p{font-size:16px}.feature{min-height:260px}.feature h2{font-size:30px}.section{padding-top:30px}.rail{grid-auto-columns:78vw}.aboutbox{grid-template-columns:1fr}}
+
+/* Vitrine inspirada na organização visual do Hotmart Club. */
+body{background:#0d0e10}
+.top{position:sticky;background:#050607;border:0}
+.topin{min-height:72px}
+.hero{padding:10px 0 6px;background:#0d0e10}
+.hero-grid{display:block;min-height:0;padding:0}
+.hero-grid>div:first-child{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.feature{position:relative;inset:auto;display:block;width:100%;min-height:0;aspect-ratio:3/1;border:0;border-radius:8px;background:#071225;box-shadow:none;pointer-events:auto}
+.feature img{opacity:1;object-position:center}
+.feature:before,.feature-content{display:none}
+.section{padding:28px 0 4px}
+.section h2{font-size:22px;font-weight:700}
+.section-head{margin-bottom:14px}
+.section-head p{display:none}
+.rail{grid-auto-columns:clamp(190px,19vw,245px);gap:22px;padding:2px 2px 18px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.tile{min-height:0;border:0;border-radius:8px;background:transparent;box-shadow:none;overflow:visible}
+.tile:hover{transform:translateY(-5px) scale(1.015);border-color:transparent}
+.cover{height:auto;aspect-ratio:720/1040;border-radius:7px;border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 24px rgba(0,0,0,.34);padding:14px;background:#111827}
+.cover img{object-position:center}
+.cover.has-image:before{background:linear-gradient(180deg,transparent 76%,rgba(0,0,0,.18))}
+.cover.has-image .mini,.cover.has-image strong,.cover:after{display:none}
+.cover strong{font-size:23px;max-width:210px}
+.tile-body{min-height:44px;padding:9px 1px 0;display:block}
+.tile h3{font-size:13px;font-weight:500;color:#9da3ad;margin:0}
+.tile p,.tile .link{display:none}
+#destaques .rail{grid-auto-columns:clamp(210px,20vw,255px)}
+#destaques .cover{aspect-ratio:720/1040}
+.utility-card,.free-card{background:#15171b;border-color:rgba(255,255,255,.08)}
+.about{border-color:rgba(255,255,255,.08)}
+.aboutbox{background:#15171b}
+
+@media(max-width:900px){.utility,.free-grid{grid-template-columns:1fr}.nav a:not(.whatsapp){display:none}.mobile-nav{display:block}.nav{margin-left:0}.nav .whatsapp{display:none}.feature{aspect-ratio:2.35/1}}
+@media(max-width:640px){.wrap{width:min(100% - 24px,1180px)}.topin{min-height:62px}.brand strong{font-size:13px}.logo{width:34px;height:34px}.hero{padding-top:8px}.feature{aspect-ratio:1.8/1}.feature img{object-fit:cover}.section{padding-top:24px}.rail,#destaques .rail{grid-auto-columns:47vw;gap:12px}.cover strong{font-size:19px}.aboutbox{grid-template-columns:1fr}.free-card{min-height:185px}.footerin{display:block}.footerin div+div{margin-top:12px}}
 </style>
+<link rel="stylesheet" href="/home-enhancements.css?v=20260919-3">
 </head>
 <body>
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 <header class="top">
   <div class="wrap topin">
     <a class="brand" href="/">
-      <span class="logo">Σ</span>
-      <span><small>PROF. LUCAS MPC</small><strong>Lucas MPC</strong></span>
+      <span class="logo"><img src="/assets/brand/mpc-mark.svg" alt="" width="38" height="38"></span>
+      <span><small>PROF. LUCAS</small><strong>MPC Educação</strong></span>
     </a>
     <nav class="nav">
       <a href="#cursos">Cursos</a>
+      <a href="#comece">Por onde começar</a>
       <a href="#materiais">Materiais</a>
       <a href="#ferramentas">Ferramentas</a>
-      <a href="/guias-de-estudo-para-concursos">Guias</a>
+      <a href="#gratuitos">Gratuitos</a>
       <a class="whatsapp" href="https://wa.me/5511960189699">WHATSAPP</a>
     </nav>
+    <details class="mobile-nav">
+      <summary aria-label="Abrir menu">☰</summary>
+      <div class="mobile-menu">
+        <a href="#cursos">Cursos</a><a href="#comece">Por onde começar</a><a href="#materiais">Materiais</a><a href="#ferramentas">Ferramentas</a><a href="#gratuitos">Conteúdo gratuito</a><a href="https://wa.me/5511960189699">WhatsApp</a>
+      </div>
+    </details>
   </div>
 </header>
 
-<main>
+<main id="conteudo">
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
       <div class="eyebrow">Cursos • Materiais • Ferramentas • Concursos</div>
-      <h1>Seu espaço de preparação para concursos.</h1>
-      <p>Encontre em um só lugar os cursos, materiais, ferramentas e projetos do Prof. Lucas MPC. Escolha o que você precisa agora e avance para a próxima etapa da sua preparação.</p>
+      <h1>Tudo para sua preparação em um só lugar.</h1>
+      <p>Cursos, materiais, simulados, concursos, ferramentas e planejamento para você saber o que estudar e avançar até a prova.</p>
       <div class="actions">
         <a class="btn gold" href="#cursos">EXPLORAR CONTEÚDOS</a>
         <a class="btn ghost" href="https://radar.lucasmpc.com.br/">ABRIR RADAR DE CONCURSOS</a>
       </div>
     </div>
 
-    <a class="feature" href="/academia-da-matematica" aria-label="Conhecer a Academia da Matemática">
-      <div class="feature-content">
-        <span class="badge">Destaque</span>
-        <h2>Academia da Matemática</h2>
-        <p>Treinamento completo de Matemática para concursos, com questões, simulados, interpretação, macetes e correções em vídeo.</p>
-        <span class="go">CONHECER A ACADEMIA →</span>
-      </div>
-    </a>
+    <div class="hero-carousel" aria-roledescription="carrossel" aria-label="Destaques do Prof. Lucas MPC">
+      <a class="feature hero-slide is-active" href="https://wa.me/5511960189699?text=Ol%C3%A1%2C%20professor%20Lucas.%20Quero%20receber%20o%20e-book%20gratuito." aria-label="Receber gratuitamente o e-book pelo WhatsApp"><picture><source media="(max-width:640px)" srcset="/assets/club/como-passar.webp"><img src="/assets/club/banner.webp" alt="Receba gratuitamente o e-book Como Passar em Concursos Públicos" width="1440" height="480"></picture><span class="banner-cta">RECEBER E-BOOK GRATUITO</span></a>
+      <a class="feature hero-slide" href="/academia-da-matematica" aria-label="Conhecer a Academia da Matemática"><picture><source media="(max-width:640px)" srcset="/assets/club/academia.webp"><img src="/assets/club/banner-academia.webp" alt="Academia da Matemática: aulas, questões e simulados" width="1440" height="480"></picture></a>
+      <a class="feature hero-slide" href="https://radar.lucasmpc.com.br/" aria-label="Consultar gratuitamente o Radar de Concursos MPC"><img src="/assets/club/banner-radar.webp" alt="Radar de Concursos MPC: editais, vagas, datas e provas" width="1440" height="480"></a>
+      <button class="hero-arrow hero-prev" type="button" aria-label="Destaque anterior">‹</button><button class="hero-arrow hero-next" type="button" aria-label="Próximo destaque">›</button>
+      <div class="hero-dots" aria-label="Escolher destaque"><button class="is-active" type="button" aria-label="Mostrar e-book"></button><button type="button" aria-label="Mostrar Academia da Matemática"></button><button type="button" aria-label="Mostrar Radar de Concursos"></button><button class="hero-toggle" type="button" aria-label="Pausar destaques">Ⅱ</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="comece">
+  <div class="wrap">
+    <div class="section-head"><div><h2>Por onde você quer começar?</h2><p>Escolha seu objetivo e encontre o caminho mais adequado.</p></div></div>
+    <div class="decision">
+      <a class="decision-card" href="/academia-da-matematica" data-analytics="jornada"><span class="decision-icon">∑</span><h3>Quero dominar Matemática</h3><p>Aulas, questões, simulados e correções para construir uma preparação completa.</p><strong>CONHECER A ACADEMIA →</strong></a>
+      <a class="decision-card" href="/cronograma-de-estudos-para-concurso" data-analytics="jornada"><span class="decision-icon">▦</span><h3>Quero organizar meus estudos</h3><p>Transforme edital, disponibilidade e prioridades em um plano claro de execução.</p><strong>CRIAR MEU CRONOGRAMA →</strong></a>
+      <a class="decision-card" href="/metodo-ia" data-analytics="jornada"><span class="decision-icon">✦</span><h3>Quero estudar com estratégia</h3><p>Conheça técnicas de prova, interpretação e recursos de IA para estudar melhor.</p><strong>VER MÉTODO IA →</strong></a>
+    </div>
+  </div>
+</section>
+
+<section class="section catalog-search" aria-labelledby="catalogo-titulo">
+  <div class="wrap">
+    <div class="catalog-box"><div><span class="eyebrow">Encontre o conteúdo certo</span><h2 id="catalogo-titulo">Explore por tema</h2></div><label class="search-field"><span class="sr-only">Buscar produto</span><input id="catalogSearch" type="search" placeholder="Buscar curso, material ou ferramenta…" autocomplete="off"></label><div class="filter-buttons" role="group" aria-label="Filtrar produtos"><button class="is-active" type="button" data-filter="todos">Todos</button><button type="button" data-filter="matematica">Matemática</button><button type="button" data-filter="estrategia">Estratégia</button><button type="button" data-filter="portugues">Português</button><button type="button" data-filter="gratuito">Gratuitos</button></div><p id="filterStatus" class="filter-status" aria-live="polite"></p></div>
   </div>
 </section>
 
 <section class="section" id="destaques">
   <div class="wrap">
-    <div class="section-head"><div><h2>Destaques</h2><p>Os principais caminhos para começar agora.</p></div></div>
+    <div class="section-head"><div><h2>Mais vendidos</h2><p>Os conteúdos mais procurados.</p></div></div>
     <div class="rail">
-      <a class="tile" href="/academia-da-matematica"><div class="cover math"><span class="mini">Curso principal</span><strong>Academia da Matemática</strong></div><div class="tile-body"><h3>Matemática para concursos</h3><p>Questões, simulados, interpretação, macetes e aulas práticas.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="https://radar.lucasmpc.com.br/"><div class="cover radar"><span class="mini">Concursos</span><strong>Radar de Concursos MPC</strong></div><div class="tile-body"><h3>Concursos e provas</h3><p>Concursos abertos, previstos, autorizados e provas anteriores.</p><span class="link">Abrir Radar →</span></div></a>
-      <a class="tile" href="/cronograma-de-estudos-para-concurso"><div class="cover plan"><span class="mini">Planejamento</span><strong>Cronograma Personalizado</strong></div><div class="tile-body"><h3>Plano até a prova</h3><p>Planejamento de estudo feito com base no seu edital e rotina.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="https://combo-matematica-treine-ate-passar.netlify.app/"><div class="cover combo"><span class="mini">Treino</span><strong>Combo Matemática 3 em 1</strong></div><div class="tile-body"><h3>Treine até passar</h3><p>Simulados, banco de questões e interpretação de Matemática.</p><span class="link">Ver oferta →</span></div></a>
+      <a class="tile" href="/80-simulados"><div class="cover has-image"><img src="/assets/club/80-simulados.webp" alt="Capa dos 80 Simulados de Matemática" loading="lazy" width="720" height="1039"></div><div class="tile-body"><h3>80 Simulados de Matemática</h3></div></a>
+      <a class="tile" href="/academia-da-matematica"><div class="cover has-image"><img src="/assets/club/academia.webp" alt="Capa da Academia da Matemática" loading="lazy" width="720" height="1039"></div><div class="tile-body"><h3>Academia da Matemática</h3></div></a>
+      <a class="tile" href="/como-passar-em-concursos"><div class="cover has-image"><img src="/assets/club/como-passar.webp" alt="Capa do curso Como Passar em Concursos" loading="lazy" width="693" height="1040"></div><div class="tile-body"><h3>Como Passar em Concursos</h3></div></a>
+      <a class="tile" href="/metodo-ia"><div class="cover has-image"><img src="/assets/club/metodo-ia.webp" alt="Capa do Método IA para Concursos" loading="lazy" width="720" height="1039"></div><div class="tile-body"><h3>Método IA para Concursos</h3></div></a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="oferta-principal">
+  <div class="wrap">
+    <div class="featured-offer">
+      <img src="/assets/club/academia.webp" alt="Capa da Academia da Matemática" loading="lazy" width="720" height="1039">
+      <div class="featured-copy"><div class="eyebrow">Oferta recomendada</div><h2 id="oferta-principal">Academia da Matemática</h2><p>Uma preparação completa para quem quer deixar de apenas assistir a aulas e começar a treinar Matemática de forma organizada, prática e contínua.</p><ul class="feature-list"><li>Aulas objetivas</li><li>Questões comentadas</li><li>Simulados para treinamento</li><li>Correções em vídeo</li></ul><a class="btn gold" href="/academia-da-matematica" data-analytics="oferta-principal">CONHECER A ACADEMIA</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="novidades">
+  <div class="wrap">
+    <div class="section-head"><div><h2>Novidades e recomendações</h2><p>Conteúdos em destaque para avançar na preparação.</p></div></div>
+    <div class="news-grid">
+      <a class="news-card" href="/metodo-ia"><img src="/assets/club/metodo-ia.webp" alt="Método IA para Concursos" loading="lazy"><div><span>Tecnologia</span><h3>Método IA para Concursos</h3><p>Use inteligência artificial com método e objetivos claros.</p></div></a>
+      <a class="news-card" href="/80-simulados"><img src="/assets/club/80-simulados.webp" alt="80 Simulados de Matemática" loading="lazy"><div><span>Treinamento</span><h3>80 Simulados de Matemática</h3><p>Aumente o volume de prática e acompanhe sua evolução.</p></div></a>
+      <a class="news-card" href="https://radar.lucasmpc.com.br/"><img src="/assets/club/banner-radar.webp" alt="Radar de Concursos MPC" loading="lazy"><div><span>Gratuito</span><h3>Radar de Concursos MPC</h3><p>Editais, vagas, datas e provas reunidos em um só lugar.</p></div></a>
     </div>
   </div>
 </section>
@@ -202,12 +308,12 @@ radial-gradient(circle at 75% 15%,rgba(214,169,40,.25),transparent 32%),
   <div class="wrap">
     <div class="section-head"><div><h2>Cursos e treinamentos</h2><p>Conteúdos para fortalecer conhecimento, estratégia e desempenho em prova.</p></div></div>
     <div class="rail">
-      <a class="tile" href="/academia-da-matematica"><div class="cover math"><span class="mini">Matemática</span><strong>Academia da Matemática</strong></div><div class="tile-body"><h3>Curso completo</h3><p>Matemática prática para concursos, do treino à resolução.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="https://segredo-da-interpretacao-matematica.netlify.app/"><div class="cover interp"><span class="mini">Matemática</span><strong>O Segredo da Interpretação</strong></div><div class="tile-body"><h3>Interpretação de questões</h3><p>Treinamento focado em compreender e atacar melhor os enunciados.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="https://manual-do-chute-certo.netlify.app/"><div class="cover chute"><span class="mini">Estratégia</span><strong>Técnicas de Chute</strong></div><div class="tile-body"><h3>Estratégias para prova</h3><p>Técnicas gerais e de Matemática para usar quando necessário.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="https://metodo-ia-para-concursos.netlify.app/"><div class="cover ai"><span class="mini">Inteligência artificial</span><strong>Método IA para Concursos</strong></div><div class="tile-body"><h3>IA aplicada aos estudos</h3><p>Uso prático de ferramentas de IA na preparação para concursos.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="https://como-passar-em-concursos-publicos.netlify.app/"><div class="cover aprov"><span class="mini">Estratégia</span><strong>Como Passar em Concursos</strong></div><div class="tile-body"><h3>Organização e aprovação</h3><p>Estratégias para melhorar a preparação e evitar erros comuns.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="https://portugues-completo-mazziotti.netlify.app/"><div class="cover portugues"><span class="mini">Português</span><strong>Português Completo do Zero</strong></div><div class="tile-body"><h3>Prof. Mazziotti</h3><p>Curso de Português para quem precisa construir uma base sólida.</p><span class="link">Conhecer →</span></div></a>
+      <a class="tile" href="/academia-da-matematica"><div class="cover has-image"><img src="/assets/club/academia.webp" alt="Capa da Academia da Matemática" loading="lazy" width="720" height="1039"></div><div class="tile-body"><h3>Academia da Matemática</h3></div></a>
+      <a class="tile" href="/interpretacao-matematica"><div class="cover has-image"><img src="/assets/club/interpretacao.webp" alt="Capa de O Segredo da Interpretação" loading="lazy" width="720" height="1039"></div><div class="tile-body"><h3>O Segredo da Interpretação</h3></div></a>
+      <a class="tile" href="/manual-do-chute"><div class="cover has-image"><img src="/assets/club/manual-chute.webp" alt="Capa do Manual do Chute Certo" loading="lazy" width="720" height="1039"></div><div class="tile-body"><h3>Manual do Chute Certo</h3></div></a>
+      <a class="tile" href="/metodo-ia"><div class="cover has-image"><img src="/assets/club/metodo-ia.webp" alt="Capa do Método IA para Concursos" loading="lazy" width="720" height="1039"></div><div class="tile-body"><h3>Método IA para Concursos</h3></div></a>
+      <a class="tile" href="/como-passar-em-concursos"><div class="cover has-image"><img src="/assets/club/como-passar.webp" alt="Capa do curso Como Passar em Concursos" loading="lazy" width="693" height="1040"></div><div class="tile-body"><h3>Como Passar em Concursos</h3></div></a>
+      <a class="tile" href="/portugues-para-concursos"><div class="cover has-image"><img src="/assets/club/portugues.webp" alt="Capa de Português para Concursos" loading="lazy" width="720" height="1039"></div><div class="tile-body"><h3>Português para Concursos</h3></div></a>
     </div>
   </div>
 </section>
@@ -216,10 +322,21 @@ radial-gradient(circle at 75% 15%,rgba(214,169,40,.25),transparent 32%),
   <div class="wrap">
     <div class="section-head"><div><h2>Questões, simulados e materiais</h2><p>Materiais para sair da teoria e aumentar o volume de treino.</p></div></div>
     <div class="rail">
-      <a class="tile" href="https://80-simulados-matematica.netlify.app/"><div class="cover sim"><span class="mini">PDF + treino</span><strong>80 Simulados de Matemática</strong></div><div class="tile-body"><h3>Prática em volume</h3><p>Simulados de Matemática para treinar resolução e ritmo de prova.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="https://combo-matematica-treine-ate-passar.netlify.app/"><div class="cover combo"><span class="mini">Combo</span><strong>Matemática — Treine Até Passar</strong></div><div class="tile-body"><h3>Combo 3 em 1</h3><p>Simulados, banco de questões e interpretação reunidos.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="https://combo-estrategia-da-aprovacao.netlify.app/"><div class="cover aprov"><span class="mini">Combo</span><strong>Estratégia da Aprovação</strong></div><div class="tile-body"><h3>Combo de estratégia</h3><p>Conteúdos voltados à preparação, IA, erros comuns e técnicas de prova.</p><span class="link">Conhecer →</span></div></a>
-      <a class="tile" href="/guias-de-estudo-para-concursos"><div class="cover guides"><span class="mini">Gratuito</span><strong>Guias de Estudo</strong></div><div class="tile-body"><h3>Conteúdo gratuito</h3><p>Guias sobre edital, rotina, cronograma e organização dos estudos.</p><span class="link">Explorar →</span></div></a>
+      <a class="tile" href="/80-simulados"><div class="cover has-image"><img src="/assets/club/80-simulados.webp" alt="Capa dos 80 Simulados de Matemática" loading="lazy" width="720" height="1039"></div><div class="tile-body"><h3>80 Simulados de Matemática</h3></div></a>
+      <a class="tile" href="/combo-matematica"><div class="cover has-image"><img src="/assets/club/combo-matematica.webp" alt="Capa do Combo Matemática — Treine Até Passar" loading="lazy" width="720" height="1040"></div><div class="tile-body"><h3>Combo 3 em 1</h3><p>Simulados, banco de questões e interpretação reunidos.</p><span class="link">Conhecer →</span></div></a>
+      <a class="tile" href="/combo-estrategia"><div class="cover has-image"><img src="/assets/club/combo-estrategia.webp" alt="Capa do Combo Estratégia da Aprovação" loading="lazy" width="720" height="1040"></div><div class="tile-body"><h3>Combo de estratégia</h3><p>Conteúdos voltados à preparação, IA, erros comuns e técnicas de prova.</p><span class="link">Conhecer →</span></div></a>
+      <a class="tile" href="/guias-de-estudo-para-concursos"><div class="cover has-image"><img src="/assets/club/guias.webp" alt="Capa dos Guias de Estudo gratuitos" loading="lazy" width="720" height="1040"></div><div class="tile-body"><h3>Conteúdo gratuito</h3><p>Guias sobre edital, rotina, cronograma e organização dos estudos.</p><span class="link">Explorar →</span></div></a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="gratuitos">
+  <div class="wrap">
+    <div class="section-head"><div><h2>Conteúdo gratuito</h2><p>Recursos para encontrar oportunidades, organizar a rotina e continuar estudando.</p></div></div>
+    <div class="free-grid">
+      <article class="free-card free-radar"><span class="tag">Concursos e provas</span><h3>Radar de Concursos MPC</h3><p>Acompanhe concursos previstos, autorizados, com banca definida, edital publicado e inscrições abertas.</p><a href="https://radar.lucasmpc.com.br/">CONSULTAR O RADAR →</a></article>
+      <article class="free-card free-guides"><span class="tag">Planejamento</span><h3>Guias de estudo</h3><p>Conteúdos sobre edital, rotina, cronograma, pouco tempo e organização para concursos.</p><a href="/guias-de-estudo-para-concursos">EXPLORAR OS GUIAS →</a></article>
+      <article class="free-card free-provas"><span class="tag">Banco de provas</span><h3>Provas anteriores</h3><p>Consulte provas organizadas no Radar para conhecer bancas e treinar com questões reais.</p><a href="https://radar.lucasmpc.com.br/provas">VER PROVAS →</a></article>
     </div>
   </div>
 </section>
@@ -228,28 +345,50 @@ radial-gradient(circle at 75% 15%,rgba(214,169,40,.25),transparent 32%),
   <div class="wrap">
     <div class="section-head"><div><h2>Ferramentas e projetos MPC</h2><p>Recursos para encontrar oportunidades e organizar a preparação.</p></div></div>
     <div class="utility">
-      <article class="utility-card"><div class="icon">◎</div><h3>Radar de Concursos MPC</h3><p>Consulte concursos, editais, vagas, datas e provas anteriores em um único ambiente.</p><a href="https://radar.lucasmpc.com.br/">ABRIR RADAR →</a></article>
-      <article class="utility-card"><div class="icon">▦</div><h3>Cronograma Personalizado</h3><p>Você envia edital e rotina. O planejamento é organizado de acordo com sua prova e disponibilidade.</p><a href="/cronograma-de-estudos-para-concurso">CONHECER →</a></article>
-      <article class="utility-card"><div class="icon">≡</div><h3>Central de Guias</h3><p>Conteúdo gratuito sobre como dividir matérias, estudar com pouco tempo e transformar edital em plano.</p><a href="/guias-de-estudo-para-concursos">VER GUIAS →</a></article>
+      <article class="utility-card utility-radar"><div class="icon">◎</div><h3>Radar de Concursos MPC</h3><p>Consulte concursos, editais, vagas, datas e provas anteriores em um único ambiente.</p><a href="https://radar.lucasmpc.com.br/">ABRIR RADAR →</a></article>
+      <article class="utility-card utility-plan"><div class="icon">▦</div><h3>Cronograma Personalizado</h3><p>Você envia edital e rotina. O planejamento é organizado de acordo com sua prova e disponibilidade.</p><a href="/cronograma-de-estudos-para-concurso">CONHECER →</a></article>
+      <article class="utility-card utility-guides"><div class="icon">≡</div><h3>Central de Guias</h3><p>Conteúdo gratuito sobre como dividir matérias, estudar com pouco tempo e transformar edital em plano.</p><a href="/guias-de-estudo-para-concursos">VER GUIAS →</a></article>
     </div>
   </div>
 </section>
 
-<section class="about">
+<section class="section" id="depoimentos">
   <div class="wrap">
-    <div class="aboutbox">
-      <div><div class="eyebrow">Prof. Lucas MPC</div><h2>Um ecossistema para quem está se preparando.</h2><p>O objetivo do site é reunir, em uma única vitrine, os cursos, materiais, ferramentas e conteúdos desenvolvidos pelo Prof. Lucas MPC e seus projetos parceiros. Assim você encontra rapidamente o recurso mais adequado para o momento atual da sua preparação.</p></div>
-      <a class="btn gold" href="https://wa.me/5511960189699">FALAR NO WHATSAPP</a>
+    <div class="section-head"><div><h2>Experiências reais de alunos</h2><p>Relatos em vídeo de quem estudou com as aulas e estratégias do Método MPC.</p></div><a class="all" href="/academia-da-matematica#testimonials">VER MAIS RELATOS →</a></div>
+    <div class="proof-grid">
+      <article class="proof-card"><button class="proof-video" type="button" data-video="AFhS3c8i8rI" aria-label="Assistir depoimento sobre o Método MPC"><img src="https://i.ytimg.com/vi/AFhS3c8i8rI/hqdefault.jpg" alt="Prévia do depoimento sobre o Método MPC" loading="lazy"><span>▶</span></button><h3>Experiência com o Método MPC</h3><p>Relato real sobre aulas, questões e estratégias de preparação.</p></article>
+      <article class="proof-card"><button class="proof-video" type="button" data-video="BR33nQ2Qvdw" aria-label="Assistir depoimento sobre as aulas"><img src="https://i.ytimg.com/vi/BR33nQ2Qvdw/hqdefault.jpg" alt="Prévia do depoimento sobre as aulas" loading="lazy"><span>▶</span></button><h3>Aprendizado mais prático</h3><p>Experiência de aluno com explicações e resolução de questões.</p></article>
+      <article class="proof-card"><button class="proof-video" type="button" data-video="8IwYn-aOU2w" aria-label="Assistir depoimento sobre preparação em Matemática"><img src="https://i.ytimg.com/vi/8IwYn-aOU2w/hqdefault.jpg" alt="Prévia do depoimento sobre Matemática" loading="lazy"><span>▶</span></button><h3>Mais segurança em Matemática</h3><p>Relato sobre uma nova forma de compreender e enfrentar as questões.</p></article>
     </div>
+    <p class="proof-note">Os depoimentos representam experiências individuais. Resultados dependem de dedicação, preparação, edital e desempenho em cada prova.</p>
+  </div>
+</section>
+
+<section class="about" id="sobre">
+  <div class="wrap">
+    <div class="aboutbox about-profile">
+      <figure class="teacher-portrait"><img class="teacher-photo" src="/assets/brand/prof-lucas-mpc.webp" alt="Professor Lucas MPC, professor de Matemática e mentor de estudos para concursos" loading="lazy" width="663" height="722"><figcaption><strong>Prof. Lucas MPC</strong><span>Professor de Matemática e mentor de estudos para concursos</span></figcaption></figure>
+      <div><div class="eyebrow">Professor Lucas MPC</div><h2>Matemática, estratégia e preparação para concursos.</h2><p>O objetivo do site é reunir cursos, materiais, ferramentas e conteúdos para que cada aluno encontre o recurso mais adequado ao momento atual da preparação.</p><a class="btn gold" href="https://wa.me/5511960189699?text=Ol%C3%A1%2C%20professor%20Lucas.%20Conheci%20o%20site%20e%20gostaria%20de%20tirar%20uma%20d%C3%BAvida.">FALAR NO WHATSAPP</a></div>
+    </div>
+    <div class="trust-strip"><div class="trust-item"><b>Conteúdo educacional</b><span>Cursos, materiais e ferramentas com foco em preparação para concursos.</span></div><div class="trust-item"><b>Contato direto</b><span>Canal de atendimento pelo WhatsApp para dúvidas antes da escolha.</span></div><div class="trust-item"><b>Ambiente seguro</b><span>Pagamentos dos produtos elegíveis processados em plataformas especializadas.</span></div></div>
   </div>
 </section>
 </main>
 
 <footer class="footer">
-  <div class="wrap footerin">
-    <div>© 2026 Prof. Lucas MPC · lucasmpc.com.br</div>
-    <div><a href="/academia-da-matematica">Academia</a> · <a href="https://radar.lucasmpc.com.br/">Radar</a> · <a href="/cronograma-de-estudos-para-concurso">Cronograma</a> · <a href="/guias-de-estudo-para-concursos">Guias</a></div>
+  <div class="wrap">
+    <div class="footer-main">
+      <div class="footer-col footer-brand"><strong>Prof. Lucas MPC</strong><p>Cursos, materiais e ferramentas para quem busca uma preparação mais clara, prática e organizada.</p><a href="https://wa.me/5511960189699">Falar pelo WhatsApp</a></div>
+      <div class="footer-col"><strong>Conteúdos</strong><a href="/academia-da-matematica">Academia</a><a href="/80-simulados">80 Simulados</a><a href="/metodo-ia">Método IA</a></div>
+      <div class="footer-col"><strong>Ferramentas</strong><a href="https://radar.lucasmpc.com.br/">Radar de Concursos</a><a href="/cronograma-de-estudos-para-concurso">Cronograma</a><a href="/guias-de-estudo-para-concursos">Guias gratuitos</a></div>
+      <div class="footer-col"><strong>Informações</strong><a href="#sobre">Sobre o projeto</a><a href="/politica-de-privacidade">Privacidade</a><a href="/termos-de-uso">Termos de uso</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Prof. Lucas MPC · lucasmpc.com.br</span><span>Produto educacional. Não há garantia de aprovação.</span></div>
   </div>
 </footer>
+<dialog class="video-modal" id="videoModal"><button class="modal-close" type="button" aria-label="Fechar vídeo">×</button><div id="videoFrame"></div></dialog>
+<div class="cookie-lite" id="cookieLite" role="region" aria-label="Aviso de privacidade"><p>Este site utiliza medição de visitas sem identificação individual para melhorar a experiência. Saiba mais na <a href="/politica-de-privacidade"><u>Política de Privacidade</u></a>.</p><button type="button">ENTENDI</button></div>
+<script src="/home-enhancements.js?v=20260919-3" defer></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"ccfa9d144c5844038b42ac64983541e9"}'></script>
 </body>
 </html>
