@@ -84,6 +84,12 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url>
+    <loc>https://lucasmpc.com.br/politica-de-cookies</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
   <url><loc>https://lucasmpc.com.br/80-simulados</loc><lastmod>2026-09-19</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://lucasmpc.com.br/metodo-ia</loc><lastmod>2026-09-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://lucasmpc.com.br/como-passar-em-concursos</loc><lastmod>2026-09-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>

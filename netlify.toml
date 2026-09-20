@@ -48,42 +48,42 @@
 
 [[redirects]]
   from = "/80-simulados"
-  to = "/produto.html"
+  to = "/80-simulados.html"
   status = 200
 
 [[redirects]]
   from = "/metodo-ia"
-  to = "/produto.html"
+  to = "/metodo-ia.html"
   status = 200
 
 [[redirects]]
   from = "/como-passar-em-concursos"
-  to = "/produto.html"
+  to = "/como-passar-em-concursos.html"
   status = 200
 
 [[redirects]]
   from = "/interpretacao-matematica"
-  to = "/produto.html"
+  to = "/interpretacao-matematica.html"
   status = 200
 
 [[redirects]]
   from = "/manual-do-chute"
-  to = "/produto.html"
+  to = "/manual-do-chute.html"
   status = 200
 
 [[redirects]]
   from = "/portugues-para-concursos"
-  to = "/produto.html"
+  to = "/portugues-para-concursos.html"
   status = 200
 
 [[redirects]]
   from = "/combo-matematica"
-  to = "/produto.html"
+  to = "/combo-matematica.html"
   status = 200
 
 [[redirects]]
   from = "/combo-estrategia"
-  to = "/produto.html"
+  to = "/combo-estrategia.html"
   status = 200
 
 # Fluxo do cliente desativado: novos e antigos visitantes não montam o cronograma sozinhos.
@@ -186,6 +186,11 @@
 [[redirects]]
   from = "/politica-de-privacidade"
   to = "/politica-de-privacidade.html"
+  status = 200
+
+[[redirects]]
+  from = "/politica-de-cookies"
+  to = "/politica-de-cookies.html"
   status = 200
 
 [[redirects]]
