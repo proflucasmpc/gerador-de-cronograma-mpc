@@ -1,0 +1,346 @@
+name: Sync live production snapshot
+on:
+  push:
+    branches: [sync-work-20260919]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sync-work-20260919
+          fetch-depth: 0
+      - name: Download current production files
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://lucasmpc.com.br"
+          files=(
+            "index.html"
+            "sitemap.xml"
+            "como-dividir-materias-do-edital.html"
+            "como-montar-cronograma-de-estudos-para-concurso.html"
+            "cronograma-de-estudos-12x36.html"
+            "cronograma-de-estudos-2-horas-por-dia.html"
+            "cronograma-de-estudos-para-concurso.html"
+            "cronograma-de-estudos-para-quem-trabalha.html"
+            "gerador-de-cronograma-de-estudos-para-concurso.html"
+            "guias-de-estudo-para-concursos.html"
+            "plano-de-estudos-a-partir-do-edital.html"
+            "vantagens-de-estudar-com-cronograma.html"
+            "home-enhancements.css"
+            "home-enhancements.js"
+            "politica-de-privacidade.html"
+            "portal-pages.css"
+            "portal-pages.js"
+            "produto.css"
+            "produto.html"
+            "produto.js"
+            "termos-de-uso.html"
+            "assets/brand/mpc-mark.svg"
+            "assets/brand/prof-lucas-mpc.webp"
+            "assets/brand/professor-lucas-mpc-logo.svg"
+            "assets/club/80-simulados.webp"
+            "assets/club/academia.webp"
+            "assets/club/banner-academia.webp"
+            "assets/club/banner-radar.webp"
+            "assets/club/banner.webp"
+            "assets/club/combo-estrategia.webp"
+            "assets/club/combo-matematica.webp"
+            "assets/club/como-passar.webp"
+            "assets/club/cronograma.webp"
+            "assets/club/guias.webp"
+            "assets/club/interpretacao.webp"
+            "assets/club/manual-chute.webp"
+            "assets/club/metodo-ia.webp"
+            "assets/club/portugues.webp"
+          )
+          for p in "${files[@]}"; do
+            mkdir -p "$(dirname "$p")"
+            curl -fsSL --retry 3 --retry-delay 2 "$base/$p" -o "$p"
+          done
+
+          cat > .gitignore <<'EOF'
+# Local Netlify project state
+.netlify/
+EOF
+
+          cat > _headers <<'EOF'
+/admin-study-routine.js
+  Cache-Control: public, max-age=0, must-revalidate
+/home-enhancements.css
+  Cache-Control: public, max-age=0, must-revalidate
+/home-enhancements.js
+  Cache-Control: public, max-age=0, must-revalidate
+/produto.css
+  Cache-Control: public, max-age=0, must-revalidate
+/produto.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-enhancements.js
+  Cache-Control: public, max-age=0, must-revalidate
+/user-plan-attribution.js
+  Cache-Control: public, max-age=0, must-revalidate
+/pomodoro.js
+  Cache-Control: public, max-age=0, must-revalidate
+/public-plan-links.js
+  Cache-Control: public, max-age=0, must-revalidate
+/public-mobile-responsive.css
+  Cache-Control: public, max-age=0, must-revalidate
+/public-plan-buttons.js
+  Cache-Control: public, max-age=0, must-revalidate
+/public-page-experience.js
+  Cache-Control: public, max-age=0, must-revalidate
+/plano.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/admin-duplicate-plan.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-public-buttons.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-public-theme.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-blackout-dates.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-capacity-fill.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-final-input-normalizer.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-generation-finalizer.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-final-consolidation.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-pedagogy-guard.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-final-capacity-guarantee.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-final-pipeline-authority.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-new-plan-button.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-package-import.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-package-compat.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-package-autofit.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-simulation-capacity.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-simulation-selection-guard.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-update-sync.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-publish-guard.js
+  Cache-Control: public, max-age=0, must-revalidate
+/admin-layout-links.css
+  Cache-Control: public, max-age=0, must-revalidate
+EOF
+
+          cat > netlify.toml <<'EOF'
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/acesso.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/area-usuario.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/area-usuario-preview.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/premium-pdf.html"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# Migração permanente: qualquer URL antiga do subdomínio Netlify mantém o mesmo caminho no domínio definitivo.
+[[redirects]]
+  from = "https://gerador-de-cronograma-mpc.netlify.app/*"
+  to = "https://lucasmpc.com.br/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://gerador-de-cronograma-mpc.netlify.app/*"
+  to = "https://lucasmpc.com.br/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/80-simulados"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/metodo-ia"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/como-passar-em-concursos"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/interpretacao-matematica"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/manual-do-chute"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/portugues-para-concursos"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/combo-matematica"
+  to = "/produto.html"
+  status = 200
+
+[[redirects]]
+  from = "/combo-estrategia"
+  to = "/produto.html"
+  status = 200
+
+# Fluxo do cliente desativado: novos e antigos visitantes não montam o cronograma sozinhos.
+[[redirects]]
+  from = "/acesso.html"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/acesso"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/area-usuario.html"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/area-usuario"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/area-usuario-preview.html"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/area-usuario-preview"
+  to = "/cronograma-de-estudos-para-concurso"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/cronograma-de-estudos-para-concurso"
+  to = "/cronograma-de-estudos-para-concurso.html"
+  status = 200
+
+[[redirects]]
+  from = "/guias-de-estudo-para-concursos"
+  to = "/guias-de-estudo-para-concursos.html"
+  status = 200
+
+[[redirects]]
+  from = "/como-montar-cronograma-de-estudos-para-concurso"
+  to = "/como-montar-cronograma-de-estudos-para-concurso.html"
+  status = 200
+
+[[redirects]]
+  from = "/cronograma-de-estudos-para-quem-trabalha"
+  to = "/cronograma-de-estudos-para-quem-trabalha.html"
+  status = 200
+
+[[redirects]]
+  from = "/plano-de-estudos-a-partir-do-edital"
+  to = "/plano-de-estudos-a-partir-do-edital.html"
+  status = 200
+
+[[redirects]]
+  from = "/gerador-de-cronograma-de-estudos-para-concurso"
+  to = "/gerador-de-cronograma-de-estudos-para-concurso.html"
+  status = 200
+
+[[redirects]]
+  from = "/cronograma-de-estudos-2-horas-por-dia"
+  to = "/cronograma-de-estudos-2-horas-por-dia.html"
+  status = 200
+
+[[redirects]]
+  from = "/como-dividir-materias-do-edital"
+  to = "/como-dividir-materias-do-edital.html"
+  status = 200
+
+[[redirects]]
+  from = "/cronograma-de-estudos-12x36"
+  to = "/cronograma-de-estudos-12x36.html"
+  status = 200
+
+[[redirects]]
+  from = "/plano/*"
+  to = "/plano.html"
+  status = 200
+
+[[redirects]]
+  from = "/vantagens-de-estudar-com-cronograma"
+  to = "/vantagens-de-estudar-com-cronograma.html"
+  status = 200
+
+[[redirects]]
+  from = "/academia-da-matematica"
+  to = "/academia-da-matematica.html"
+  status = 200
+
+[[redirects]]
+  from = "/politica-de-privacidade"
+  to = "/politica-de-privacidade.html"
+  status = 200
+
+[[redirects]]
+  from = "/termos-de-uso"
+  to = "/termos-de-uso.html"
+  status = 200
+EOF
+
+          rm -f .github/workflows/sync-live-production.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "Sincroniza snapshot publicado do Lucas MPC"
+          git push origin HEAD:sync-work-20260919
