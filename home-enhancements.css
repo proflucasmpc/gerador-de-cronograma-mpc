@@ -50,3 +50,5 @@
 @media(max-width:640px){.section-head{align-items:flex-start;gap:12px}.section-head h2,.about-profile h2{overflow-wrap:anywhere}.rail,#destaques .rail{scroll-padding-inline:0}.tile,.decision-card,.news-card,.proof-card,.free-card,.utility-card{min-width:0}.filter-buttons{display:flex;max-width:100%;overflow-x:auto;padding-bottom:4px}.filter-buttons button{flex:0 0 auto}.teacher-portrait{min-height:0}.teacher-photo{width:100%;aspect-ratio:1201/1309;object-fit:cover;object-position:center 28%;transform:none}.about-profile>div{text-align:left}.about-profile .btn{width:100%;justify-content:center;text-align:center}.footer-col a{overflow-wrap:anywhere}}
 @media(max-width:390px){.teacher-portrait figcaption{padding:11px 12px}.teacher-portrait figcaption span{font-size:10px}.featured-offer{padding:16px}.catalog-box{padding:14px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.tile,.decision-card,.feature img,.tile-overlay{transition:none!important}}
+
+@media(min-width:641px){.hero-ebook-redesigned .hero-ebook-cover,.hero-ebook-redesigned .hero-ebook-copy{display:none!important}}
