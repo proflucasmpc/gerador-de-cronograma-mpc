@@ -1,0 +1,56 @@
+name: Gerar imagens estáticas PM-SP
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/generate_pmsp_static_images.py"
+      - "correcao-pmsp-2026/download/prova-pmsp-2026-aluno-soldado.pdf"
+      - ".github/workflows/generate-pmsp-static-images.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install pymupdf pillow
+
+      - name: Gerar recortes estáticos
+        run: python scripts/generate_pmsp_static_images.py
+
+      - name: Validar quantidade de arquivos
+        run: |
+          test "$(find correcao-pmsp-2026/imagens-prova -maxdepth 1 -name 'questao-*.webp' | wc -l)" -eq 60
+          test -f correcao-pmsp-2026/imagens-prova/texto-01-08.webp
+          test -f correcao-pmsp-2026/imagens-prova/tira-09-10.webp
+          test -f correcao-pmsp-2026/imagens-prova/texto-11-16.webp
+          test -f correcao-pmsp-2026/imagens-prova/texto-17-20.webp
+          test -f correcao-pmsp-2026/imagens-prova/figura-32-33.webp
+
+      - name: Versionar imagens geradas
+        run: |
+          if git diff --quiet -- correcao-pmsp-2026/imagens-prova && [ -d correcao-pmsp-2026/imagens-prova ]; then
+            if [ -z "$(git status --porcelain -- correcao-pmsp-2026/imagens-prova)" ]; then
+              echo "Nenhuma alteração nos recortes."
+              exit 0
+            fi
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add correcao-pmsp-2026/imagens-prova
+          git commit -m "Gera recortes estáticos da prova PM-SP"
+          git push origin HEAD:main
