@@ -1,0 +1,855 @@
+{
+  "source": "correcao-pmsp-2026/download/prova-pmsp-2026-aluno-soldado.pdf",
+  "scale": 3.0,
+  "format": "webp",
+  "quality": 92,
+  "questions": {
+    "1": {
+      "file": "questao-01.webp",
+      "page": 3,
+      "crop_points": {
+        "x": 28,
+        "y": 628,
+        "w": 270,
+        "h": 172
+      },
+      "width": 810,
+      "height": 516,
+      "sha256": "9be71160edd574c5ca0deb1c4c9bf0e494238de57f7b067ddb07f8249993baaf"
+    },
+    "2": {
+      "file": "questao-02.webp",
+      "page": 3,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 200
+      },
+      "width": 810,
+      "height": 600,
+      "sha256": "b950f032b9794f867201b16808d81dd4368ae9353766998089ae03a6b538be86"
+    },
+    "3": {
+      "file": "questao-03.webp",
+      "page": 3,
+      "crop_points": {
+        "x": 302,
+        "y": 223,
+        "w": 270,
+        "h": 165
+      },
+      "width": 810,
+      "height": 495,
+      "sha256": "42806e437ea709410ae23c21f8ebc55e9e5b0a4cd73f78b528aecba2de8aa900"
+    },
+    "4": {
+      "file": "questao-04.webp",
+      "page": 3,
+      "crop_points": {
+        "x": 302,
+        "y": 389,
+        "w": 270,
+        "h": 165
+      },
+      "width": 810,
+      "height": 495,
+      "sha256": "4ddf52ecf541684b31b351b27915db02150da69c3b65124069cc66c37ba671fa"
+    },
+    "5": {
+      "file": "questao-05.webp",
+      "page": 3,
+      "crop_points": {
+        "x": 302,
+        "y": 555,
+        "w": 270,
+        "h": 245
+      },
+      "width": 810,
+      "height": 735,
+      "sha256": "75381c61816b2d73791d6e7a7ce99f66999a1a7c87af2f572ae6c969564f3b2b"
+    },
+    "6": {
+      "file": "questao-06.webp",
+      "page": 4,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 225
+      },
+      "width": 810,
+      "height": 675,
+      "sha256": "577c270b0ebe97c83755a96b8e6f0feeef3a2f808d06dba47309965fb83b9958"
+    },
+    "7": {
+      "file": "questao-07.webp",
+      "page": 4,
+      "crop_points": {
+        "x": 28,
+        "y": 248,
+        "w": 270,
+        "h": 295
+      },
+      "width": 810,
+      "height": 885,
+      "sha256": "75c6f84668b60d62a5d782f7a50ef15f4073d7fe10c772ec3ecb68d71ed10c4e"
+    },
+    "8": {
+      "file": "questao-08.webp",
+      "page": 4,
+      "crop_points": {
+        "x": 28,
+        "y": 548,
+        "w": 270,
+        "h": 252
+      },
+      "width": 810,
+      "height": 756,
+      "sha256": "8dd885fc94a56695d05bb6df18c618da1ff154aba31737a7b2ea161dc015e204"
+    },
+    "9": {
+      "file": "questao-09.webp",
+      "page": 4,
+      "crop_points": {
+        "x": 302,
+        "y": 440,
+        "w": 270,
+        "h": 200
+      },
+      "width": 810,
+      "height": 600,
+      "sha256": "8d122245738a449a45d6cdcebbffd4fbe6967e118c1ef7826ee13effeb4f407e"
+    },
+    "10": {
+      "file": "questao-10.webp",
+      "page": 4,
+      "crop_points": {
+        "x": 302,
+        "y": 643,
+        "w": 270,
+        "h": 157
+      },
+      "width": 810,
+      "height": 471,
+      "sha256": "f87721f585312120eb62d7c4212484d57881536636c5583747dc3ac294b032d2"
+    },
+    "11": {
+      "file": "questao-11.webp",
+      "page": 5,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 285
+      },
+      "width": 810,
+      "height": 855,
+      "sha256": "73d98f94e1cdd92b1cd1d36771c537f71b911b774020493279f4b80b49007e17"
+    },
+    "12": {
+      "file": "questao-12.webp",
+      "page": 5,
+      "crop_points": {
+        "x": 302,
+        "y": 305,
+        "w": 270,
+        "h": 495
+      },
+      "width": 810,
+      "height": 1485,
+      "sha256": "d83b58de1dc336d1adb0221e5e59b198a7f75d351bc1bf0810631651a3f02453"
+    },
+    "13": {
+      "file": "questao-13.webp",
+      "page": 6,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 385
+      },
+      "width": 810,
+      "height": 1155,
+      "sha256": "d48ed4eb46dd80a07f27c5e0954fb7c2329bf52ad3c56b27e8c30d78c21993d6"
+    },
+    "14": {
+      "file": "questao-14.webp",
+      "page": 6,
+      "crop_points": {
+        "x": 28,
+        "y": 410,
+        "w": 270,
+        "h": 390
+      },
+      "width": 810,
+      "height": 1170,
+      "sha256": "81cc0cc040530ca052a744c36fc92a0f7cac6520b140095f8bd475d5cb5362a6"
+    },
+    "15": {
+      "file": "questao-15.webp",
+      "page": 6,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 315
+      },
+      "width": 810,
+      "height": 945,
+      "sha256": "61c3eae5e15a3cd02809d13c6076f2523b1389b027802764e66921e6b4a53db5"
+    },
+    "16": {
+      "file": "questao-16.webp",
+      "page": 6,
+      "crop_points": {
+        "x": 302,
+        "y": 340,
+        "w": 270,
+        "h": 460
+      },
+      "width": 810,
+      "height": 1380,
+      "sha256": "e26d8bb78f0cd300e3a2945b1adfa1d0e78db6775fdaee55bb136ab7ef7dd2b5"
+    },
+    "17": {
+      "file": "questao-17.webp",
+      "page": 7,
+      "crop_points": {
+        "x": 28,
+        "y": 410,
+        "w": 270,
+        "h": 390
+      },
+      "width": 810,
+      "height": 1170,
+      "sha256": "53d04697da1fbd85e4b01da67c4ae41ab5855d7ee36d57af28070630c6f7dbbf"
+    },
+    "18": {
+      "file": "questao-18.webp",
+      "page": 7,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 255
+      },
+      "width": 810,
+      "height": 765,
+      "sha256": "58b18de69abb754599a95ed7d8b0443c0244a98d5113925eb09c74e8e58d7c04"
+    },
+    "19": {
+      "file": "questao-19.webp",
+      "page": 7,
+      "crop_points": {
+        "x": 302,
+        "y": 280,
+        "w": 270,
+        "h": 195
+      },
+      "width": 810,
+      "height": 585,
+      "sha256": "40dfdedbcde49391841de288edb87609df90c4e08bb09ead4e585b2fb3ac5e49"
+    },
+    "20": {
+      "file": "questao-20.webp",
+      "page": 7,
+      "crop_points": {
+        "x": 302,
+        "y": 480,
+        "w": 270,
+        "h": 320
+      },
+      "width": 810,
+      "height": 960,
+      "sha256": "92eb1e833c63ba6dcdf540b501c735ab06ddc3e47881d6cc866604bcbcda1d59"
+    },
+    "21": {
+      "file": "questao-21.webp",
+      "page": 8,
+      "crop_points": {
+        "x": 28,
+        "y": 45,
+        "w": 270,
+        "h": 380
+      },
+      "width": 810,
+      "height": 1140,
+      "sha256": "dc0a77a2652b8d0589cda0276c925c50305f2bc13d033f916522007e2af14daf"
+    },
+    "22": {
+      "file": "questao-22.webp",
+      "page": 8,
+      "crop_points": {
+        "x": 28,
+        "y": 430,
+        "w": 270,
+        "h": 165
+      },
+      "width": 810,
+      "height": 495,
+      "sha256": "b901b3a2fb5fb66afb3af4bec912ee709ef62f32fb0379f3cc19959ad0f4c9b5"
+    },
+    "23": {
+      "file": "questao-23.webp",
+      "page": 8,
+      "crop_points": {
+        "x": 28,
+        "y": 595,
+        "w": 270,
+        "h": 205
+      },
+      "width": 810,
+      "height": 615,
+      "sha256": "284f3a6059805519cd84749df41ba9c53ccf4474c9f4ee23d16d78edf1948744"
+    },
+    "24": {
+      "file": "questao-24.webp",
+      "page": 9,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 210
+      },
+      "width": 810,
+      "height": 630,
+      "sha256": "31ad7bf5fac05ca1200f298e4045e03bc6fc9fa3b31593e379c5aadcda09dd20"
+    },
+    "25": {
+      "file": "questao-25.webp",
+      "page": 9,
+      "crop_points": {
+        "x": 28,
+        "y": 235,
+        "w": 270,
+        "h": 295
+      },
+      "width": 810,
+      "height": 885,
+      "sha256": "26d34aac8a7e00b3425ff6661ef38f7659fe402b57904f063738ae685aa17224"
+    },
+    "26": {
+      "file": "questao-26.webp",
+      "page": 9,
+      "crop_points": {
+        "x": 28,
+        "y": 535,
+        "w": 270,
+        "h": 265
+      },
+      "width": 810,
+      "height": 795,
+      "sha256": "3e5d13ec46cf572eeb5098d2c3f369c338560cb67d98ef12578780d165ab8d06"
+    },
+    "27": {
+      "file": "questao-27.webp",
+      "page": 10,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 200
+      },
+      "width": 810,
+      "height": 600,
+      "sha256": "aa79e73ce1635b034a46523436478e662eb794618920923ba2beba4e7e1c4e81"
+    },
+    "28": {
+      "file": "questao-28.webp",
+      "page": 10,
+      "crop_points": {
+        "x": 28,
+        "y": 228,
+        "w": 270,
+        "h": 180
+      },
+      "width": 810,
+      "height": 540,
+      "sha256": "a48ccd422befe8ec0b248d846750bb3d4ab9fb6d05669a82a0e334e4575b09f6"
+    },
+    "29": {
+      "file": "questao-29.webp",
+      "page": 10,
+      "crop_points": {
+        "x": 28,
+        "y": 418,
+        "w": 270,
+        "h": 185
+      },
+      "width": 810,
+      "height": 555,
+      "sha256": "88f130963e04aa46652f5b7882284f22d7694f71157c204539d9dc86b37b0b50"
+    },
+    "30": {
+      "file": "questao-30.webp",
+      "page": 10,
+      "crop_points": {
+        "x": 28,
+        "y": 615,
+        "w": 270,
+        "h": 185
+      },
+      "width": 810,
+      "height": 555,
+      "sha256": "2d6ce5f9d22230eb17e43acbd42fc06c6cf7a214329d5687d9090a37061b5580"
+    },
+    "31": {
+      "file": "questao-31.webp",
+      "page": 11,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 780
+      },
+      "width": 810,
+      "height": 2340,
+      "sha256": "bfdeeabcee94f0d4eeb8afb226051850a44de49f44d81c0967ce941ade0c2040"
+    },
+    "32": {
+      "file": "questao-32.webp",
+      "page": 12,
+      "crop_points": {
+        "x": 28,
+        "y": 238,
+        "w": 270,
+        "h": 130
+      },
+      "width": 810,
+      "height": 390,
+      "sha256": "20d8491b47d89023fdc45684185e8e15f4807141d1fa98d67fc7f05982f9cd9e"
+    },
+    "33": {
+      "file": "questao-33.webp",
+      "page": 12,
+      "crop_points": {
+        "x": 28,
+        "y": 373,
+        "w": 270,
+        "h": 245
+      },
+      "width": 810,
+      "height": 735,
+      "sha256": "d3c3805039312846d8db848ff5cb39f6db567694a901e0242341a519b0ec0a6f"
+    },
+    "34": {
+      "file": "questao-34.webp",
+      "page": 12,
+      "crop_points": {
+        "x": 28,
+        "y": 625,
+        "w": 270,
+        "h": 175
+      },
+      "width": 810,
+      "height": 525,
+      "sha256": "7d4ae43f3e2b632a402069dcb07860921e9c3284e83ec47a2c32e6465e0a8cbd"
+    },
+    "35": {
+      "file": "questao-35.webp",
+      "page": 13,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 325
+      },
+      "width": 810,
+      "height": 975,
+      "sha256": "8fdad80257b58d03f19635833756ba80e6f295dc28f482d1cca36010bc3172ba"
+    },
+    "36": {
+      "file": "questao-36.webp",
+      "page": 13,
+      "crop_points": {
+        "x": 302,
+        "y": 95,
+        "w": 270,
+        "h": 570
+      },
+      "width": 810,
+      "height": 1710,
+      "sha256": "37e7eeaf28713c2a9bd47b4053c4e3f7d3bbbc561c71c84579d31a8424e30567"
+    },
+    "37": {
+      "file": "questao-37.webp",
+      "page": 14,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 525
+      },
+      "width": 810,
+      "height": 1575,
+      "sha256": "dfa40e49ebe90df93d951973000b3180d8fd3223eb0d3fab72affbda1ed89e68"
+    },
+    "38": {
+      "file": "questao-38.webp",
+      "page": 14,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 430
+      },
+      "width": 810,
+      "height": 1290,
+      "sha256": "b0abc5211f6cfb162c18c5496de8bf4085d9c9ca59eb2a1dd12a185a457b805f"
+    },
+    "39": {
+      "file": "questao-39.webp",
+      "page": 15,
+      "crop_points": {
+        "x": 28,
+        "y": 55,
+        "w": 270,
+        "h": 605
+      },
+      "width": 810,
+      "height": 1815,
+      "sha256": "466b67760aa6fb061ba1eb5b11e6609e6694fb757148530383676bf4a0abd676"
+    },
+    "40": {
+      "file": "questao-40.webp",
+      "page": 15,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 605
+      },
+      "width": 810,
+      "height": 1815,
+      "sha256": "99737d71c66ebf6838c4d9f8d130ea89a8670e8487e2fbb6df4bba4bfee51dda"
+    },
+    "41": {
+      "file": "questao-41.webp",
+      "page": 16,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 780
+      },
+      "width": 810,
+      "height": 2340,
+      "sha256": "ded535b6b67c4b516a2adfedb4fd873b602f69491f38edc8c4a37c631bfa3313"
+    },
+    "42": {
+      "file": "questao-42.webp",
+      "page": 16,
+      "crop_points": {
+        "x": 302,
+        "y": 50,
+        "w": 270,
+        "h": 270
+      },
+      "width": 810,
+      "height": 810,
+      "sha256": "37ced6c11d183ac07ce5c29415abf4d290387325d0c5a6c4d61f9ead4e0f79ad"
+    },
+    "43": {
+      "file": "questao-43.webp",
+      "page": 16,
+      "crop_points": {
+        "x": 302,
+        "y": 325,
+        "w": 270,
+        "h": 480
+      },
+      "width": 810,
+      "height": 1440,
+      "sha256": "162cf8ea556df8092fbae5e4f5c1d47298158e0d4f04d58aeb9b243eaed0eae4"
+    },
+    "44": {
+      "file": "questao-44.webp",
+      "page": 17,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 290
+      },
+      "width": 810,
+      "height": 870,
+      "sha256": "4f9790e294188f2bfad7d44c77ff139d0b479c68d0605ffb8e87ed832e8f72cc"
+    },
+    "45": {
+      "file": "questao-45.webp",
+      "page": 17,
+      "crop_points": {
+        "x": 28,
+        "y": 375,
+        "w": 270,
+        "h": 165
+      },
+      "width": 810,
+      "height": 495,
+      "sha256": "155e97929b6d1d429ccb7beeecef2d3ef97404378693115f9d12b133fb391f32"
+    },
+    "46": {
+      "file": "questao-46.webp",
+      "page": 17,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 785
+      },
+      "width": 810,
+      "height": 2355,
+      "sha256": "fef6c50110f1d670ffc5434f8fdeebd30c12603a7a5e38cd900adca17592d9ca"
+    },
+    "47": {
+      "file": "questao-47.webp",
+      "page": 18,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 240
+      },
+      "width": 810,
+      "height": 720,
+      "sha256": "9182486d59f09202642e3ecbffa257bea6a7edc4fd85c873b773bfe94e61eca1"
+    },
+    "48": {
+      "file": "questao-48.webp",
+      "page": 18,
+      "crop_points": {
+        "x": 28,
+        "y": 325,
+        "w": 270,
+        "h": 265
+      },
+      "width": 810,
+      "height": 795,
+      "sha256": "c7107091ecb528ccf86606d02fe661c6cf030ebf09c5d6c79dbbb808891d0142"
+    },
+    "49": {
+      "file": "questao-49.webp",
+      "page": 18,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 300
+      },
+      "width": 810,
+      "height": 900,
+      "sha256": "c87122370d4f16a4bb4b18a87f4a8ed550c6379bbef7187d2512885059f59d3a"
+    },
+    "50": {
+      "file": "questao-50.webp",
+      "page": 18,
+      "crop_points": {
+        "x": 302,
+        "y": 325,
+        "w": 270,
+        "h": 230
+      },
+      "width": 810,
+      "height": 690,
+      "sha256": "42f0719ea17f6e1935dd67cc3180728786f25711ecf58e384d725cc1541d908e"
+    },
+    "51": {
+      "file": "questao-51.webp",
+      "page": 19,
+      "crop_points": {
+        "x": 30,
+        "y": 58,
+        "w": 535,
+        "h": 245
+      },
+      "width": 1605,
+      "height": 735,
+      "sha256": "faaf71daae27cd0eb5fa4192fead9d41c8bfe25f65d8eec308d06ce185f893b5"
+    },
+    "52": {
+      "file": "questao-52.webp",
+      "page": 19,
+      "crop_points": {
+        "x": 30,
+        "y": 318,
+        "w": 535,
+        "h": 180
+      },
+      "width": 1605,
+      "height": 540,
+      "sha256": "cbd6fa4a7ac5d613cbd49594f8ecaf4d3a5045b09bfada066959eb82788d0287"
+    },
+    "53": {
+      "file": "questao-53.webp",
+      "page": 19,
+      "crop_points": {
+        "x": 30,
+        "y": 515,
+        "w": 535,
+        "h": 275
+      },
+      "width": 1605,
+      "height": 825,
+      "sha256": "c46b089add2fe49f606566004e4e92c11461444844d54d7668fc24a07114646f"
+    },
+    "54": {
+      "file": "questao-54.webp",
+      "page": 20,
+      "crop_points": {
+        "x": 28,
+        "y": 24,
+        "w": 270,
+        "h": 250
+      },
+      "width": 810,
+      "height": 750,
+      "sha256": "6670a94a4d8eac0ad372826299444b759fa72eeca1a7e70e451ea092d6e41298"
+    },
+    "55": {
+      "file": "questao-55.webp",
+      "page": 20,
+      "crop_points": {
+        "x": 28,
+        "y": 292,
+        "w": 270,
+        "h": 395
+      },
+      "width": 810,
+      "height": 1185,
+      "sha256": "1994b5c39f45c09600cedf285dd19c7ba50f16192875df9c20c22c221b3894ac"
+    },
+    "56": {
+      "file": "questao-56.webp",
+      "page": 20,
+      "crop_points": {
+        "x": 302,
+        "y": 52,
+        "w": 270,
+        "h": 235
+      },
+      "width": 810,
+      "height": 705,
+      "sha256": "928171ac2a7b18298f0fa99d47f363200d1e0577e4aef260ef4838e059f4b773"
+    },
+    "57": {
+      "file": "questao-57.webp",
+      "page": 20,
+      "crop_points": {
+        "x": 302,
+        "y": 295,
+        "w": 270,
+        "h": 340
+      },
+      "width": 810,
+      "height": 1020,
+      "sha256": "af95319f28472cb60a4555a53ef3203c07f56117617a510a786cdec165f4f11e"
+    },
+    "58": {
+      "file": "questao-58.webp",
+      "page": 21,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 300
+      },
+      "width": 810,
+      "height": 900,
+      "sha256": "432ab9377d40107189d556a2047d451310f5644e23a0bc63c1049b7318d513a9"
+    },
+    "59": {
+      "file": "questao-59.webp",
+      "page": 21,
+      "crop_points": {
+        "x": 28,
+        "y": 330,
+        "w": 270,
+        "h": 355
+      },
+      "width": 810,
+      "height": 1065,
+      "sha256": "3aba25ca12137d88a2f316834200c5ed103d9d2d284b0e26459078439a531a44"
+    },
+    "60": {
+      "file": "questao-60.webp",
+      "page": 21,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 190
+      },
+      "width": 810,
+      "height": 570,
+      "sha256": "904fdda3b003d5e4ac7033cd90f683358086e9704d7bf5f82ffdfa1db5ece6f8"
+    }
+  },
+  "shared": {
+    "texto-01-08": {
+      "file": "texto-01-08.webp",
+      "page": 3,
+      "crop_points": {
+        "x": 28,
+        "y": 65,
+        "w": 270,
+        "h": 555
+      },
+      "width": 810,
+      "height": 1665,
+      "sha256": "3c11e4e3aac27704ea554ff47cd002a23309422ec1a4a00689ae4eb24cf0753a"
+    },
+    "tira-09-10": {
+      "file": "tira-09-10.webp",
+      "page": 4,
+      "crop_points": {
+        "x": 302,
+        "y": 20,
+        "w": 270,
+        "h": 415
+      },
+      "width": 810,
+      "height": 1245,
+      "sha256": "0fc0fae5592eae7a0a174269570c667791cfb1a7e784c3a41b3bb5e58e7505d4"
+    },
+    "texto-11-16": {
+      "file": "texto-11-16.webp",
+      "page": 5,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 780
+      },
+      "width": 810,
+      "height": 2340,
+      "sha256": "72e56e0474e416ddf09e1f3e1f7dcdf3839be86ac6ea829a1621850807e2578f"
+    },
+    "texto-17-20": {
+      "file": "texto-17-20.webp",
+      "page": 7,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 385
+      },
+      "width": 810,
+      "height": 1155,
+      "sha256": "9fae5d292f5018380d98b3d27e929e99e54cb08285bcb25994c6f15ca24adb55"
+    },
+    "figura-32-33": {
+      "file": "figura-32-33.webp",
+      "page": 12,
+      "crop_points": {
+        "x": 28,
+        "y": 20,
+        "w": 270,
+        "h": 215
+      },
+      "width": 810,
+      "height": 645,
+      "sha256": "0303407bc8bacc31ae7fc09cff21ac700244a70cd30ea4a41a3dc16c6a18e142"
+    }
+  }
+}
