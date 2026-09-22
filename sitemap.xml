@@ -112,7 +112,13 @@
   </url>
   <url>
     <loc>https://lucasmpc.com.br/questao-anulada-pmsp-2026/</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-09-22</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://lucasmpc.com.br/como-enviar-recurso-vunesp-pmsp-2026/</loc>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
