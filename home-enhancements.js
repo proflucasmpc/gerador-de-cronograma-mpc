@@ -25,4 +25,31 @@
   const cookie=document.getElementById('cookieLite');if(cookie){const key='mpc_privacy_notice';if(localStorage.getItem(key)==='ok')cookie.classList.add('hidden');cookie.querySelector('button')?.addEventListener('click',()=>{localStorage.setItem(key,'ok');cookie.classList.add('hidden');});}
   document.querySelectorAll('.mobile-menu a').forEach(link=>link.addEventListener('click',()=>link.closest('details')?.removeAttribute('open')));
   document.querySelectorAll('a[href]').forEach(link=>{const href=link.getAttribute('href')?.trim();if(!href)return;try{const url=new URL(href,location.href);if(url.origin!==location.origin){link.target='_blank';link.rel='noopener noreferrer';}else{link.removeAttribute('target');}}catch{}});
+
+  // Hotfix 2026-09-23: impede qualquer distorção da foto da seção Sobre.
+  const hotfixStyle=document.createElement('style');
+  hotfixStyle.textContent=`
+    .about>img,
+    .about img[src*="prof-lucas-mpc-clean"]{
+      display:block!important;
+      width:280px!important;
+      max-width:100%!important;
+      height:auto!important;
+      max-height:360px!important;
+      aspect-ratio:auto!important;
+      object-fit:contain!important;
+      object-position:center center!important;
+      align-self:center!important;
+      justify-self:center!important;
+    }
+    @media(max-width:900px){
+      .about>img,
+      .about img[src*="prof-lucas-mpc-clean"]{
+        width:min(280px,100%)!important;
+        height:auto!important;
+        max-height:340px!important;
+      }
+    }
+  `;
+  document.head.appendChild(hotfixStyle);
 })();
