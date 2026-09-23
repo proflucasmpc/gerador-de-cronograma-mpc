@@ -70,7 +70,7 @@
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-top:22px}.card{padding:21px;border-radius:17px;border:1px solid var(--line);background:rgba(255,255,255,.03)}.card p{color:#d4dbe6;margin:7px 0}.card .tag{display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(22,140,255,.1);border:1px solid rgba(22,140,255,.32);color:#9dceff;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
     .checklist{display:grid;gap:10px;margin-top:20px}.check{display:flex;gap:12px;align-items:flex-start;padding:14px 15px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.028)}.check span:first-child{display:grid;place-items:center;flex:0 0 25px;height:25px;border-radius:7px;background:rgba(82,216,155,.12);color:#8ff0bd;font-weight:900}.check p{margin:0;color:#dbe2ec}
     .version-box{padding:25px;border-radius:19px;border:2px solid rgba(246,196,83,.48);background:linear-gradient(135deg,rgba(246,196,83,.1),rgba(255,255,255,.02))}.version-box h2{color:var(--gold2)}.version-box .codes{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}.code{padding:7px 10px;border-radius:10px;background:rgba(214,169,40,.1);border:1px solid rgba(214,169,40,.32);font-weight:900;color:var(--gold2)}
-    .copy-area{margin-top:22px;padding:22px;border:1px solid rgba(22,140,255,.3);border-radius:18px;background:rgba(22,140,255,.055)}.copy-area p{color:#d7e3f0}.copy-area .actions{margin-top:16px}
+    .copy-area{margin-top:22px;padding:22px;border:1px solid rgba(22,140,255,.3);border-radius:18px;background:rgba(22,140,255,.055)}.copy-area p{color:#d7e3f0}.copy-area .actions{margin-top:16px}.resource-model{padding:25px;border:2px solid rgba(214,169,40,.5);border-radius:19px;background:linear-gradient(135deg,rgba(214,169,40,.1),rgba(255,255,255,.025))}.resource-model h2{color:var(--gold2);margin-top:13px}.resource-text{margin:18px 0;padding:20px;border:1px solid var(--line);border-radius:14px;background:#020b1b;color:#edf2f7;white-space:pre-wrap;overflow-wrap:anywhere;font-family:Georgia,serif;line-height:1.65}.copy-feedback{display:block;margin-top:10px;min-height:22px;color:#9ff0c4;font-weight:800}.btn.copy{background:var(--gold);color:var(--bg);border-color:var(--gold)}
     .faq details{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:14px;padding:16px 18px;margin:10px 0}.faq summary{cursor:pointer;font-weight:900}.faq p{color:#d6deea;margin-bottom:2px}
     .whatsapp{padding:29px;border:1px solid rgba(37,211,102,.38);border-radius:20px;background:linear-gradient(135deg,rgba(37,211,102,.13),rgba(255,255,255,.02));text-align:center}.whatsapp p{max-width:720px;margin:0 auto 18px;color:#d9e9df}.source{font-size:14px;color:var(--muted)}.source a{color:var(--gold2);font-weight:800}footer{padding:30px 0 92px;border-top:1px solid var(--line);text-align:center;color:var(--muted)}
     .mobile-cta{display:none;position:fixed;z-index:30;left:0;right:0;bottom:0;padding:10px max(12px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:rgba(1,8,23,.97);border-top:1px solid var(--line)}.mobile-cta .btn{width:100%}
@@ -92,8 +92,38 @@
     <div class="actions">
       <a class="btn blue" href="https://www.vunesp.com.br/AreaCandidato/Posicionar/PMES2601/Recurso" target="_blank" rel="noopener">Abrir recursos na Vunesp ↗</a>
       <a class="btn ghost" href="#passo-a-passo">Ver o passo a passo</a>
+      <a class="btn gold" href="#modelo-recurso-51">Ver modelo da Questão 51</a>
     </div>
     <div class="important"><strong>Este botão leva ao sistema oficial.</strong> Se você ainda não estiver identificado, a Vunesp abrirá primeiro a tela de login da Área do Candidato.</div>
+  </div></section>
+
+  <section id="modelo-recurso-51"><div class="wrap">
+    <div class="resource-model">
+      <span class="pill">MODELO DISPONÍVEL NESTA PÁGINA</span>
+      <h2>Modelo de recurso — Questão 51</h2>
+      <p>Confira se o sistema da Vunesp apresenta o enunciado sobre os cinco arquivos <code>.txt</code> e o Histórico da Área de Transferência. A letra da alternativa muda entre os cadernos; por isso, o modelo não depende de uma letra específica.</p>
+      <div class="warning"><strong>Leia antes de copiar:</strong> este é um modelo técnico para possível recurso. Ele não garante acolhimento nem anulação. Confirme a correspondência da questão no seu caderno.</div>
+      <div class="resource-text" id="texto-recurso-51">À Banca Examinadora,
+
+Solicito a anulação da questão que trata da cópia de cinco arquivos .txt, por meio do Explorador de Arquivos do Windows 10, para pastas de destino diferentes com uso do Histórico da Área de Transferência.
+
+A alternativa pretendida pela banca pressupõe que, após ativar o histórico e copiar cada arquivo individualmente com Ctrl + C, os cinco arquivos ficarão disponíveis para seleção por meio do atalho Windows + V. Entretanto, essa descrição não é compatível com a documentação técnica oficial da Microsoft.
+
+Segundo a página “Using the clipboard”, da Microsoft, o Histórico da Área de Transferência oferece suporte a itens nos formatos texto, HTML e bitmap, com limite de 4 MB por item. Um arquivo .txt copiado no Explorador não se transforma, por esse ato, no texto contido no documento. O objeto copiado é um arquivo do sistema.
+
+A documentação “Shell Clipboard Formats”, também da Microsoft, informa que a transferência de arquivos pelo Shell utiliza formatos próprios para objetos do sistema de arquivos, entre eles o CF_HDROP, destinado às localizações de arquivos existentes. Esse formato é tecnicamente distinto dos formatos de conteúdo admitidos pelo Histórico da Área de Transferência.
+
+Assim, embora a alternativa indicada possa representar a intenção didática da questão, o procedimento descrito não permite selecionar, pelo Histórico aberto com Windows + V, os cinco arquivos copiados individualmente no Explorador da maneira afirmada. Como nenhuma alternativa descreve corretamente uma operação capaz de produzir o resultado solicitado, requer-se a anulação da questão.
+
+Fontes:
+Microsoft Support - Using the clipboard: https://support.microsoft.com/en-us/windows/apps/using-the-clipboard
+Microsoft Learn - Shell Clipboard Formats: https://learn.microsoft.com/en-us/windows/win32/shell/clipboard</div>
+      <div class="actions">
+        <button class="btn copy" type="button" onclick="copiarRecurso51()">Copiar o texto do recurso</button>
+        <a class="btn blue" href="https://www.vunesp.com.br/AreaCandidato/Posicionar/PMES2601/Recurso" target="_blank" rel="noopener">Abrir o sistema da Vunesp ↗</a>
+      </div>
+      <span class="copy-feedback" id="copy-feedback" role="status" aria-live="polite"></span>
+    </div>
   </div></section>
 
   <section id="passo-a-passo"><div class="wrap">
@@ -142,7 +172,7 @@
     <div class="copy-area">
       <h3>Quer conferir nossa análise antes de recorrer?</h3>
       <p>Auditamos as questões 4, 16, 22, 35, 46, 48, 51 e 55 e diferenciamos questionamento, possível recurso e ausência de fundamento técnico.</p>
-      <div class="actions"><a class="btn gold" href="/questao-anulada-pmsp-2026/#modelo-recurso-51">Copiar modelo da Questão 51</a><a class="btn ghost" href="/questao-anulada-pmsp-2026/">Ver todas as questões analisadas</a></div>
+      <div class="actions"><a class="btn gold" href="#modelo-recurso-51">Voltar ao modelo da Questão 51</a><a class="btn ghost" href="/questao-anulada-pmsp-2026/">Ver todas as questões analisadas</a></div>
     </div>
   </div></section>
 
@@ -176,6 +206,19 @@
 <div class="mobile-cta"><a class="btn blue" href="https://www.vunesp.com.br/AreaCandidato/Posicionar/PMES2601/Recurso" target="_blank" rel="noopener">Enviar recurso na Vunesp ↗</a></div>
 
 <script>
+  function copiarRecurso51(){
+    const texto=document.getElementById('texto-recurso-51').innerText.trim();
+    const retorno=document.getElementById('copy-feedback');
+    const concluido=()=>{retorno.textContent='Texto copiado. Leia e confira antes de enviar.'};
+    if(navigator.clipboard&&window.isSecureContext){
+      navigator.clipboard.writeText(texto).then(concluido).catch(()=>copiarFallback(texto,concluido));
+    }else{copiarFallback(texto,concluido)}
+  }
+  function copiarFallback(texto,concluido){
+    const area=document.createElement('textarea');
+    area.value=texto;area.setAttribute('readonly','');area.style.position='fixed';area.style.opacity='0';
+    document.body.appendChild(area);area.select();document.execCommand('copy');document.body.removeChild(area);concluido();
+  }
   (function(){
     const opening = new Date('2026-09-23T08:00:00-03:00').getTime();
     const closing = new Date('2026-09-25T23:59:00-03:00').getTime();
