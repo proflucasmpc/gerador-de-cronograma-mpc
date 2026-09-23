@@ -29,18 +29,19 @@
         "inLanguage":"pt-BR",
         "totalTime":"PT10M",
         "step":[
-          {"@type":"HowToStep","position":1,"name":"Acesse a área de recursos","text":"Abra o endereço oficial da Vunesp para os recursos do concurso PMES2601."},
-          {"@type":"HowToStep","position":2,"name":"Faça a identificação","text":"Entre na Área do Candidato com a mesma conta usada na inscrição."},
-          {"@type":"HowToStep","position":3,"name":"Selecione o recurso correto","text":"Localize o recurso referente às questões da Prova Objetiva — Parte I."},
-          {"@type":"HowToStep","position":4,"name":"Confira a questão","text":"Selecione a questão indicada pelo sistema e confira sua correspondência com a versão da prova."},
-          {"@type":"HowToStep","position":5,"name":"Revise e protocole","text":"Insira a fundamentação, revise as informações, envie e guarde o comprovante."}
+          {"@type":"HowToStep","position":1,"name":"Acesse e identifique-se","text":"Abra o sistema oficial, entre na Área do Candidato e confirme o concurso PMES2601."},
+          {"@type":"HowToStep","position":2,"name":"Abra Recursos","text":"Na inscrição do concurso PMES2601, abra a aba Recursos e localize o recurso contra o gabarito do Exame de Conhecimentos — Parte I."},
+          {"@type":"HowToStep","position":3,"name":"Inclua o recurso","text":"Clique em Incluir Recurso, leia as regras, marque a declaração de concordância e prossiga."},
+          {"@type":"HowToStep","position":4,"name":"Selecione a questão","text":"No campo Nº da Questão, selecione 51. O protocolo é gerado automaticamente e não deve ser preenchido."},
+          {"@type":"HowToStep","position":5,"name":"Preencha os dois campos","text":"Cole separadamente o Questionamento e o Embasamento, respeitando o limite de 8.000 caracteres de cada campo."},
+          {"@type":"HowToStep","position":6,"name":"Salve e guarde o comprovante","text":"Revise, clique em Salvar, confira o protocolo e use as opções de visualizar e imprimir para guardar o comprovante."}
         ]
       },
       {
         "@type":"FAQPage",
         "@id":"https://lucasmpc.com.br/como-enviar-recurso-vunesp-pmsp-2026/#faq",
         "mainEntity":[
-          {"@type":"Question","name":"Qual é o prazo para enviar recurso da prova da PM-SP 2026?","acceptedAnswer":{"@type":"Answer","text":"A Vunesp informa que o recurso contra o gabarito do Exame de Conhecimentos — Parte I poderá ser enviado das 8h de 23 de setembro de 2026 até as 23h59 de 25 de setembro de 2026."}},
+          {"@type":"Question","name":"Qual é o prazo para enviar recurso da prova da PM-SP 2026?","acceptedAnswer":{"@type":"Answer","text":"A Vunesp informa que o recurso contra o gabarito do Exame de Conhecimentos — Parte I poderá ser enviado das 8h de 23 de setembro de 2026 até as 23h59min59s de 25 de setembro de 2026."}},
           {"@type":"Question","name":"Posso enviar o recurso pelo celular?","acceptedAnswer":{"@type":"Answer","text":"O procedimento é eletrônico e pode ser acessado pelo navegador do celular. Antes de enviar, revise o texto e confirme a questão selecionada."}},
           {"@type":"Question","name":"Enviar recurso garante a anulação da questão?","acceptedAnswer":{"@type":"Answer","text":"Não. A Vunesp pode manter a questão e o gabarito, alterar a resposta ou anular o item após a análise."}},
           {"@type":"Question","name":"Por que preciso conferir a versão da prova?","acceptedAnswer":{"@type":"Answer","text":"Os cadernos podem apresentar as questões e alternativas em ordens diferentes. O candidato deve conferir a correspondência antes de protocolar."}}
@@ -86,7 +87,7 @@
     <h1>Como enviar recurso <span>na Vunesp</span></h1>
     <p class="lead">Veja onde entrar, o que conferir e como protocolar corretamente um recurso contra o gabarito do Exame de Conhecimentos — Parte I do concurso PMES2601.</p>
     <div class="deadline" id="deadlineBox">
-      <div><span class="deadline-label">Período oficial informado pela Vunesp</span><strong>De 23/09, às 8h, até 25/09/2026, às 23h59</strong><span class="muted">Horário de Brasília. Antes das 8h do dia 23, o formulário ainda não estará disponível.</span></div>
+      <div><span class="deadline-label">Período oficial informado pela Vunesp</span><strong>De 23/09, às 8h, até 25/09/2026, às 23h59min59s</strong><span class="muted">Horário de Brasília. Não deixe para os minutos finais.</span></div>
       <div class="countdown" id="countdown" aria-live="polite">Calculando abertura…</div>
     </div>
     <div class="actions">
@@ -103,23 +104,38 @@
       <h2>Modelo de recurso — Questão 51</h2>
       <p>Confira se o sistema da Vunesp apresenta o enunciado sobre os cinco arquivos <code>.txt</code> e o Histórico da Área de Transferência. A letra da alternativa muda entre os cadernos; por isso, o modelo não depende de uma letra específica.</p>
       <div class="warning"><strong>Leia antes de copiar:</strong> este é um modelo técnico para possível recurso. Ele não garante acolhimento nem anulação. Confirme a correspondência da questão no seu caderno.</div>
-      <div class="resource-text" id="texto-recurso-51">À Banca Examinadora,
+      <h3>1. Campo “Questionamento”</h3>
+      <p class="muted">Cole somente o texto abaixo no campo Questionamento da Vunesp.</p>
+      <div class="resource-text" id="questionamento-recurso-51">A questão afirma que cinco arquivos .txt, copiados individualmente no Explorador de Arquivos do Windows 10, permaneceriam disponíveis para seleção por meio do Histórico da Área de Transferência, acessado pelo atalho Windows+V.
 
-Solicito a anulação da questão que trata da cópia de cinco arquivos .txt, por meio do Explorador de Arquivos do Windows 10, para pastas de destino diferentes com uso do Histórico da Área de Transferência.
+Contudo, o procedimento apresentado não é tecnicamente compatível com o funcionamento documentado pela Microsoft. Arquivos copiados pelo Explorador são objetos do sistema de arquivos e utilizam formato próprio de transferência, não se confundindo com os conteúdos de texto admitidos pelo Histórico da Área de Transferência.
 
-A alternativa pretendida pela banca pressupõe que, após ativar o histórico e copiar cada arquivo individualmente com Ctrl + C, os cinco arquivos ficarão disponíveis para seleção por meio do atalho Windows + V. Entretanto, essa descrição não é compatível com a documentação técnica oficial da Microsoft.
-
-Segundo a página “Using the clipboard”, da Microsoft, o Histórico da Área de Transferência oferece suporte a itens nos formatos texto, HTML e bitmap, com limite de 4 MB por item. Um arquivo .txt copiado no Explorador não se transforma, por esse ato, no texto contido no documento. O objeto copiado é um arquivo do sistema.
-
-A documentação “Shell Clipboard Formats”, também da Microsoft, informa que a transferência de arquivos pelo Shell utiliza formatos próprios para objetos do sistema de arquivos, entre eles o CF_HDROP, destinado às localizações de arquivos existentes. Esse formato é tecnicamente distinto dos formatos de conteúdo admitidos pelo Histórico da Área de Transferência.
-
-Assim, embora a alternativa indicada possa representar a intenção didática da questão, o procedimento descrito não permite selecionar, pelo Histórico aberto com Windows + V, os cinco arquivos copiados individualmente no Explorador da maneira afirmada. Como nenhuma alternativa descreve corretamente uma operação capaz de produzir o resultado solicitado, requer-se a anulação da questão.
-
-Fontes:
-Microsoft Support - Using the clipboard: https://support.microsoft.com/en-us/windows/apps/using-the-clipboard
-Microsoft Learn - Shell Clipboard Formats: https://learn.microsoft.com/en-us/windows/win32/shell/clipboard</div>
+Como nenhuma alternativa descreve corretamente uma operação capaz de produzir o resultado solicitado, requer-se a anulação da questão.</div>
       <div class="actions">
-        <button class="btn copy" type="button" onclick="copiarRecurso51()">Copiar o texto do recurso</button>
+        <button class="btn copy" type="button" onclick="copiarCampo('questionamento-recurso-51','Questionamento copiado. Cole no campo Questionamento da Vunesp.')">Copiar Questionamento</button>
+      </div>
+
+      <h3>2. Campo “Embasamento”</h3>
+      <p class="muted">Cole somente o texto abaixo no campo Embasamento da Vunesp.</p>
+      <div class="resource-text" id="embasamento-recurso-51">A alternativa indicada como correta pressupõe que, após ativar o Histórico da Área de Transferência e copiar individualmente cada arquivo .txt com Ctrl+C, os cinco arquivos ficarão disponíveis para seleção pelo atalho Windows+V.
+
+Entretanto, segundo a documentação técnica oficial da Microsoft, essa conclusão não se aplica aos arquivos copiados pelo Explorador de Arquivos.
+
+A página “Using the clipboard”, da Microsoft, informa que o Histórico da Área de Transferência oferece suporte a itens nos formatos texto, HTML e bitmap, com limite de 4 MB por item. Quando um arquivo .txt é copiado no Explorador, ele não se transforma automaticamente no conteúdo textual existente dentro do documento. O objeto copiado continua sendo um arquivo do sistema.
+
+A documentação “Shell Clipboard Formats”, também da Microsoft, esclarece que a transferência de arquivos pelo Shell utiliza formatos próprios para objetos do sistema de arquivos. Entre eles está o CF_HDROP, utilizado para representar uma lista com as localizações de arquivos existentes. Esse formato é tecnicamente diferente dos formatos de conteúdo admitidos pelo Histórico da Área de Transferência.
+
+Portanto, embora a alternativa indicada possa representar a intenção didática da questão, o procedimento descrito não permite selecionar, pelo histórico aberto com Windows+V, os cinco arquivos copiados individualmente no Explorador da maneira afirmada. Diante da inexistência de alternativa tecnicamente correta, solicita-se a anulação da questão.
+
+Fontes oficiais:
+
+Microsoft Support – Using the clipboard:
+https://support.microsoft.com/en-us/windows/apps/using-the-clipboard
+
+Microsoft Learn – Shell Clipboard Formats:
+https://learn.microsoft.com/en-us/windows/win32/shell/clipboard</div>
+      <div class="actions">
+        <button class="btn copy" type="button" onclick="copiarCampo('embasamento-recurso-51','Embasamento copiado. Cole no campo Embasamento da Vunesp.')">Copiar Embasamento</button>
         <a class="btn blue" href="https://www.vunesp.com.br/AreaCandidato/Posicionar/PMES2601/Recurso" target="_blank" rel="noopener">Abrir o sistema da Vunesp ↗</a>
       </div>
       <span class="copy-feedback" id="copy-feedback" role="status" aria-live="polite"></span>
@@ -128,15 +144,16 @@ Microsoft Learn - Shell Clipboard Formats: https://learn.microsoft.com/en-us/win
 
   <section id="passo-a-passo"><div class="wrap">
     <h2>Passo a passo para enviar o recurso</h2>
-    <p class="muted">Os nomes e a disposição dos campos internos podem variar conforme o dispositivo. Leia tudo o que aparecer na Área do Candidato antes de confirmar.</p>
+    <p class="muted">Fluxo conferido diretamente no formulário disponibilizado pela Vunesp em 23/09/2026. A disposição visual pode variar no celular, mas os campos e as confirmações são os mesmos.</p>
     <div class="steps">
-      <article class="step"><h3>Acesse a área oficial de recursos</h3><p>Use o botão desta página ou entre em <a href="https://www.vunesp.com.br/PMES2601" target="_blank" rel="noopener">vunesp.com.br/PMES2601</a> e escolha <strong>Recursos</strong>.</p></article>
-      <article class="step"><h3>Faça a identificação</h3><p>Entre com o mesmo CPF ou e-mail utilizado na inscrição. A Vunesp também apresenta opções de identificação vinculadas na própria tela.</p></article>
-      <article class="step"><h3>Localize o recurso correto</h3><p>Procure a opção <strong>Recurso contra o gabarito — Exame de Conhecimentos — Parte I</strong>. Não selecione um recurso de outra etapa do concurso.</p></article>
-      <article class="step"><h3>Selecione e confira a questão</h3><p>Confirme qual item está sendo contestado. Compare o enunciado e a alternativa com o seu caderno antes de inserir a fundamentação.</p></article>
-      <article class="step"><h3>Insira a fundamentação</h3><p>Apresente um argumento objetivo, diretamente relacionado ao problema da questão. Evite desabafos, acusações e justificativas pessoais.</p></article>
-      <article class="step"><h3>Revise antes de enviar</h3><p>Confira a questão selecionada, o texto completo, eventuais limites e todas as instruções mostradas pela banca.</p></article>
-      <article class="step"><h3>Protocole e guarde a confirmação</h3><p>Finalize o envio e salve o comprovante, protocolo ou captura da confirmação. Não feche a tela antes de verificar se o sistema registrou o recurso.</p></article>
+      <article class="step"><h3>Entre na Área do Candidato</h3><p>Use o botão desta página. Se o sistema solicitar identificação, entre com o mesmo e-mail ou CPF e a senha utilizados na inscrição, ou use uma opção de acesso vinculada à sua conta.</p></article>
+      <article class="step"><h3>Confirme o concurso PMES2601</h3><p>Alguns candidatos podem ter mais de uma inscrição na Área do Candidato. Localize <strong>PMES2601 – Aluno-Soldado PM do Quadro de Praças</strong> antes de continuar.</p></article>
+      <article class="step"><h3>Abra “Recursos”</h3><p>Na inscrição correta, clique na aba <strong>RECURSOS</strong> e localize <strong>Recurso contra o gabarito – Exame de Conhecimentos – Parte I</strong>.</p></article>
+      <article class="step"><h3>Clique em “+ Incluir Recurso”</h3><p>Leia as regras exibidas pela Vunesp. Marque <strong>“Li, estou de acordo e desejo fazer a interposição do recurso”</strong> e clique em <strong>PROSSEGUIR</strong>.</p></article>
+      <article class="step"><h3>Selecione a questão 51</h3><p>No campo <strong>Nº da Questão</strong>, escolha <strong>51</strong>. O campo <strong>Nº do Protocolo</strong> fica bloqueado: não tente preenchê-lo, pois o número será gerado automaticamente.</p></article>
+      <article class="step"><h3>Preencha os dois campos separadamente</h3><p>Cole o primeiro texto em <strong>Questionamento</strong> e o segundo em <strong>Embasamento</strong>. Cada campo aceita até <strong>8.000 caracteres</strong>. Não há envio de PDF nesse formulário.</p></article>
+      <article class="step"><h3>Revise antes de salvar</h3><p>Confira novamente o número 51 e leia os dois campos. O botão <strong>SALVAR</strong> registra o recurso e gera o protocolo.</p></article>
+      <article class="step"><h3>Confira e guarde o comprovante</h3><p>Depois do registro, use o botão de visualização para conferir o texto completo e o botão da impressora para salvar o comprovante em PDF. Guarde-o sem divulgar seus dados pessoais.</p></article>
     </div>
   </div></section>
 
@@ -154,6 +171,8 @@ Microsoft Learn - Shell Clipboard Formats: https://learn.microsoft.com/en-us/win
     <div class="checklist">
       <div class="check"><span>✓</span><p>Entrei na página correta do concurso <strong>PMES2601</strong>.</p></div>
       <div class="check"><span>✓</span><p>Escolhi <strong>Recurso contra o gabarito — Exame de Conhecimentos — Parte I</strong>.</p></div>
+      <div class="check"><span>✓</span><p>Selecionei a <strong>Questão 51</strong> no campo correto.</p></div>
+      <div class="check"><span>✓</span><p>Colei os textos separadamente em <strong>Questionamento</strong> e <strong>Embasamento</strong>.</p></div>
       <div class="check"><span>✓</span><p>Conferi a questão pelo conteúdo, e não somente pelo número ou pela letra.</p></div>
       <div class="check"><span>✓</span><p>Meu argumento é objetivo, respeitoso e relacionado diretamente ao problema apontado.</p></div>
       <div class="check"><span>✓</span><p>Revisei o texto e as informações mostradas no sistema.</p></div>
@@ -178,9 +197,11 @@ Microsoft Learn - Shell Clipboard Formats: https://learn.microsoft.com/en-us/win
 
   <section class="faq" id="duvidas"><div class="wrap">
     <h2>Dúvidas frequentes</h2>
-    <details open><summary>Qual é o prazo?</summary><p>A Vunesp informa que o recurso contra o gabarito do Exame de Conhecimentos — Parte I estará disponível das <strong>8h de 23/09/2026</strong> até as <strong>23h59 de 25/09/2026</strong>.</p></details>
+    <details open><summary>Qual é o prazo?</summary><p>A Vunesp informa que o recurso contra o gabarito do Exame de Conhecimentos — Parte I estará disponível das <strong>8h de 23/09/2026</strong> até as <strong>23h59min59s de 25/09/2026</strong>.</p></details>
     <details><summary>Posso enviar pelo celular?</summary><p>O acesso é eletrônico e pode ser feito no navegador do celular. Use uma conexão estável, revise com atenção e guarde a confirmação do envio.</p></details>
-    <details><summary>Posso recorrer de mais de uma questão?</summary><p>Consulte as opções e instruções exibidas pela Vunesp. A fundamentação deve ser individualizada e corresponder exatamente à questão selecionada.</p></details>
+    <details><summary>Posso recorrer de mais de uma questão?</summary><p>Sim, mas a Vunesp permite somente um recurso por questão. Para contestar outra questão, clique novamente em <strong>+ Incluir Recurso</strong>, selecione o outro número e repita o procedimento com uma fundamentação própria.</p></details>
+    <details><summary>Devo enviar o recurso em PDF?</summary><p>Não. Neste formulário, o conteúdo é inserido diretamente nos campos <strong>Questionamento</strong> e <strong>Embasamento</strong>. As fontes podem ser informadas como endereços escritos no próprio texto.</p></details>
+    <details><summary>Preciso preencher o número do protocolo?</summary><p>Não. Esse campo aparece bloqueado e o número é gerado automaticamente pela Vunesp depois que o recurso é salvo.</p></details>
     <details><summary>Posso copiar um modelo?</summary><p>Um modelo pode organizar o argumento, mas deve ser lido e conferido. Não envie texto que você não compreende ou que não corresponda à sua questão.</p></details>
     <details><summary>Enviar recurso garante anulação?</summary><p>Não. A decisão pertence exclusivamente à banca. Após a análise, a Vunesp pode manter a questão, alterar o gabarito ou anular o item.</p></details>
     <details><summary>Se a questão for anulada, apenas quem recorreu recebe o ponto?</summary><p>Não. Conforme a regra do edital, a pontuação de uma questão efetivamente anulada é atribuída aos candidatos presentes na prova.</p></details>
@@ -198,7 +219,7 @@ Microsoft Learn - Shell Clipboard Formats: https://learn.microsoft.com/en-us/win
     <h2>Referências oficiais</h2>
     <p><a href="https://www.vunesp.com.br/PMES2601" target="_blank" rel="noopener">Página do concurso PMES2601 na Fundação Vunesp ↗</a></p>
     <p><a href="https://www.vunesp.com.br/AreaCandidato/Posicionar/PMES2601/Recurso" target="_blank" rel="noopener">Área oficial de recursos ↗</a></p>
-    <p>Orientação atualizada em 22/09/2026. Em caso de divergência, prevalecem o edital e as informações publicadas oficialmente pela Vunesp.</p>
+    <p>Orientação atualizada em 23/09/2026 após conferência do formulário oficial. Em caso de divergência, prevalecem o edital e as informações publicadas oficialmente pela Vunesp.</p>
   </div></section>
 </main>
 
@@ -206,10 +227,10 @@ Microsoft Learn - Shell Clipboard Formats: https://learn.microsoft.com/en-us/win
 <div class="mobile-cta"><a class="btn blue" href="https://www.vunesp.com.br/AreaCandidato/Posicionar/PMES2601/Recurso" target="_blank" rel="noopener">Enviar recurso na Vunesp ↗</a></div>
 
 <script>
-  function copiarRecurso51(){
-    const texto=document.getElementById('texto-recurso-51').innerText.trim();
+  function copiarCampo(id,mensagem){
+    const texto=document.getElementById(id).innerText.trim();
     const retorno=document.getElementById('copy-feedback');
-    const concluido=()=>{retorno.textContent='Texto copiado. Leia e confira antes de enviar.'};
+    const concluido=()=>{retorno.textContent=mensagem};
     if(navigator.clipboard&&window.isSecureContext){
       navigator.clipboard.writeText(texto).then(concluido).catch(()=>copiarFallback(texto,concluido));
     }else{copiarFallback(texto,concluido)}
@@ -221,7 +242,7 @@ Microsoft Learn - Shell Clipboard Formats: https://learn.microsoft.com/en-us/win
   }
   (function(){
     const opening = new Date('2026-09-23T08:00:00-03:00').getTime();
-    const closing = new Date('2026-09-25T23:59:00-03:00').getTime();
+    const closing = new Date('2026-09-25T23:59:59-03:00').getTime();
     const output = document.getElementById('countdown');
     const box = document.getElementById('deadlineBox');
     function update(){
