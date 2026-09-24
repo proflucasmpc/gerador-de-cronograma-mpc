@@ -524,10 +524,12 @@
       .mobile-menu { position: absolute; top: 50px; right: 0; width: min(270px,calc(100vw - 32px)); padding: 9px; border: 1px solid var(--line); border-radius: 14px; background: #0b1019; box-shadow: 0 24px 70px rgba(0,0,0,.6); }
       .mobile-menu a { display: block; padding: 12px; border-radius: 9px; color: #e1e6ee; font-size: 14px; }
       .mobile-menu a:hover { background: rgba(255,255,255,.06); }
+      .mobile-menu-group { display: block; padding: 10px 12px 4px; color: var(--gold2); font-size: 8px; font-weight: 950; letter-spacing: .14em; text-transform: uppercase; }
       .showcase { padding-top: 30px; }
       .showcase-main { position: relative; display: block; aspect-ratio: 3/1; overflow: hidden; border: 1px solid rgba(214,169,40,.28); border-radius: 18px; background: #071225; box-shadow: 0 28px 80px rgba(0,0,0,.38); }
       .showcase-main img,.showcase-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
       .showcase-main:hover img,.showcase-card:hover img { transform: scale(1.018); }
+      .mobile-banner-copy { display: none; }
       .showcase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
       .showcase-card { position: relative; display: block; aspect-ratio: 3/1; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #071225; box-shadow: 0 18px 48px rgba(0,0,0,.26); }
       .showcase-label { position: absolute; z-index: 2; left: 18px; bottom: 16px; display: inline-flex; align-items: center; min-height: 36px; padding: 0 13px; border: 1px solid rgba(242,208,107,.55); border-radius: 9px; background: rgba(3,7,15,.88); color: #fff1b9; font-size: 11px; font-weight: 900; letter-spacing: .04em; backdrop-filter: blur(8px); }
@@ -576,6 +578,7 @@
       .product p { display: block; margin: 5px 0 0; color: #7f8792; font-size: 11px; line-height: 1.35; }
       .product b { display: none; }
       .product[data-badge]:before { content: attr(data-badge); position: absolute; z-index: 2; top: 10px; left: 10px; padding: 5px 8px; border-radius: 999px; background: rgba(242,208,107,.94); color: #171108; font-size: 8px; font-weight: 950; letter-spacing: .06em; text-transform: uppercase; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+      .product[data-entry]:after { content: attr(data-entry); position: absolute; z-index: 2; top: 10px; right: 10px; padding: 5px 8px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; background: rgba(2,8,20,.86); color: #eef2f7; font-size: 7px; font-weight: 900; letter-spacing: .045em; text-transform: uppercase; backdrop-filter: blur(8px); }
       .catalog-control { position: absolute; z-index: 5; top: calc(50% - 28px); translate: 0 -50%; display: grid; place-items: center; width: 42px; height: 58px; padding: 0; border: 1px solid rgba(255,255,255,.16); border-radius: 10px; background: rgba(4,6,10,.92); color: #fff; font-size: 28px; line-height: 1; cursor: pointer; box-shadow: 0 12px 30px rgba(0,0,0,.4); transition: opacity .2s ease,background .2s ease,border-color .2s ease; }
       .catalog-control:hover,.catalog-control:focus-visible { background: #20242b; border-color: rgba(242,208,107,.65); outline: 0; }
       .catalog-control.prev { left: -14px; }
@@ -586,7 +589,7 @@
       .mentor-art span { color: #f3df9b; font-family: Inter,system-ui,sans-serif; font-size: 10px; font-weight: 900; line-height: 1.25; letter-spacing: .13em; text-transform: uppercase; }
       .social-proof { padding: 28px; border: 1px solid rgba(214,169,40,.18); border-radius: 20px; background: linear-gradient(145deg,#12161d,#090c12); }
       .proof-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 20px; }
-      .proof-card { display: block; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: #080c13; transition: transform .22s ease,border-color .22s ease; }
+      .proof-card { display: block; width: 100%; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: #080c13; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: transform .22s ease,border-color .22s ease; }
       .proof-card:hover { transform: translateY(-4px); border-color: rgba(242,208,107,.45); }
       .proof-image { position: relative; aspect-ratio: 16/9; overflow: hidden; background: #02060d; }
       .proof-image img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.66) saturate(.8); transition: filter .22s ease,transform .3s ease; }
@@ -596,6 +599,11 @@
       .proof-copy strong { display: block; color: #edf0f4; font-size: 14px; }
       .proof-copy span { display: block; margin-top: 5px; color: #8f97a3; font-size: 11px; line-height: 1.4; }
       .proof-note { margin: 16px 0 0; color: #737b87; font-size: 10px; }
+      .video-modal { width: min(920px,calc(100% - 28px)); padding: 0; overflow: hidden; border: 1px solid rgba(242,208,107,.35); border-radius: 16px; background: #030712; box-shadow: 0 30px 100px rgba(0,0,0,.72); }
+      .video-modal::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(5px); }
+      .video-frame { aspect-ratio: 16/9; background: #000; }
+      .video-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+      .modal-close { position: absolute; z-index: 2; top: 10px; right: 10px; display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid rgba(255,255,255,.35); border-radius: 50%; background: rgba(2,7,17,.88); color: #fff; font-size: 23px; cursor: pointer; }
       @media (max-width: 900px) {
         .nav {
           display: none;
@@ -655,13 +663,17 @@
         }
         .mentor-art { min-height: 205px; }
         .showcase { padding-top: 20px; }
-        .showcase-main { aspect-ratio: 3/1; border-radius: 13px; }
-        .showcase-main img { object-fit: contain; }
+        .showcase-main { aspect-ratio: 16/10; border-radius: 13px; }
+        .showcase-main img { object-fit: cover; object-position: 48% center; filter: brightness(.58); }
         .showcase-grid { grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
-        .showcase-card { aspect-ratio: 3/1; }
-        .showcase-card:not(.ebook) img { object-fit: contain; }
+        .showcase-card { aspect-ratio: 16/10; }
+        .showcase-card:not(.ebook) img { object-fit: cover; object-position: center; filter: brightness(.58); }
         .showcase-card.ebook { aspect-ratio: 16/9; }
         .showcase-card.ebook img { object-position: 62% center; }
+        .mobile-banner-copy { position: absolute; z-index: 2; inset: auto 16px 58px; display: block; max-width: 76%; color: #fff; }
+        .mobile-banner-copy small { display: block; margin-bottom: 6px; color: var(--gold2); font-size: 8px; font-weight: 950; letter-spacing: .12em; text-transform: uppercase; }
+        .mobile-banner-copy strong { display: block; font-family: Georgia,serif; font-size: clamp(25px,8vw,37px); line-height: .96; text-shadow: 0 3px 18px rgba(0,0,0,.7); }
+        .mobile-banner-copy em { display: block; margin-top: 8px; color: #d1d6de; font-size: 10px; font-style: normal; line-height: 1.4; }
         .ebook-copy { top: 14px; left: 15px; width: 54%; }
         .ebook-copy strong { font-size: clamp(20px,6.5vw,29px); }
         .ebook-copy p { display: none; }
@@ -698,7 +710,7 @@
         }
       }
     </style>
-    <script src="/home-enhancements.js?v=20260924-radar" defer></script>
+    <script src="/home-enhancements.js?v=20260924-ux2" defer></script>
   <script src="/site-analytics.js?v=20260924" defer></script>
 </head>
   <body>
@@ -731,10 +743,12 @@
         <details class="mobile-nav">
           <summary aria-label="Abrir menu">☰</summary>
           <div class="mobile-menu">
+            <span class="mobile-menu-group">Estudar</span>
             <a href="#matematica">Matemática</a>
             <a href="#mentoria">Mentoria</a>
             <a href="#catalogo">Materiais e cursos</a>
             <a href="/cronograma-de-estudos-para-concurso">Cronograma</a>
+            <span class="mobile-menu-group">Acompanhar</span>
             <a href="/correcao-pmsp-2026/">PM-SP 2026</a>
             <a href="#concursos-abertos">Concursos abertos</a>
             <a href="https://wa.me/5511960189699">WhatsApp</a>
@@ -791,15 +805,17 @@
           </div>
           <a class="showcase-main" href="/academia-da-matematica" aria-label="Conhecer a Academia da Matemática">
             <img src="/assets/club/banner-academia.webp" alt="Academia da Matemática: aulas, questões e simulados" width="1440" height="480" />
+            <span class="mobile-banner-copy"><small>Formação completa</small><strong>Academia da Matemática</strong><em>Aulas, questões e simulados para concursos.</em></span>
           </a>
           <div class="showcase-grid">
-            <a class="showcase-card ebook" href="https://wa.me/5511960189699?text=Ol%C3%A1%2C%20professor%20Lucas.%20Vi%20o%20e-book%20Como%20Passar%20em%20Concursos%20no%20seu%20site%20e%20quero%20adquirir%20o%20meu.%20Pode%20me%20enviar%20as%20informa%C3%A7%C3%B5es%3F" target="_blank" rel="noopener noreferrer" aria-label="Solicitar o e-book Como Passar em Concursos pelo WhatsApp">
+            <a class="showcase-card ebook" href="https://wa.me/5511960189699?text=Ol%C3%A1%2C%20professor%20Lucas%21%20Vi%20no%20seu%20site%20o%20e-book%20gratuito%20Como%20Passar%20em%20Concursos%20P%C3%BAblicos%20e%20gostaria%20de%20receber%20o%20meu." target="_blank" rel="noopener noreferrer" aria-label="Receber gratuitamente o e-book Como Passar em Concursos pelo WhatsApp">
               <img src="/assets/club/banner-como-passar-estudo.webp" alt="E-book Como Passar em Concursos Públicos" width="2172" height="724" loading="lazy" />
-              <span class="ebook-copy"><small>E-book atualizado</small><strong>Como Passar em Concursos Públicos</strong><p>Organização, método e estratégia para transformar estudo em preparação consistente.</p></span>
-              <span class="showcase-label">QUERO O E-BOOK →</span>
+              <span class="ebook-copy"><small>E-book gratuito</small><strong>Como Passar em Concursos Públicos</strong><p>Organização, método e estratégia para transformar estudo em preparação consistente.</p></span>
+              <span class="showcase-label">RECEBER E-BOOK GRÁTIS →</span>
             </a>
             <a class="showcase-card" href="https://radar-de-concursos-mpc.netlify.app/" target="_blank" rel="noopener noreferrer" aria-label="Abrir o Radar de Concursos MPC">
               <img src="/assets/club/banner-radar.webp" alt="Radar de Concursos MPC: editais, vagas, datas e provas" width="1440" height="480" loading="lazy" />
+              <span class="mobile-banner-copy"><small>Oportunidades atualizadas</small><strong>Radar de Concursos MPC</strong><em>Editais, vagas, datas e provas em um só lugar.</em></span>
               <span class="showcase-label">CONSULTAR O RADAR →</span>
             </a>
           </div>
@@ -1044,22 +1060,22 @@
                 href="/manual-do-chute"
                 ><img
                   src="/assets/club/manual-chute.webp"
-                  alt="Manual do Chute"
+                  alt="Manual do Chute Certo"
                   loading="lazy"
                 />
                 <div>
-                  <h3>Manual do Chute</h3>
+                  <h3>Manual do Chute Certo</h3>
                   <p>Estratégias de decisão em prova.</p>
                   <b>VER DETALHES →</b>
                 </div></a
               ><a class="product" data-category="estrategia" href="/metodo-ia"
                 ><img
                   src="/assets/club/metodo-ia.webp"
-                  alt="Método IA"
+                  alt="Método IA para Concursos"
                   loading="lazy"
                 />
                 <div>
-                  <h3>Método IA</h3>
+                  <h3>Método IA para Concursos</h3>
                   <p>IA aplicada aos estudos.</p>
                   <b>VER DETALHES →</b>
                 </div></a
@@ -1083,11 +1099,11 @@
                 href="/combo-estrategia"
                 ><img
                   src="/assets/club/combo-estrategia.webp"
-                  alt="Combo Estratégia"
+                  alt="Combo Estratégia da Aprovação"
                   loading="lazy"
                 />
                 <div>
-                  <h3>Combo Estratégia</h3>
+                  <h3>Combo Estratégia da Aprovação</h3>
                   <p>Método, IA e técnicas de prova.</p>
                   <b>VER DETALHES →</b>
                 </div></a
@@ -1113,7 +1129,7 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 ><img
-                  src="/assets/club/combo-portugues.webp"
+                  src="/assets/club/combo-portugues-v2.webp"
                   alt="Combo de Português com 3 apostilas e 2 bônus"
                   loading="lazy"
                 />
@@ -1142,18 +1158,18 @@
             <p>Relatos em vídeo de quem acompanhou explicações, questões e estratégias do Método MPC.</p>
           </div>
           <div class="proof-grid">
-            <a class="proof-card" href="https://www.youtube.com/watch?v=AFhS3c8i8rI" target="_blank" rel="noopener noreferrer" aria-label="Assistir ao primeiro relato de aluno">
+            <button class="proof-card" type="button" data-video="AFhS3c8i8rI" aria-label="Assistir ao relato sobre a Academia da Matemática">
               <div class="proof-image"><img src="https://i.ytimg.com/vi/AFhS3c8i8rI/hqdefault.jpg" alt="Relato em vídeo de aluno da Academia da Matemática" loading="lazy" /><span class="proof-play" aria-hidden="true">▶</span></div>
-              <div class="proof-copy"><strong>Experiência com as aulas</strong><span>Relato sobre explicações, questões e preparação.</span></div>
-            </a>
-            <a class="proof-card" href="https://www.youtube.com/watch?v=BR33nQ2Qvdw" target="_blank" rel="noopener noreferrer" aria-label="Assistir ao segundo relato de aluno">
+              <div class="proof-copy"><strong>Academia da Matemática</strong><span>Assistir ao relato completo →</span></div>
+            </button>
+            <button class="proof-card" type="button" data-video="BR33nQ2Qvdw" aria-label="Assistir ao relato sobre o Método MPC">
               <div class="proof-image"><img src="https://i.ytimg.com/vi/BR33nQ2Qvdw/hqdefault.jpg" alt="Relato em vídeo sobre o Método MPC" loading="lazy" /><span class="proof-play" aria-hidden="true">▶</span></div>
-              <div class="proof-copy"><strong>Preparação mais prática</strong><span>Experiência de quem estudou com a didática do Prof. Lucas.</span></div>
-            </a>
-            <a class="proof-card" href="https://www.youtube.com/watch?v=8IwYn-aOU2w" target="_blank" rel="noopener noreferrer" aria-label="Assistir ao terceiro relato de aluno">
+              <div class="proof-copy"><strong>Método MPC</strong><span>Assistir ao relato completo →</span></div>
+            </button>
+            <button class="proof-card" type="button" data-video="8IwYn-aOU2w" aria-label="Assistir ao relato sobre Matemática para concursos">
               <div class="proof-image"><img src="https://i.ytimg.com/vi/8IwYn-aOU2w/hqdefault.jpg" alt="Relato em vídeo sobre Matemática para concursos" loading="lazy" /><span class="proof-play" aria-hidden="true">▶</span></div>
-              <div class="proof-copy"><strong>Matemática com mais clareza</strong><span>Uma experiência com resolução e interpretação de questões.</span></div>
-            </a>
+              <div class="proof-copy"><strong>Matemática para concursos</strong><span>Assistir ao relato completo →</span></div>
+            </button>
           </div>
           <p class="proof-note">Os depoimentos representam experiências individuais. Os resultados dependem da dedicação, preparação e desempenho de cada aluno.</p>
         </div>
@@ -1161,7 +1177,7 @@
       <section class="section">
         <div class="wrap">
           <div class="section-head">
-            <h2>Planejamento e ferramentas</h2>
+            <h2>Ferramentas para sua preparação</h2>
             <p>Organize edital, rotina e tempo disponível.</p>
           </div>
           <div class="utility">
@@ -1183,30 +1199,6 @@
               ><h3>Radar de Concursos MPC</h3>
               <p>Concursos e provas anteriores em um projeto gratuito.</p>
               <strong>ABRIR RADAR →</strong></a
-            >
-          </div>
-        </div>
-      </section>
-      <section class="section">
-        <div class="wrap">
-          <div class="section-head"><h2>Conteúdo gratuito</h2></div>
-          <div class="free-grid">
-            <a class="card" href="/guias-de-estudo-para-concursos"
-              ><h3>Central de Guias</h3>
-              <p>Planejamento e métodos de estudo para concursos.</p>
-              <strong>LER →</strong></a
-            ><a class="card" href="/correcao-pmsp-2026/"
-              ><h3>PM-SP 2026</h3>
-              <p>Correção, recursos e acompanhamento pós-prova.</p>
-              <strong>ACOMPANHAR →</strong></a
-            ><a
-              class="card"
-              href="https://radar-de-concursos-mpc.netlify.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><h3>Provas anteriores</h3>
-              <p>Acesse o acervo pelo Radar de Concursos.</p>
-              <strong>ABRIR →</strong></a
             >
           </div>
         </div>
@@ -1257,5 +1249,9 @@
       </p>
       <button type="button">Entendi</button>
     </div>
+    <dialog id="videoModal" class="video-modal" aria-label="Depoimento em vídeo">
+      <button class="modal-close" type="button" aria-label="Fechar vídeo">×</button>
+      <div id="videoFrame" class="video-frame"></div>
+    </dialog>
   </body>
 </html>

@@ -14,7 +14,7 @@
     '/academia-da-matematica':'Recomendado',
     '/80-simulados':'Mais vendido',
     '/combo-matematica':'Combo',
-    '/como-passar-em-concursos':'E-book',
+    '/como-passar-em-concursos':'Gratuito',
     '/portugues-para-concursos':'Curso completo'
   };
   if(catalogShell&&products.length){
@@ -27,7 +27,7 @@
       const prev=document.createElement('button');prev.className='catalog-control prev';prev.type='button';prev.setAttribute('aria-label',`Ver itens anteriores em ${group.title}`);prev.textContent='‹';
       const rail=document.createElement('div');rail.className='catalog-grid';
       const next=document.createElement('button');next.className='catalog-control next';next.type='button';next.setAttribute('aria-label',`Ver mais itens em ${group.title}`);next.textContent='›';
-      items.forEach(product=>{const path=new URL(product.href,location.href).pathname;const badge=badges[path];if(badge)product.dataset.badge=badge;rail.append(product);});
+      items.forEach(product=>{const path=new URL(product.href,location.href).pathname;const badge=badges[path];if(badge)product.dataset.badge=badge;if(['/80-simulados','/como-passar-em-concursos','/portugues-para-concursos'].includes(path)||product.querySelector('img[src*="combo-portugues"]'))product.dataset.entry='Comece por aqui';rail.append(product);});
       railShell.append(prev,rail,next);row.append(heading,railShell);rows.append(row);
     });
     catalogShell.replaceChildren(rows);
