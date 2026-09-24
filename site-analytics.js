@@ -21,7 +21,10 @@
   const readConsent=()=>{
     try{return localStorage.getItem('amc_cookie_consent')||'';}catch{return '';}
   };
+  const consentGranted=()=>readConsent()==='all';
 
+  // Consent Mode: Google Analytics começa sem armazenamento de cookies.
+  // Quando o visitante autoriza medição na interface existente, o armazenamento é liberado.
   gtag('consent','default',{
     analytics_storage:'denied',
     ad_storage:'denied',
@@ -30,7 +33,7 @@
     wait_for_update:500
   });
   gtag('set','ads_data_redaction',true);
-  if(readConsent()==='all'){
+  if(consentGranted()){
     gtag('consent','update',{analytics_storage:'granted'});
   }
 
@@ -49,6 +52,7 @@
     gtag('consent','update',{analytics_storage:granted?'granted':'denied'});
   };
 
+  // Integra com o consentimento já existente na página da Academia, sem alterar sua interface.
   document.addEventListener('click',(event)=>{
     const el=event.target.closest('#accept,#necessary');
     if(!el)return;
@@ -96,16 +100,30 @@
     const label=cleanText(anchor.textContent||anchor.getAttribute('aria-label')||'');
     const common={link_text:label,destination_domain:url.hostname,destination_path:path};
 
-    if(url.hostname===HOTMART_HOST){track('checkout_click',common);return;}
+    if(url.hostname===HOTMART_HOST){
+      track('checkout_click',common);
+      return;
+    }
     if(['wa.me','api.whatsapp.com','chat.whatsapp.com','web.whatsapp.com'].includes(url.hostname)){
-      track('whatsapp_click',common);return;
+      track('whatsapp_click',common);
+      return;
     }
-    if(url.hostname==='radar.lucasmpc.com.br'){track('radar_click',common);return;}
+    if(url.hostname==='radar.lucasmpc.com.br'){
+      track('radar_click',common);
+      return;
+    }
     if(url.origin===location.origin&&PRODUCT_PATHS.has(path)){
-      track('product_click',{...common,product_name:PRODUCT_PATHS.get(path)});return;
+      track('product_click',{...common,product_name:PRODUCT_PATHS.get(path)});
+      return;
     }
-    if(url.origin!==location.origin){track('outbound_click',common);}
+    if(url.origin!==location.origin){
+      track('outbound_click',common);
+    }
   },true);
 
-  window.MPCAnalytics={measurementId:MEASUREMENT_ID,track,setConsent:setAnalyticsConsent};
+  window.MPCAnalytics={
+    measurementId:MEASUREMENT_ID,
+    track,
+    setConsent:setAnalyticsConsent
+  };
 })();
