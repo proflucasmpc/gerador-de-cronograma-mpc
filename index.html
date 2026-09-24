@@ -529,6 +529,24 @@
       .showcase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
       .showcase-card { position: relative; display: block; aspect-ratio: 3/1; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #071225; box-shadow: 0 18px 48px rgba(0,0,0,.26); }
       .showcase-label { position: absolute; z-index: 2; left: 18px; bottom: 16px; display: inline-flex; align-items: center; min-height: 36px; padding: 0 13px; border: 1px solid rgba(242,208,107,.55); border-radius: 9px; background: rgba(3,7,15,.88); color: #fff1b9; font-size: 11px; font-weight: 900; letter-spacing: .04em; backdrop-filter: blur(8px); }
+      .nav-radar { position: relative; }
+      .nav-radar:before { content: ""; position: absolute; top: -5px; right: -7px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold2); box-shadow: 0 0 0 4px rgba(242,208,107,.1); }
+      .open-contests { position: relative; overflow: hidden; padding: 28px; border: 1px solid rgba(214,169,40,.22); border-radius: 20px; background: radial-gradient(circle at 88% 8%,rgba(31,91,176,.16),transparent 34%),linear-gradient(145deg,#111722,#090d14 64%); box-shadow: 0 24px 70px rgba(0,0,0,.24); }
+      .open-contests:before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(var(--gold2),rgba(214,169,40,.08)); }
+      .open-contests-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
+      .open-contests-head h2 { margin: 5px 0 6px; font-size: clamp(25px,3vw,36px); }
+      .open-contests-head p { max-width: 680px; margin: 0; color: var(--muted); }
+      .open-contests-all { flex: 0 0 auto; color: #f3da7e; font-size: 12px; font-weight: 900; letter-spacing: .03em; }
+      .open-contests-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 13px; }
+      .contest-card { position: relative; min-height: 210px; display: flex; flex-direction: column; padding: 18px; border: 1px solid rgba(255,255,255,.085); border-radius: 14px; background: rgba(3,8,17,.72); transition: transform .22s ease,border-color .22s ease,background .22s ease; }
+      .contest-card:hover { transform: translateY(-4px); border-color: rgba(242,208,107,.48); background: rgba(9,17,31,.92); }
+      .contest-state { align-self: flex-start; padding: 5px 8px; border-radius: 999px; background: rgba(29,93,180,.2); color: #aecdff; font-size: 9px; font-weight: 900; letter-spacing: .08em; }
+      .contest-card h3 { margin: 14px 0 7px; color: #f0f2f6; font-size: 17px; line-height: 1.2; }
+      .contest-role { margin: 0 0 15px; color: #9ba4b1; font-size: 11px; line-height: 1.45; }
+      .contest-facts { display: grid; gap: 6px; margin-top: auto; color: #c8cdd5; font-size: 10px; }
+      .contest-facts strong { color: #f1d778; }
+      .contest-card-link { margin-top: 16px; color: #f3da7e; font-size: 10px; font-weight: 900; letter-spacing: .055em; }
+      .open-contests-empty { margin: 0; padding: 18px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); }
       .catalog-box { padding-inline: 0; border: 0; background: transparent; }
       .catalog-top { margin-bottom: 8px; }
       .filter-status { margin: 10px 0 4px; }
@@ -584,6 +602,7 @@
         .catalog-top {
           grid-template-columns: 1fr;
         }
+        .open-contests-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
         .filters {
           overflow-x: auto;
           flex-wrap: nowrap;
@@ -616,6 +635,11 @@
         .showcase-card { aspect-ratio: 16/9; }
         .showcase-card.ebook img { content: url('/assets/club/banner-como-passar-estudo-mobile.webp'); }
         .showcase-label { left: 12px; bottom: 11px; min-height: 33px; font-size: 10px; }
+        .open-contests { padding: 21px 17px; border-radius: 16px; }
+        .open-contests-head { align-items: flex-start; flex-direction: column; gap: 12px; }
+        .open-contests-grid { display: flex; margin-right: -17px; padding: 2px 17px 10px 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .open-contests-grid::-webkit-scrollbar { display: none; }
+        .contest-card { flex: 0 0 min(78vw,285px); min-height: 205px; scroll-snap-align: start; }
         .catalog-row-title span { display: none; }
         .product p { font-size: 10px; }
         .featured img {
@@ -636,7 +660,7 @@
         }
       }
     </style>
-    <script src="/home-enhancements.js?v=20260924-visual" defer></script>
+    <script src="/home-enhancements.js?v=20260924-radar" defer></script>
   </head>
   <body>
     <a
@@ -656,6 +680,7 @@
           ><a href="#catalogo">Materiais</a
           ><a href="/cronograma-de-estudos-para-concurso">Cronograma</a
           ><a href="/correcao-pmsp-2026/">PM-SP 2026</a
+          ><a class="nav-radar" href="#concursos-abertos">Concursos abertos</a
           ><a
             class="wa"
             href="https://wa.me/5511960189699"
@@ -672,6 +697,7 @@
             <a href="#catalogo">Materiais e cursos</a>
             <a href="/cronograma-de-estudos-para-concurso">Cronograma</a>
             <a href="/correcao-pmsp-2026/">PM-SP 2026</a>
+            <a href="#concursos-abertos">Concursos abertos</a>
             <a href="https://wa.me/5511960189699">WhatsApp</a>
           </div>
         </details>
@@ -737,6 +763,49 @@
               <span class="showcase-label">CONSULTAR O RADAR →</span>
             </a>
           </div>
+        </div>
+      </section>
+      <section class="section" id="concursos-abertos" aria-labelledby="concursos-abertos-title">
+        <div class="wrap open-contests">
+          <div class="open-contests-head">
+            <div>
+              <span class="eyebrow">OPORTUNIDADES NO RADAR MPC</span>
+              <h2 id="concursos-abertos-title">Concursos com inscrições abertas</h2>
+              <p>Confira algumas oportunidades em andamento e acesse o Radar para pesquisar por cargo, estado, escolaridade e banca.</p>
+            </div>
+            <a class="open-contests-all" href="https://radar-de-concursos-mpc.netlify.app/#oportunidades" target="_blank" rel="noopener noreferrer">VER TODOS NO RADAR →</a>
+          </div>
+          <div class="open-contests-grid" id="openContestsGrid">
+            <a class="contest-card" data-deadline="2026-09-29" href="https://radar-de-concursos-mpc.netlify.app/detalhes.html?concurso=caraguaprev-concurso-2026" target="_blank" rel="noopener noreferrer">
+              <span class="contest-state">SP · VUNESP</span>
+              <h3>Caraguaprev</h3>
+              <p class="contest-role">Cargos de níveis fundamental, médio e superior.</p>
+              <div class="contest-facts"><span><strong>7 vagas</strong></span><span>Salários de até R$ 7.104,30</span><span>Inscrições até 29/09</span></div>
+              <span class="contest-card-link">VER DETALHES NO RADAR →</span>
+            </a>
+            <a class="contest-card" data-deadline="2026-10-08" href="https://radar-de-concursos-mpc.netlify.app/detalhes.html?concurso=paulinia-guarda-municipal-2026" target="_blank" rel="noopener noreferrer">
+              <span class="contest-state">SP · VUNESP</span>
+              <h3>Guarda Municipal de Paulínia</h3>
+              <p class="contest-role">Guarda Municipal 6ª Classe, com cadastro reserva.</p>
+              <div class="contest-facts"><span><strong>40 vagas + CR</strong></span><span>Salário de R$ 4.676,85</span><span>Inscrições até 08/10</span></div>
+              <span class="contest-card-link">VER DETALHES NO RADAR →</span>
+            </a>
+            <a class="contest-card" data-deadline="2026-10-19" href="https://radar-de-concursos-mpc.netlify.app/detalhes.html?concurso=camara-itanhaem-concurso-2026" target="_blank" rel="noopener noreferrer">
+              <span class="contest-state">SP · VUNESP</span>
+              <h3>Câmara de Itanhaém</h3>
+              <p class="contest-role">Oportunidades para níveis médio e superior.</p>
+              <div class="contest-facts"><span><strong>27 vagas</strong></span><span>Salários de até R$ 7.097</span><span>Inscrições até 19/10</span></div>
+              <span class="contest-card-link">VER DETALHES NO RADAR →</span>
+            </a>
+            <a class="contest-card" data-deadline="2026-11-09" href="https://radar-de-concursos-mpc.netlify.app/detalhes.html?concurso=camara-boituva-edital-01-2026" target="_blank" rel="noopener noreferrer">
+              <span class="contest-state">SP · INSTITUTO MAIS</span>
+              <h3>Câmara de Boituva</h3>
+              <p class="contest-role">Dois editais para cargos de níveis médio e superior.</p>
+              <div class="contest-facts"><span><strong>Editais 01 e 02/2026</strong></span><span>Vagas e salários no edital</span><span>Inscrições até 09/11</span></div>
+              <span class="contest-card-link">VER DETALHES NO RADAR →</span>
+            </a>
+          </div>
+          <p class="open-contests-empty" id="openContestsEmpty" hidden>Os destaques desta seleção encerraram. Consulte o Radar para ver as oportunidades abertas mais recentes.</p>
         </div>
       </section>
       <section class="section">

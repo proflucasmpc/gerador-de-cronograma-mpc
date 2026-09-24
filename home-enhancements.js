@@ -56,6 +56,12 @@
   const cookie=document.getElementById('cookieLite');if(cookie){const key='mpc_privacy_notice';if(localStorage.getItem(key)==='ok')cookie.classList.add('hidden');cookie.querySelector('button')?.addEventListener('click',()=>{localStorage.setItem(key,'ok');cookie.classList.add('hidden');});}
   document.querySelectorAll('.mobile-menu a').forEach(link=>link.addEventListener('click',()=>link.closest('details')?.removeAttribute('open')));
   document.querySelectorAll('a[href]').forEach(link=>{const href=link.getAttribute('href')?.trim();if(!href)return;try{const url=new URL(href,location.href);if(url.origin!==location.origin){link.target='_blank';link.rel='noopener noreferrer';}else{link.removeAttribute('target');}}catch{}});
+  const contestGrid=document.getElementById('openContestsGrid');
+  if(contestGrid){
+    const today=new Date();today.setHours(0,0,0,0);
+    contestGrid.querySelectorAll('[data-deadline]').forEach(card=>{const deadline=new Date(`${card.dataset.deadline}T23:59:59-03:00`);if(today>deadline)card.remove();});
+    if(!contestGrid.children.length){contestGrid.hidden=true;document.getElementById('openContestsEmpty')?.removeAttribute('hidden');}
+  }
 
   // Hotfix 2026-09-23: impede qualquer distorção da foto da seção Sobre.
   const hotfixStyle=document.createElement('style');
