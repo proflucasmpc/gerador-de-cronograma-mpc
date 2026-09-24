@@ -120,9 +120,11 @@
       }
       html {
         scroll-behavior: smooth;
+        overflow-x: clip;
       }
       body {
         margin: 0;
+        overflow-x: clip;
         background: var(--bg);
         color: var(--text);
         font:
@@ -485,11 +487,11 @@
         z-index: 60;
         right: 18px;
         bottom: 18px;
-        width: min(440px, calc(100% - 32px));
+        width: min(360px, calc(100% - 32px));
         display: flex;
-        gap: 16px;
+        gap: 10px;
         align-items: center;
-        padding: 14px 16px;
+        padding: 10px 11px;
         border: 1px solid var(--line);
         border-radius: 12px;
         background: #111317;
@@ -498,12 +500,12 @@
         margin: 0;
         flex: 1;
         color: #b2b8c2;
-        font-size: 12px;
+        font-size: 10px;
       }
       .cookie-lite button {
         border: 0;
         border-radius: 8px;
-        padding: 9px 12px;
+        padding: 7px 10px;
         background: var(--gold2);
         font-weight: 900;
       }
@@ -529,6 +531,12 @@
       .showcase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
       .showcase-card { position: relative; display: block; aspect-ratio: 3/1; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #071225; box-shadow: 0 18px 48px rgba(0,0,0,.26); }
       .showcase-label { position: absolute; z-index: 2; left: 18px; bottom: 16px; display: inline-flex; align-items: center; min-height: 36px; padding: 0 13px; border: 1px solid rgba(242,208,107,.55); border-radius: 9px; background: rgba(3,7,15,.88); color: #fff1b9; font-size: 11px; font-weight: 900; letter-spacing: .04em; backdrop-filter: blur(8px); }
+      .showcase-card.ebook { background: #02060e; }
+      .showcase-card.ebook:after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(1,5,13,.16),transparent 66%); pointer-events: none; }
+      .ebook-copy { position: absolute; z-index: 2; top: 17px; left: 19px; width: 45%; color: #fff; }
+      .ebook-copy small { display: block; margin-bottom: 6px; color: var(--gold2); font-size: 8px; font-weight: 950; letter-spacing: .13em; text-transform: uppercase; }
+      .ebook-copy strong { display: block; max-width: 310px; font-family: Georgia,serif; font-size: clamp(20px,2.25vw,32px); line-height: .98; }
+      .ebook-copy p { margin: 7px 0 0; color: #c3c9d2; font-size: 9px; line-height: 1.35; }
       .nav-radar { position: relative; }
       .nav-radar:before { content: ""; position: absolute; top: -5px; right: -7px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold2); box-shadow: 0 0 0 4px rgba(242,208,107,.1); }
       .open-contests { position: relative; overflow: hidden; padding: 28px; border: 1px solid rgba(214,169,40,.22); border-radius: 20px; background: radial-gradient(circle at 88% 8%,rgba(31,91,176,.16),transparent 34%),linear-gradient(145deg,#111722,#090d14 64%); box-shadow: 0 24px 70px rgba(0,0,0,.24); }
@@ -573,8 +581,21 @@
       .catalog-control.prev { left: -14px; }
       .catalog-control.next { right: -14px; }
       .catalog-control:disabled { visibility: hidden; opacity: 0; pointer-events: none; }
-      .mentor-art { position: relative; place-items: end start; overflow: hidden; padding: 24px; background: linear-gradient(180deg,rgba(1,8,23,.12),rgba(1,8,23,.96)),url('/assets/club/banner-como-passar-estudo.webp') center/cover; color: #f7e7aa; font-family: Georgia,serif; font-size: 34px; line-height: .95; }
-      .mentor-art small { display: block; margin-top: 9px; color: #fff; font-family: Inter,system-ui,sans-serif; font-size: 11px; font-weight: 750; letter-spacing: .13em; }
+      .mentor-art { position: relative; place-items: end start; overflow: hidden; padding: 21px; background: linear-gradient(180deg,rgba(1,8,23,.05),rgba(1,8,23,.91)),url('/assets/club/banner-como-passar-estudo.webp') 62% center/cover; }
+      .mentor-art:before { content: "↗"; display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 11px; border: 1px solid rgba(242,208,107,.55); border-radius: 50%; background: rgba(1,8,23,.72); color: #f2d06b; font-size: 25px; box-shadow: 0 12px 28px rgba(0,0,0,.28); }
+      .mentor-art span { color: #f3df9b; font-family: Inter,system-ui,sans-serif; font-size: 10px; font-weight: 900; line-height: 1.25; letter-spacing: .13em; text-transform: uppercase; }
+      .social-proof { padding: 28px; border: 1px solid rgba(214,169,40,.18); border-radius: 20px; background: linear-gradient(145deg,#12161d,#090c12); }
+      .proof-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 20px; }
+      .proof-card { display: block; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: #080c13; transition: transform .22s ease,border-color .22s ease; }
+      .proof-card:hover { transform: translateY(-4px); border-color: rgba(242,208,107,.45); }
+      .proof-image { position: relative; aspect-ratio: 16/9; overflow: hidden; background: #02060d; }
+      .proof-image img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.66) saturate(.8); transition: filter .22s ease,transform .3s ease; }
+      .proof-card:hover .proof-image img { filter: brightness(.8) saturate(.95); transform: scale(1.025); }
+      .proof-play { position: absolute; inset: 50% auto auto 50%; translate: -50% -50%; display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid rgba(255,255,255,.55); border-radius: 50%; background: rgba(1,8,23,.78); color: #f2d06b; font-size: 16px; }
+      .proof-copy { padding: 15px; }
+      .proof-copy strong { display: block; color: #edf0f4; font-size: 14px; }
+      .proof-copy span { display: block; margin-top: 5px; color: #8f97a3; font-size: 11px; line-height: 1.4; }
+      .proof-note { margin: 16px 0 0; color: #737b87; font-size: 10px; }
       @media (max-width: 900px) {
         .nav {
           display: none;
@@ -599,6 +620,7 @@
         .catalog-grid { grid-auto-columns: min(46vw,218px); gap: 13px; }
         .catalog-control { display: none; }
         .catalog-rail-shell:after { width: 38px; }
+        .proof-grid { grid-template-columns: 1fr 1fr; }
         .catalog-top {
           grid-template-columns: 1fr;
         }
@@ -613,6 +635,7 @@
         }
       }
       @media (max-width: 600px) {
+        .section { padding: 34px 0 0; }
         .wrap {
           width: min(100% - 22px, 1180px);
         }
@@ -627,13 +650,21 @@
         }
         .featured {
           grid-template-columns: 1fr;
+          gap: 18px;
+          padding: 18px;
         }
+        .mentor-art { min-height: 205px; }
         .showcase { padding-top: 20px; }
-        .showcase-main { aspect-ratio: 16/9; border-radius: 13px; }
-        .showcase-main img { content: url('/assets/club/academia.webp'); }
+        .showcase-main { aspect-ratio: 3/1; border-radius: 13px; }
+        .showcase-main img { object-fit: contain; }
         .showcase-grid { grid-template-columns: 1fr; gap: 12px; margin-top: 12px; }
-        .showcase-card { aspect-ratio: 16/9; }
-        .showcase-card.ebook img { content: url('/assets/club/banner-como-passar-estudo-mobile.webp'); }
+        .showcase-card { aspect-ratio: 3/1; }
+        .showcase-card:not(.ebook) img { object-fit: contain; }
+        .showcase-card.ebook { aspect-ratio: 16/9; }
+        .showcase-card.ebook img { object-position: 62% center; }
+        .ebook-copy { top: 14px; left: 15px; width: 54%; }
+        .ebook-copy strong { font-size: clamp(20px,6.5vw,29px); }
+        .ebook-copy p { display: none; }
         .showcase-label { left: 12px; bottom: 11px; min-height: 33px; font-size: 10px; }
         .open-contests { padding: 21px 17px; border-radius: 16px; }
         .open-contests-head { align-items: flex-start; flex-direction: column; gap: 12px; }
@@ -641,6 +672,7 @@
         .open-contests-grid::-webkit-scrollbar { display: none; }
         .contest-card { flex: 0 0 min(78vw,285px); min-height: 205px; scroll-snap-align: start; }
         .catalog-row-title span { display: none; }
+        .catalog-grid { width: 100%; max-width: 100%; overscroll-behavior-inline: contain; }
         .product p { font-size: 10px; }
         .featured img {
           max-height: 250px;
@@ -648,15 +680,21 @@
         .about {
           padding: 18px;
         }
+        .pmsp,.featured,.open-contests,.social-proof,.about { border-radius: 14px; }
+        .social-proof { padding: 21px 16px; }
+        .proof-grid { display: flex; margin-right: -16px; padding-right: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .proof-grid::-webkit-scrollbar { display: none; }
+        .proof-card { flex: 0 0 min(82vw,310px); scroll-snap-align: start; }
         .cookie-lite {
           right: 11px;
           bottom: 11px;
           width: calc(100% - 22px);
-          align-items: flex-start;
-          flex-direction: column;
+          align-items: center;
+          flex-direction: row;
         }
         .cookie-lite button {
-          width: 100%;
+          width: auto;
+          flex: 0 0 auto;
         }
       }
     </style>
@@ -756,7 +794,8 @@
           </a>
           <div class="showcase-grid">
             <a class="showcase-card ebook" href="https://wa.me/5511960189699?text=Ol%C3%A1%2C%20professor%20Lucas.%20Vi%20o%20e-book%20Como%20Passar%20em%20Concursos%20no%20seu%20site%20e%20quero%20adquirir%20o%20meu.%20Pode%20me%20enviar%20as%20informa%C3%A7%C3%B5es%3F" target="_blank" rel="noopener noreferrer" aria-label="Solicitar o e-book Como Passar em Concursos pelo WhatsApp">
-              <img src="/assets/club/banner.webp" alt="E-book Como Passar em Concursos Públicos" width="1440" height="480" loading="lazy" />
+              <img src="/assets/club/banner-como-passar-estudo.webp" alt="E-book Como Passar em Concursos Públicos" width="2172" height="724" loading="lazy" />
+              <span class="ebook-copy"><small>E-book atualizado</small><strong>Como Passar em Concursos Públicos</strong><p>Organização, método e estratégia para transformar estudo em preparação consistente.</p></span>
               <span class="showcase-label">QUERO O E-BOOK →</span>
             </a>
             <a class="showcase-card" href="https://radar-de-concursos-mpc.netlify.app/" target="_blank" rel="noopener noreferrer" aria-label="Abrir o Radar de Concursos MPC">
@@ -890,22 +929,21 @@
           </article>
           <article class="featured" id="mentoria">
             <div class="mentor-art" aria-hidden="true">
-              <span>Mentoria MPC<small>ESTRATÉGIA · DIREÇÃO · ACOMPANHAMENTO</small></span>
+              <span>Direção · estratégia<br />acompanhamento</span>
             </div>
             <div>
               <span class="eyebrow">PREPARAÇÃO COMPLETA</span>
               <h2>Mentoria para concursos</h2>
               <p>
-                Organização da preparação, prioridades, rotina, métodos de
-                estudo, ferramentas e acompanhamento estratégico para quem
-                precisa de direção.
+                Organize edital, rotina, prioridades, revisões e métodos de
+                estudo com acompanhamento estratégico do Prof. Lucas MPC.
               </p>
               <a
                 class="btn gold"
                 href="https://wa.me/5511960189699?text=Quero%20saber%20mais%20sobre%20a%20Mentoria%20Completa%20para%20Concursos"
                 target="_blank"
                 rel="noopener noreferrer"
-                >FALAR SOBRE A MENTORIA</a
+                >QUERO CONHECER A MENTORIA</a
               >
             </div>
           </article>
@@ -933,7 +971,7 @@
             ><button data-filter="portugues">Português</button>
           </div>
           <p id="filterStatus" class="filter-status" aria-live="polite">
-            9 materiais encontrados.
+            10 materiais encontrados.
           </p>
           <div class="catalog-shell">
             <button
@@ -1067,6 +1105,23 @@
                   <p>Curso apresentado pelo Prof. Mazziotti.</p>
                   <b>VER DETALHES →</b>
                 </div></a
+              ><a
+                class="product"
+                data-category="portugues"
+                data-badge="Combo"
+                href="https://wa.me/5511960189699?text=Ol%C3%A1%2C%20professor%20Lucas.%20Vi%20o%20Combo%20de%20Portugu%C3%AAs%20com%203%20apostilas%20e%202%20b%C3%B4nus%20no%20site%20e%20quero%20receber%20as%20informa%C3%A7%C3%B5es."
+                target="_blank"
+                rel="noopener noreferrer"
+                ><img
+                  src="/assets/club/combo-portugues.webp"
+                  alt="Combo de Português com 3 apostilas e 2 bônus"
+                  loading="lazy"
+                />
+                <div>
+                  <h3>Combo de Português</h3>
+                  <p>3 apostilas e 2 bônus para concursos.</p>
+                  <b>FALAR NO WHATSAPP →</b>
+                </div></a
               >
             </div>
             <button
@@ -1077,6 +1132,30 @@
               ›
             </button>
           </div>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="resultados-title">
+        <div class="wrap social-proof">
+          <div class="section-head">
+            <span class="eyebrow">EXPERIÊNCIAS REAIS</span>
+            <h2 id="resultados-title">Veja o que alunos dizem sobre as aulas</h2>
+            <p>Relatos em vídeo de quem acompanhou explicações, questões e estratégias do Método MPC.</p>
+          </div>
+          <div class="proof-grid">
+            <a class="proof-card" href="https://www.youtube.com/watch?v=AFhS3c8i8rI" target="_blank" rel="noopener noreferrer" aria-label="Assistir ao primeiro relato de aluno">
+              <div class="proof-image"><img src="https://i.ytimg.com/vi/AFhS3c8i8rI/hqdefault.jpg" alt="Relato em vídeo de aluno da Academia da Matemática" loading="lazy" /><span class="proof-play" aria-hidden="true">▶</span></div>
+              <div class="proof-copy"><strong>Experiência com as aulas</strong><span>Relato sobre explicações, questões e preparação.</span></div>
+            </a>
+            <a class="proof-card" href="https://www.youtube.com/watch?v=BR33nQ2Qvdw" target="_blank" rel="noopener noreferrer" aria-label="Assistir ao segundo relato de aluno">
+              <div class="proof-image"><img src="https://i.ytimg.com/vi/BR33nQ2Qvdw/hqdefault.jpg" alt="Relato em vídeo sobre o Método MPC" loading="lazy" /><span class="proof-play" aria-hidden="true">▶</span></div>
+              <div class="proof-copy"><strong>Preparação mais prática</strong><span>Experiência de quem estudou com a didática do Prof. Lucas.</span></div>
+            </a>
+            <a class="proof-card" href="https://www.youtube.com/watch?v=8IwYn-aOU2w" target="_blank" rel="noopener noreferrer" aria-label="Assistir ao terceiro relato de aluno">
+              <div class="proof-image"><img src="https://i.ytimg.com/vi/8IwYn-aOU2w/hqdefault.jpg" alt="Relato em vídeo sobre Matemática para concursos" loading="lazy" /><span class="proof-play" aria-hidden="true">▶</span></div>
+              <div class="proof-copy"><strong>Matemática com mais clareza</strong><span>Uma experiência com resolução e interpretação de questões.</span></div>
+            </a>
+          </div>
+          <p class="proof-note">Os depoimentos representam experiências individuais. Os resultados dependem da dedicação, preparação e desempenho de cada aluno.</p>
         </div>
       </section>
       <section class="section">
