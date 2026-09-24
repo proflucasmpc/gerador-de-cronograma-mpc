@@ -20,9 +20,9 @@ replacements = {
         '"description":"Gabarito PM-SP 2026 da Vunesp com as quatro versões, prova de Soldado em PDF, 60 questões comentadas, tema da redação, modelo autoral e análise de possível recurso."',
     '"dateModified":"2026-09-22"':
         '"dateModified":"2026-09-24"',
-    '<h1>Correção Completa da Prova PM-SP 2026 <span>60 Questões Comentadas + Gabarito</span></h1>':
+    '<h1>Gabarito PM-SP Soldado 2026 <span>Correção das 60 questões + redação</span></h1>':
         '<h1>Gabarito PM-SP 2026 + Prova em PDF <span>60 Questões Comentadas + Tema da Redação</span></h1>',
-    '<p class="lead">Acompanhe a correção da prova da Polícia Militar de São Paulo questão por questão. Esta página será atualizada conforme as respostas forem conferidas, com atenção especial às questões de Matemática e aos pontos que possam exigir análise de recurso.</p>':
+    '<p class="lead">Confira o gabarito preliminar da Vunesp nas quatro versões da prova de Soldado PM-SP 2026. Selecione sua versão ou o código do caderno e consulte as 60 questões comentadas, o modelo de redação e a análise de possível recurso.</p>':
         '<p class="lead">Confira o gabarito da prova de Soldado PM-SP 2026 da Vunesp nas quatro versões, baixe a prova completa em PDF e veja as 60 questões comentadas. A página também reúne o tema da redação, um modelo autoral e a análise responsável de possíveis recursos.</p>',
     '<h2>Modelo de redação sobre o tema da prova</h2>':
         '<h2>Tema da redação PM-SP 2026 + modelo comentado</h2>',
