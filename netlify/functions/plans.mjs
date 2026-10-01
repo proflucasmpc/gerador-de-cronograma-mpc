@@ -45,6 +45,7 @@ function cleanSyllabus(input) {
   if (!Array.isArray(input)) return [];
   return input.slice(0, 80).map(section => ({
     name: cleanString(section?.name, 220),
+    countInMetrics: section?.countInMetrics !== false,
     topics: Array.isArray(section?.topics) ? section.topics.slice(0, 240).map(topic => ({
       title: cleanString(topic?.title, 1200),
       subtopics: Array.isArray(topic?.subtopics) ? topic.subtopics.slice(0, 400).map(item => cleanString(item, 1200)).filter(Boolean) : []
