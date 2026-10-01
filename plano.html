@@ -65,8 +65,9 @@ function render(plan){
  const topicSet=new Set(),subSet=new Set(); const contentMap=new Map();
  tasks.forEach(t=>{const s=t.subject||'Disciplina',c=contentParts(t);topicSet.add(`${s}|${c.topic}`);if(c.subtopic)subSet.add(`${s}|${c.topic}|${c.subtopic}`);if(!contentMap.has(s))contentMap.set(s,new Map());const sm=contentMap.get(s);if(!sm.has(c.topic))sm.set(c.topic,new Set());if(c.subtopic)sm.get(c.topic).add(c.subtopic)});
  const officialSyllabus=Array.isArray(plan.syllabus)?plan.syllabus.filter(section=>section?.name&&Array.isArray(section.topics)&&section.topics.length):[];
- const officialTopicCount=officialSyllabus.length?officialSyllabus.reduce((total,section)=>total+section.topics.length,0):topicSet.size;
- const officialSubtopicCount=officialSyllabus.length?officialSyllabus.reduce((total,section)=>total+section.topics.reduce((sum,topic)=>sum+(Array.isArray(topic.subtopics)?topic.subtopics.length:0),0),0):subSet.size;
+ const metricSyllabus=officialSyllabus.filter(section=>section.countInMetrics!==false);
+ const officialTopicCount=officialSyllabus.length?metricSyllabus.reduce((total,section)=>total+section.topics.length,0):topicSet.size;
+ const officialSubtopicCount=officialSyllabus.length?metricSyllabus.reduce((total,section)=>total+section.topics.reduce((sum,topic)=>sum+(Array.isArray(topic.subtopics)?topic.subtopics.length:0),0),0):subSet.size;
  const sims=tasks.filter(t=>typeClass(t.type)==='simulado').length,reviews=tasks.filter(t=>typeClass(t.type)==='revisao').length;
  const progressKey=`mpc-public-plan-progress:${id}`; let done=new Set();try{done=new Set(JSON.parse(localStorage.getItem(progressKey)||'[]'))}catch{}
  const taskId=(t,i)=>t.id||`${t.date||'x'}-${t.subject||'s'}-${i}`;
