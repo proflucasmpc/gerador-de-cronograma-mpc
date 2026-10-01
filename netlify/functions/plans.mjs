@@ -41,15 +41,26 @@ function cleanStudyRoutine(input) {
 function cleanTask(task = {}) {
   return { id: cleanString(task.id, 100), date: cleanString(task.date, 20), day: Number.isFinite(Number(task.day)) ? Number(task.day) : null, start: cleanString(task.start, 10), end: cleanString(task.end, 10), subject: cleanString(task.subject, 220), activity: cleanString(task.activity, 2500), type: cleanString(task.type, 80), notes: cleanString(task.notes, 500), done: Boolean(task.done) };
 }
+function cleanSyllabus(input) {
+  if (!Array.isArray(input)) return [];
+  return input.slice(0, 80).map(section => ({
+    name: cleanString(section?.name, 220),
+    topics: Array.isArray(section?.topics) ? section.topics.slice(0, 240).map(topic => ({
+      title: cleanString(topic?.title, 1200),
+      subtopics: Array.isArray(topic?.subtopics) ? topic.subtopics.slice(0, 400).map(item => cleanString(item, 1200)).filter(Boolean) : []
+    })).filter(topic => topic.title) : []
+  })).filter(section => section.name && section.topics.length);
+}
 function sanitizePlan(input = {}) {
   const tasks = Array.isArray(input.tasks) ? input.tasks.slice(0, 1600).map(cleanTask) : [];
   if (!tasks.length) throw new Error('O cronograma não possui atividades.');
   const examDateUnknown = Boolean(input.examDateUnknown);
   const contestStage = examDateUnknown ? cleanContestStage(input.contestStage) : '';
   return {
-    version: 7,
+    version: 8,
     studentName: cleanString(input.studentName, 180), createdByUser: Boolean(input.createdByUser), creatorName: cleanString(input.creatorName || input.studentName, 180), goal: cleanString(input.goal, 300), examDate: examDateUnknown ? '' : cleanString(input.examDate, 20), examDateUnknown, contestStage, startDate: cleanString(input.startDate, 20), endDate: cleanString(input.endDate, 20), hoursPerDay: Math.max(0, Math.min(24, Number(input.hoursPerDay) || 0)), scheduleStyle: cleanString(input.scheduleStyle, 40), publicTheme: cleanPublicTheme(input.publicTheme), generalGuidance: cleanMultiline(input.generalGuidance, 16000), studyRoutine: cleanStudyRoutine(input.studyRoutine),
     subjects: Array.isArray(input.subjects) ? input.subjects.slice(0, 80).map(s => ({ name: cleanString(s?.name, 220), priority: Number(s?.priority) || 0, level: cleanString(s?.level, 40) })) : [],
+    syllabus: cleanSyllabus(input.syllabus),
     tasks, createdAt: new Date().toISOString(), brand: 'Professor Lucas MPC'
   };
 }
