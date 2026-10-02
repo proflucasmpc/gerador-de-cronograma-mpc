@@ -8,72 +8,32 @@
   const DEMO_MODE=pathParts[0]==='exemplo'||pathParts[0]==='plano';
   const id=location.pathname.match(/\/plano\/([A-Z0-9]{10})/i)?.[1]?.toUpperCase()||'';
   const THEMES={
-    masculino:{navy:'#0D1B33',navy2:'#18365E',navy3:'#071225',gold:'#D7AE50',cyan:'#24C8FF',purple:'#8A5CFF',blue:'#4C7DFF',green:'#31B77A',teal:'#2DB7B3',orange:'#F0A23B',coral:'#E86C7C',bg:'#F5F7FB',paper:'#FFFFFF',text:'#172033',muted:'#657086',line:'#E4E8F0',track:'#E9EDF4'},
-    feminino:{navy:'#3B1636',navy2:'#642B57',navy3:'#271024',gold:'#D4A574',cyan:'#D887A9',purple:'#9B6BC6',blue:'#7A76C8',green:'#4FAF8A',teal:'#55A8A1',orange:'#D89558',coral:'#D9657B',bg:'#FBF7FA',paper:'#FFFFFF',text:'#2E2230',muted:'#776A76',line:'#EADFE7',track:'#F1E9EF'},
-    aulacerta:{navy:'#071329',navy2:'#10234A',navy3:'#07111F',gold:'#10B981',cyan:'#315EFB',purple:'#6E8AFF',blue:'#315EFB',green:'#10B981',teal:'#2CB7A0',orange:'#F59E0B',coral:'#EF6A7A',bg:'#F6F8FC',paper:'#FFFFFF',text:'#0D1B2A',muted:'#667085',line:'#E7EBF2',track:'#E8EDF4'}
+    'azul-premium':{navy:'#0B1628',navy2:'#18324F',navy3:'#07111F',gold:'#C9A46A',cyan:'#4AA8D8',purple:'#6B7FD7',blue:'#4169A1',green:'#2E9A6F',teal:'#3E9C9A',orange:'#D7923D',coral:'#D56D79',bg:'#F6F8FB',paper:'#FFFFFF',text:'#1F2A37',muted:'#687386',line:'#E3E8EF',track:'#ECF0F4'},
+    'rose-premium':{navy:'#0B1628',navy2:'#26364E',navy3:'#07111F',gold:'#C9A46A',cyan:'#C9879F',purple:'#9F7DBD',blue:'#6D7FB6',green:'#3E9A79',teal:'#5A9C98',orange:'#D18C58',coral:'#C96F82',bg:'#FAF7F9',paper:'#FFFFFF',text:'#29303A',muted:'#756D75',line:'#E9E1E6',track:'#F1EBEF'},
+    'violeta-elegante':{navy:'#241934',navy2:'#39274D',navy3:'#181120',gold:'#C8AB72',cyan:'#B298D8',purple:'#8A67B5',blue:'#7D75B7',green:'#4D9D7C',teal:'#659E9A',orange:'#C28A55',coral:'#BE6A7D',bg:'#F8F6FA',paper:'#FFFFFF',text:'#2C2732',muted:'#756E7B',line:'#E7E1EA',track:'#EFEAF2'},
+    'verde-executivo':{navy:'#0A1E28',navy2:'#123845',navy3:'#07161D',gold:'#C5A56C',cyan:'#2CA58D',purple:'#5D75B8',blue:'#347BA0',green:'#138A69',teal:'#2A8F87',orange:'#D08B45',coral:'#C86E76',bg:'#F5F8F7',paper:'#FFFFFF',text:'#203038',muted:'#66757B',line:'#DFE8E5',track:'#E9F0EE'},
+    'neutro-minimalista':{navy:'#1D2939',navy2:'#344054',navy3:'#101828',gold:'#B6925E',cyan:'#667085',purple:'#7F56D9',blue:'#475467',green:'#2E8B57',teal:'#547C7A',orange:'#B7791F',coral:'#B65F68',bg:'#F8F9FB',paper:'#FFFFFF',text:'#1D2939',muted:'#667085',line:'#EAECF0',track:'#F2F4F7'},
+    masculino:null,feminino:null,aulacerta:null
   };
-  const cleanTheme=value=>THEMES[value]?value:'masculino';
+  THEMES.masculino=THEMES['azul-premium'];THEMES.feminino=THEMES['rose-premium'];THEMES.aulacerta=THEMES['verde-executivo'];
+  const cleanTheme=value=>THEMES[value]?value:'azul-premium';
   function addStyles(){
     if(document.getElementById('mpcPublicExperienceStyles'))return;
     const style=document.createElement('style');style.id='mpcPublicExperienceStyles';style.textContent=`
       .mpc-personal-fixed{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:120;width:min(950px,calc(100% - 28px));display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,var(--navy3),var(--navy2));color:#fff;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 48px rgba(7,18,37,.28)}
-      .mpc-personal-fixed-copy{min-width:0}
-      .mpc-personal-fixed strong{display:block;font-size:15px;line-height:1.25}.mpc-personal-fixed-copy>span{display:block;margin-top:4px;font-size:12px;line-height:1.4;opacity:.9}
-      .mpc-personal-fixed a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 18px;border-radius:11px;background:#25D366;color:#071225;font-size:12px;font-weight:950;text-align:center;white-space:nowrap;box-shadow:0 9px 22px rgba(37,211,102,.22)}
-      .mpc-personal-fixed a:hover{filter:brightness(.97)}.mpc-free-explainer{font-weight:900}
-      .mpc-wa-icon{font-size:17px;line-height:1}
-      body[data-public-theme="aulacerta"] .mpc-personal-fixed{background:linear-gradient(145deg,#10234A,#315EFB)}
-      .final-banner{display:none!important}
-      body.mpc-private-plan .header-generator-cta,
-      body.mpc-private-plan .hero-actions .btn-free,
-      body.mpc-private-plan .generator-cta,
-      body.mpc-private-plan .mentoria-fixed,
-      body.mpc-private-plan #mpcPersonalScheduleFixed{display:none!important}
-      body.mpc-private-plan{padding-bottom:40px!important}
-      body:not(.mpc-private-plan){padding-bottom:92px!important}
-      @media(min-width:1200px){.mpc-personal-fixed{left:calc(50% + 100px);width:min(950px,calc(100% - 330px))}}
-      @media(max-width:880px){
-        .whatsapp-float{display:none!important}
-        .mpc-personal-fixed{left:50%;bottom:9px;width:calc(100% - 18px);grid-template-columns:1fr;padding:13px 14px 12px;gap:10px;text-align:center;border-radius:18px}
-        .mpc-personal-fixed-copy{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;overflow:hidden}
-        .mpc-personal-fixed strong{font-size:13px;line-height:1.2;text-align:center;max-width:100%;margin:0 auto;white-space:nowrap}
-        .mpc-personal-fixed-copy>span{display:none}
-        .mpc-personal-fixed a{width:100%;min-height:48px;white-space:normal;font-size:12px;line-height:1.2;padding:13px 10px}
-        .mpc-personal-fixed a span{display:inline!important}
-        body:not(.mpc-private-plan) .shell{padding-bottom:140px!important}
-        body.mpc-private-plan .shell{padding-bottom:48px!important}
-        .mobile-nav{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;margin:26px 0 12px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;border-radius:15px!important;box-shadow:0 10px 28px rgba(7,18,37,.16)!important}
-      }
-      @media(max-width:380px){
-        .mpc-personal-fixed{padding-left:10px;padding-right:10px}
-        .mpc-personal-fixed strong{font-size:12px;letter-spacing:-.015em}
-        .mpc-personal-fixed a{font-size:10.5px;letter-spacing:-.01em}
-      }
+      .mpc-personal-fixed-copy{min-width:0}.mpc-personal-fixed strong{display:block;font-size:15px;line-height:1.25}.mpc-personal-fixed-copy>span{display:block;margin-top:4px;font-size:12px;line-height:1.4;opacity:.9}.mpc-personal-fixed a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 18px;border-radius:11px;background:#25D366;color:#071225;font-size:12px;font-weight:950;text-align:center;white-space:nowrap;box-shadow:0 9px 22px rgba(37,211,102,.22)}
+      .final-banner{display:none!important}body.mpc-private-plan .header-generator-cta,body.mpc-private-plan .hero-actions .btn-free,body.mpc-private-plan .generator-cta,body.mpc-private-plan .mentoria-fixed,body.mpc-private-plan #mpcPersonalScheduleFixed{display:none!important}body.mpc-private-plan{padding-bottom:40px!important}body:not(.mpc-private-plan){padding-bottom:92px!important}
+      @media(min-width:1200px){.mpc-personal-fixed{left:calc(50% + 100px);width:min(950px,calc(100% - 330px))}}@media(max-width:880px){.whatsapp-float{display:none!important}.mpc-personal-fixed{left:50%;bottom:9px;width:calc(100% - 18px);grid-template-columns:1fr;padding:13px 14px 12px;gap:10px;text-align:center;border-radius:18px}.mpc-personal-fixed-copy{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;overflow:hidden}.mpc-personal-fixed strong{font-size:13px;line-height:1.2;text-align:center;max-width:100%;margin:0 auto;white-space:nowrap}.mpc-personal-fixed-copy>span{display:none}.mpc-personal-fixed a{width:100%;min-height:48px;white-space:normal;font-size:12px;line-height:1.2;padding:13px 10px}body:not(.mpc-private-plan) .shell{padding-bottom:140px!important}body.mpc-private-plan .shell{padding-bottom:48px!important}.mobile-nav{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;margin:26px 0 12px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;border-radius:15px!important;box-shadow:0 10px 28px rgba(7,18,37,.16)!important}}
     `;document.head.appendChild(style);
   }
   function applyTheme(theme){const name=cleanTheme(theme),vars=THEMES[name];document.body.dataset.publicTheme=name;Object.entries(vars).forEach(([key,value])=>document.documentElement.style.setProperty(`--${key}`,value))}
-  function clarifyGeneratorCtas(){
-    const header=document.querySelector('.header-generator-cta');if(header){header.textContent='CONHECER O GERADOR DE CRONOGRAMA';header.title='Conheça a ferramenta de criação de cronogramas'}
-    document.querySelectorAll('.hero-actions .btn-free').forEach(btn=>{btn.textContent='✦ CONHECER O GERADOR DE CRONOGRAMA';btn.title='Conheça a ferramenta para montar seu cronograma'});
-    const box=document.querySelector('.generator-cta');if(box){const eyebrow=box.querySelector('.eyebrow'),h=box.querySelector('h3'),p=box.querySelector('p'),btn=box.querySelector('.btn-free');if(eyebrow)eyebrow.textContent='Gerador de Cronograma MPC';if(h)h.textContent='Quer organizar seus estudos com um cronograma?';if(p)p.innerHTML='Conheça o Gerador de Cronograma MPC e veja as opções disponíveis para montar seu planejamento.';if(btn)btn.textContent='CONHECER O GERADOR →'}
-  }
+  function clarifyGeneratorCtas(){const header=document.querySelector('.header-generator-cta');if(header){header.textContent='CONHECER O GERADOR DE CRONOGRAMA';header.title='Conheça a ferramenta de criação de cronogramas'}document.querySelectorAll('.hero-actions .btn-free').forEach(btn=>{btn.textContent='✦ CONHECER O GERADOR DE CRONOGRAMA';btn.title='Conheça a ferramenta para montar seu cronograma'});const box=document.querySelector('.generator-cta');if(box){const eyebrow=box.querySelector('.eyebrow'),h=box.querySelector('h3'),p=box.querySelector('p'),btn=box.querySelector('.btn-free');if(eyebrow)eyebrow.textContent='Gerador de Cronograma MPC';if(h)h.textContent='Quer organizar seus estudos com um cronograma?';if(p)p.innerHTML='Conheça o Gerador de Cronograma MPC e veja as opções disponíveis para montar seu planejamento.';if(btn)btn.textContent='CONHECER O GERADOR →'}}
   function removePrivatePromotions(){document.body.classList.add('mpc-private-plan');document.querySelectorAll('.header-generator-cta,.hero-actions .btn-free,.generator-cta,.mentoria-fixed,#mpcPersonalScheduleFixed,.final-banner,.whatsapp-float').forEach(el=>el.remove())}
   function removeFloatingWhatsapp(){document.querySelectorAll('.whatsapp-float').forEach(el=>el.remove())}
   function removeFinalBanner(){document.querySelectorAll('.final-banner').forEach(el=>el.remove())}
-  function fixedCta(){
-    if(PRIVATE_MODE)return null;
-    let cta=document.getElementById('mpcPersonalScheduleFixed');if(cta)return cta;
-    cta=document.createElement('div');cta.id='mpcPersonalScheduleFixed';cta.className='mpc-personal-fixed';
-    cta.innerHTML=`<div class="mpc-personal-fixed-copy"><strong>Quer um cronograma feito especificamente para você?</strong><span>Serviço personalizado: o Prof. Lucas analisa sua rotina, objetivo e conteúdo da prova.</span></div><a href="${PERSONAL_URL}" target="_blank" rel="noopener"><span class="mpc-wa-icon">✆</span><span>SOLICITAR MEU CRONOGRAMA PERSONALIZADO</span></a>`;
-    document.body.appendChild(cta);return cta;
-  }
+  function fixedCta(){if(PRIVATE_MODE)return null;let cta=document.getElementById('mpcPersonalScheduleFixed');if(cta)return cta;cta=document.createElement('div');cta.id='mpcPersonalScheduleFixed';cta.className='mpc-personal-fixed';cta.innerHTML=`<div class="mpc-personal-fixed-copy"><strong>Quer um cronograma feito especificamente para você?</strong><span>Serviço personalizado: o Prof. Lucas analisa sua rotina, objetivo e conteúdo da prova.</span></div><a href="${PERSONAL_URL}" target="_blank" rel="noopener"><span>✆ SOLICITAR MEU CRONOGRAMA PERSONALIZADO</span></a>`;document.body.appendChild(cta);return cta}
   function normalizeMobileMenu(){const nav=document.querySelector('.mobile-nav'),shell=document.querySelector('main.shell');if(!nav||!shell)return;if(nav.parentElement!==shell)shell.appendChild(nav)}
-  function apply(plan={}){
-    addStyles();applyTheme(plan.publicTheme||'masculino');removeFloatingWhatsapp();removeFinalBanner();normalizeMobileMenu();
-    if(PRIVATE_MODE){removePrivatePromotions();return}
-    if(DEMO_MODE)clarifyGeneratorCtas();
-    fixedCta();
-  }
+  function apply(plan={}){addStyles();applyTheme(plan.publicTheme||'azul-premium');removeFloatingWhatsapp();removeFinalBanner();normalizeMobileMenu();if(PRIVATE_MODE){removePrivatePromotions();return}if(DEMO_MODE)clarifyGeneratorCtas();fixedCta()}
   window.mpcApplyPublicExperience=apply;
   async function planData(){if(!id)return{};try{const r=await fetch(`/api/plans?id=${encodeURIComponent(id)}&_=${Date.now()}`,{cache:'no-store'});return r.ok?await r.json():{}}catch{return{}}}
   async function init(){addStyles();const planPromise=planData();let tries=0;const timer=setInterval(async()=>{if(document.querySelector('.hero')){clearInterval(timer);apply(await planPromise)}else if(++tries>100)clearInterval(timer)},80)}
