@@ -1,7 +1,8 @@
 (()=>{
   'use strict';
   const STATE_KEY='geradorCronogramaMpcData';
-  const PATCH_FLAG='mpcPedagogyGuardV2';
+  const PATCH_FLAG='mpcPedagogyGuardV3';
+  const $=(s,r=document)=>r.querySelector(s);
   const read=(key,fallback=null)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}};
   const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));return true}catch{return false}};
   const parseDate=value=>{const d=new Date(`${String(value||'').slice(0,10)}T12:00:00`);return Number.isNaN(d.getTime())?null:d};
@@ -38,10 +39,36 @@
     return{changed};
   }
 
+  function isImportedPackage(){
+    const state=read(STATE_KEY,{})||{};
+    return Boolean(state?.adminPersonalization?.packageImportVersion);
+  }
+
+  function withFlexiblePackageReviews(event){
+    const button=event.target?.closest?.('#adminRefreshInsightsBtn,#adminGenerateScheduleBtn');
+    if(!button||!isImportedPackage())return;
+    const checkbox=$('#adminIncludeReviews');
+    if(!checkbox?.checked)return;
+
+    // O planejador-base trata cada revisão como compromisso rígido e pode bloquear
+    // pacotes extensos mesmo quando a carga total cabe. Para pacotes importados,
+    // deixamos a geração-base montar teoria + exercícios e transferimos as revisões
+    // para o Planejador Final, que usa a capacidade remanescente de forma flexível.
+    checkbox.checked=false;
+    checkbox.dataset.mpcFlexibleReviewTemporary='1';
+
+    setTimeout(()=>{
+      if(checkbox.dataset.mpcFlexibleReviewTemporary==='1'){
+        checkbox.checked=true;
+        delete checkbox.dataset.mpcFlexibleReviewTemporary;
+      }
+    },0);
+  }
+
   function markStrategy(result,consolidation){
     const state=read(STATE_KEY,null);if(!state)return;
-    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),reviewRequiresPriorTheory:true,reviewPrerequisiteMode:'subject-theory-started-flexible',reviewDatesAreAdvisory:true,finalCapacityFillRequired:true,finalCapacityFillApplied:Boolean(consolidation?.ok),pedagogyGuardVersion:2}};
-    state.adminPersonalization={...(state.adminPersonalization||{}),pedagogyGuardVersion:2,reviewOrderValidated:true,reviewDatesFlexible:true,finalCapacityFillApplied:Boolean(consolidation?.ok)};
+    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...(state.studyRoutine?.planningStrategy||{}),reviewRequiresPriorTheory:true,reviewPrerequisiteMode:'subject-theory-started-flexible',reviewDatesAreAdvisory:true,packageReviewsDelegatedToFinalPlanner:isImportedPackage(),finalCapacityFillRequired:true,finalCapacityFillApplied:Boolean(consolidation?.ok),pedagogyGuardVersion:3}};
+    state.adminPersonalization={...(state.adminPersonalization||{}),pedagogyGuardVersion:3,reviewOrderValidated:true,reviewDatesFlexible:true,packageReviewsDelegatedToFinalPlanner:isImportedPackage(),finalCapacityFillApplied:Boolean(consolidation?.ok)};
     write(STATE_KEY,state);
   }
 
@@ -63,6 +90,9 @@
     return true;
   }
 
-  function init(){let tries=0;const timer=setInterval(()=>{if(patch()||++tries>80)clearInterval(timer)},50)}
+  function init(){
+    document.addEventListener('click',withFlexiblePackageReviews,true);
+    let tries=0;const timer=setInterval(()=>{if(patch()||++tries>80)clearInterval(timer)},50)
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
