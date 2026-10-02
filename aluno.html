@@ -54,5 +54,6 @@ function render(plan){
 load().then(render).catch(err=>{if(err.code==='ACTIVATION_REQUIRED'){renderActivation();return}app.innerHTML=`<div class="state"><h1>Não foi possível abrir este cronograma</h1><p>${esc(err.message)}</p></div>`});
 })();
 </script>
+<script src="/student-palette.js?v=20261002-1" defer></script>
 </body>
 </html>
