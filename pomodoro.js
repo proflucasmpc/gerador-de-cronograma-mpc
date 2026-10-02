@@ -1,6 +1,7 @@
 (()=>{
   'use strict';
   if(!document.querySelector('script[src*="public-plan-links.js"]')){const extra=document.createElement('script');extra.src='/public-plan-links.js?v=20260813-1';extra.defer=true;document.head.appendChild(extra)}
+  if(!document.querySelector('script[src*="public-capture-copy.js"]')){const copyFix=document.createElement('script');copyFix.src='/public-capture-copy.js?v=20261002-1';copyFix.defer=true;document.head.appendChild(copyFix)}
   const SETTINGS_KEY='mpcPomodoroSettingsV1';
   const SESSION_KEY='mpcPomodoroSessionV1';
   const $=(s,r=document)=>r.querySelector(s);
