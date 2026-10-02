@@ -3,6 +3,9 @@
   const WHATSAPP_NUMBER='5511960189699';
   const PERSONAL_MESSAGE='Olá, Prof. Lucas MPC. Vi um cronograma de estudos e quero solicitar um cronograma personalizado feito para a minha rotina, objetivo e prova.';
   const PERSONAL_URL=`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(PERSONAL_MESSAGE)}`;
+  const pathParts=location.pathname.split('/').filter(Boolean);
+  const PRIVATE_MODE=pathParts[0]==='aluno';
+  const DEMO_MODE=pathParts[0]==='exemplo'||pathParts[0]==='plano';
   const id=location.pathname.match(/\/plano\/([A-Z0-9]{10})/i)?.[1]?.toUpperCase()||'';
   const THEMES={
     masculino:{navy:'#0D1B33',navy2:'#18365E',navy3:'#071225',gold:'#D7AE50',cyan:'#24C8FF',purple:'#8A5CFF',blue:'#4C7DFF',green:'#31B77A',teal:'#2DB7B3',orange:'#F0A23B',coral:'#E86C7C',bg:'#F5F7FB',paper:'#FFFFFF',text:'#172033',muted:'#657086',line:'#E4E8F0',track:'#E9EDF4'},
@@ -21,7 +24,13 @@
       .mpc-wa-icon{font-size:17px;line-height:1}
       body[data-public-theme="aulacerta"] .mpc-personal-fixed{background:linear-gradient(145deg,#10234A,#315EFB)}
       .final-banner{display:none!important}
-      body{padding-bottom:92px!important}
+      body.mpc-private-plan .header-generator-cta,
+      body.mpc-private-plan .hero-actions .btn-free,
+      body.mpc-private-plan .generator-cta,
+      body.mpc-private-plan .mentoria-fixed,
+      body.mpc-private-plan #mpcPersonalScheduleFixed{display:none!important}
+      body.mpc-private-plan{padding-bottom:40px!important}
+      body:not(.mpc-private-plan){padding-bottom:92px!important}
       @media(min-width:1200px){.mpc-personal-fixed{left:calc(50% + 100px);width:min(950px,calc(100% - 330px))}}
       @media(max-width:880px){
         .whatsapp-float{display:none!important}
@@ -31,7 +40,8 @@
         .mpc-personal-fixed-copy>span{display:none}
         .mpc-personal-fixed a{width:100%;min-height:48px;white-space:normal;font-size:12px;line-height:1.2;padding:13px 10px}
         .mpc-personal-fixed a span{display:inline!important}
-        .shell{padding-bottom:140px!important}
+        body:not(.mpc-private-plan) .shell{padding-bottom:140px!important}
+        body.mpc-private-plan .shell{padding-bottom:48px!important}
         .mobile-nav{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important;margin:26px 0 12px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;border-radius:15px!important;box-shadow:0 10px 28px rgba(7,18,37,.16)!important}
       }
       @media(max-width:380px){
@@ -43,20 +53,27 @@
   }
   function applyTheme(theme){const name=cleanTheme(theme),vars=THEMES[name];document.body.dataset.publicTheme=name;Object.entries(vars).forEach(([key,value])=>document.documentElement.style.setProperty(`--${key}`,value))}
   function clarifyGeneratorCtas(){
-    const header=document.querySelector('.header-generator-cta');if(header){header.textContent='USAR GERADOR AUTOMÁTICO GRÁTIS';header.title='Ferramenta automática gratuita para você montar seu próprio cronograma'}
-    document.querySelectorAll('.hero-actions .btn-free').forEach(btn=>{btn.textContent='✦ TESTAR GERADOR AUTOMÁTICO GRÁTIS';btn.title='Você mesmo monta seu cronograma usando a ferramenta gratuita'});
-    const box=document.querySelector('.generator-cta');if(box){const eyebrow=box.querySelector('.eyebrow'),h=box.querySelector('h3'),p=box.querySelector('p'),btn=box.querySelector('.btn-free');if(eyebrow)eyebrow.textContent='Ferramenta automática gratuita';if(h)h.textContent='Quer montar seu próprio cronograma sozinho?';if(p)p.innerHTML='<span class="mpc-free-explainer">O Gerador é uma ferramenta gratuita de autoatendimento.</span> Você informa seus dados e monta o cronograma por conta própria.';if(btn)btn.textContent='USAR O GERADOR AUTOMÁTICO GRÁTIS →'}
+    const header=document.querySelector('.header-generator-cta');if(header){header.textContent='CONHECER O GERADOR DE CRONOGRAMA';header.title='Conheça a ferramenta de criação de cronogramas'}
+    document.querySelectorAll('.hero-actions .btn-free').forEach(btn=>{btn.textContent='✦ CONHECER O GERADOR DE CRONOGRAMA';btn.title='Conheça a ferramenta para montar seu cronograma'});
+    const box=document.querySelector('.generator-cta');if(box){const eyebrow=box.querySelector('.eyebrow'),h=box.querySelector('h3'),p=box.querySelector('p'),btn=box.querySelector('.btn-free');if(eyebrow)eyebrow.textContent='Gerador de Cronograma MPC';if(h)h.textContent='Quer organizar seus estudos com um cronograma?';if(p)p.innerHTML='Conheça o Gerador de Cronograma MPC e veja as opções disponíveis para montar seu planejamento.';if(btn)btn.textContent='CONHECER O GERADOR →'}
   }
+  function removePrivatePromotions(){document.body.classList.add('mpc-private-plan');document.querySelectorAll('.header-generator-cta,.hero-actions .btn-free,.generator-cta,.mentoria-fixed,#mpcPersonalScheduleFixed,.final-banner,.whatsapp-float').forEach(el=>el.remove())}
   function removeFloatingWhatsapp(){document.querySelectorAll('.whatsapp-float').forEach(el=>el.remove())}
   function removeFinalBanner(){document.querySelectorAll('.final-banner').forEach(el=>el.remove())}
   function fixedCta(){
+    if(PRIVATE_MODE)return null;
     let cta=document.getElementById('mpcPersonalScheduleFixed');if(cta)return cta;
     cta=document.createElement('div');cta.id='mpcPersonalScheduleFixed';cta.className='mpc-personal-fixed';
     cta.innerHTML=`<div class="mpc-personal-fixed-copy"><strong>Quer um cronograma feito especificamente para você?</strong><span>Serviço personalizado: o Prof. Lucas analisa sua rotina, objetivo e conteúdo da prova.</span></div><a href="${PERSONAL_URL}" target="_blank" rel="noopener"><span class="mpc-wa-icon">✆</span><span>SOLICITAR MEU CRONOGRAMA PERSONALIZADO</span></a>`;
     document.body.appendChild(cta);return cta;
   }
   function normalizeMobileMenu(){const nav=document.querySelector('.mobile-nav'),shell=document.querySelector('main.shell');if(!nav||!shell)return;if(nav.parentElement!==shell)shell.appendChild(nav)}
-  function apply(plan={}){addStyles();applyTheme(plan.publicTheme||'masculino');removeFloatingWhatsapp();removeFinalBanner();clarifyGeneratorCtas();normalizeMobileMenu();fixedCta()}
+  function apply(plan={}){
+    addStyles();applyTheme(plan.publicTheme||'masculino');removeFloatingWhatsapp();removeFinalBanner();normalizeMobileMenu();
+    if(PRIVATE_MODE){removePrivatePromotions();return}
+    if(DEMO_MODE)clarifyGeneratorCtas();
+    fixedCta();
+  }
   window.mpcApplyPublicExperience=apply;
   async function planData(){if(!id)return{};try{const r=await fetch(`/api/plans?id=${encodeURIComponent(id)}&_=${Date.now()}`,{cache:'no-store'});return r.ok?await r.json():{}}catch{return{}}}
   async function init(){addStyles();const planPromise=planData();let tries=0;const timer=setInterval(async()=>{if(document.querySelector('.hero')){clearInterval(timer);apply(await planPromise)}else if(++tries>100)clearInterval(timer)},80)}
