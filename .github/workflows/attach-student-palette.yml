@@ -1,0 +1,34 @@
+name: Attach student palette runtime
+
+on:
+  push:
+    paths:
+      - '.github/workflows/attach-student-palette.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attach palette runtime to private student page
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('aluno.html')
+          text = p.read_text(encoding='utf-8')
+          tag = '<script src="/student-palette.js?v=20261002-1" defer></script>'
+          if tag not in text:
+              text = text.replace('</body>', f'{tag}\n</body>')
+              p.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit change
+        run: |
+          if git diff --quiet -- aluno.html; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add aluno.html
+          git commit -m "Ativa paletas na página privada do aluno"
+          git push
