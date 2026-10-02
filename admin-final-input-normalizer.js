@@ -16,6 +16,42 @@
   const isReview=t=>/revis|resumo|flashcard|lei seca/i.test(`${t?.type||''} ${t?.activity||''}`);
   const isBlackout=value=>typeof window.mpcIsBlackoutDate==='function'&&window.mpcIsBlackoutDate(value);
 
+  function weekdayFromText(value=''){
+    const text=String(value||'').trim().toLocaleLowerCase('pt-BR');
+    if(!text)return null;
+    if(/^(seg|segunda|segunda-feira|mon|monday)$/.test(text))return 0;
+    if(/^(ter|terça|terca|terça-feira|terca-feira|tue|tuesday)$/.test(text))return 1;
+    if(/^(qua|quarta|quarta-feira|wed|wednesday)$/.test(text))return 2;
+    if(/^(qui|quinta|quinta-feira|thu|thursday)$/.test(text))return 3;
+    if(/^(sex|sexta|sexta-feira|fri|friday)$/.test(text))return 4;
+    if(/^(sáb|sab|sábado|sabado|sat|saturday)$/.test(text))return 5;
+    if(/^(dom|domingo|sun|sunday)$/.test(text))return 6;
+    return null;
+  }
+
+  function normalizeAvailableDays(){
+    const root=$('#adminAvailableDays');if(!root)return[];
+    const inputs=$$('input',root);
+    const normalized=[];
+    inputs.forEach((input,index)=>{
+      let n=Number(input.value);
+      if(!Number.isInteger(n)||n<0||n>6){
+        const label=input.closest('label');
+        const fromData=weekdayFromText(input.dataset?.weekday||input.dataset?.day||label?.dataset?.weekday||label?.dataset?.day||'');
+        const fromText=weekdayFromText(label?.textContent||input.getAttribute('aria-label')||'');
+        n=fromData??fromText??index;
+        if(Number.isInteger(n)&&n>=0&&n<=6)input.value=String(n);
+      }
+      if(input.checked&&Number.isInteger(n)&&n>=0&&n<=6)normalized.push(n);
+    });
+    if(normalized.length){
+      const state=read(STATE_KEY,{});
+      state.availableDays=[...new Set(normalized)].sort((a,b)=>a-b);
+      save(STATE_KEY,state);
+    }
+    return normalized;
+  }
+
   function simulationDates(state){
     if(!$('#adminSimulationEnabled')?.checked)return[];
     const start=parseDate($('#adminStartDate')?.value||state.startDate);if(!start)return[];
@@ -53,6 +89,7 @@
   }
 
   function normalize(){
+    normalizeAvailableDays();
     if(typeof window.mpcSyncBlackoutRanges==='function')window.mpcSyncBlackoutRanges();
     const state=read(STATE_KEY,null);if(!state?.tasks?.length)return false;
     const tasks=[];let reviewsReleased=0,oldSimulationsRemoved=0,blackoutTasksReleased=0;
@@ -66,10 +103,20 @@
     const sims=currentSimulations(state);state.tasks=[...tasks,...sims];
     state.adminPersonalization={...(state.adminPersonalization||{}),simulationCount:sims.length,simulationScheduleRebuilt:true,simulationDaysExclusive:true,reviewDatesReleased:true,blackoutDatesExclusive:true,blackoutTasksReleased};
     const previousStrategy=state.studyRoutine?.planningStrategy||{};
-    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...previousStrategy,singleFinalPlanner:false,plannerVersion:0,reviewDatesAreAdvisory:true,simulationScheduleRebuilt:true,simulationDaysExclusive:true,blackoutDatesExclusive:true,blackoutTasksReleased,finalInputNormalizerVersion:9}};
+    state.studyRoutine={...(state.studyRoutine||{}),planningStrategy:{...previousStrategy,singleFinalPlanner:false,plannerVersion:0,reviewDatesAreAdvisory:true,simulationScheduleRebuilt:true,simulationDaysExclusive:true,blackoutDatesExclusive:true,blackoutTasksReleased,finalInputNormalizerVersion:10}};
     save(STATE_KEY,state);return true;
   }
   window.mpcNormalizeFinalPlannerInput=normalize;
-  function bind(){document.addEventListener('click',event=>{if(event.target?.closest?.('#adminGenerateScheduleBtn,#publicPageBtn,#exportPublicPageBtn'))normalize()},true)}
+  function bind(){
+    normalizeAvailableDays();
+    document.addEventListener('change',event=>{if(event.target?.closest?.('#adminAvailableDays'))normalizeAvailableDays()},true);
+    document.addEventListener('click',event=>{
+      if(event.target?.closest?.('#adminAvailableDays'))setTimeout(normalizeAvailableDays,0);
+      if(event.target?.closest?.('#adminRefreshInsightsBtn,#adminGenerateScheduleBtn,#publicPageBtn,#exportPublicPageBtn')){
+        normalizeAvailableDays();
+        normalize();
+      }
+    },true);
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
 })();
