@@ -7,7 +7,7 @@
   let declaredHours='';
   function rememberDeclaredHours(){const input=$('#adminHoursPerDay');if(input&&String(input.value||'').trim())declaredHours=String(input.value).trim()}
   function restoreDeclaredHoursBeforeGeneration(){if(!declaredHours)return;const input=$('#adminHoursPerDay');if(!input)return;const current=String(input.value||'').trim();if(current===declaredHours)return;input.value=declaredHours;input.dispatchEvent(new Event('change',{bubbles:true}))}
-  function plannerReady(){const state=read(STATE_KEY,{})||{},strategy=state?.studyRoutine?.planningStrategy||{};return Boolean(strategy.singleFinalPlanner)&&Number(strategy.plannerVersion)===4}
+  function plannerReady(){const state=read(STATE_KEY,{})||{},strategy=state?.studyRoutine?.planningStrategy||{};return Boolean(strategy.singleFinalPlanner)&&Number(strategy.plannerVersion)>=4}
   function fullCapacityReady(){const state=read(STATE_KEY,{})||{},strategy=state?.studyRoutine?.planningStrategy||{};return Boolean(strategy.fullCapacityValidated)&&Number(strategy.fullCapacityValidationVersion)>=4}
   function hasGeneratedTasks(){const state=read(STATE_KEY,{})||{};return Array.isArray(state.tasks)&&state.tasks.length>0}
   function isCreatePageButton(target){return target?.closest?.('#publicPageBtn,#exportPublicPageBtn')}
@@ -17,16 +17,25 @@
       if(typeof window.mpcApplyCapacityFill!=='function')return{ok:false,reason:'O Planejador Final ainda está carregando. Aguarde um instante e tente novamente.'};
       const planned=window.mpcApplyCapacityFill({silent:true})||{ok:false,reason:'Não foi possível finalizar o cronograma.'};if(!planned.ok)return planned;
     }
-    if(typeof window.mpcApplyFinalConsolidation!=='function')return{ok:false,reason:'A validação de capacidade ainda está carregando. Aguarde um instante e tente novamente.'};
-    const final=window.mpcApplyFinalConsolidation();if(!final?.ok)return final||{ok:false,reason:'Não foi possível preencher toda a capacidade disponível.'};
-    return{ok:true,final};
+    if(typeof window.mpcApplyFinalConsolidation==='function'){
+      const final=window.mpcApplyFinalConsolidation();if(final&&!final.ok)return final;
+      return{ok:true,final};
+    }
+    return{ok:true};
   }
   function guardNewPublication(event){
     const button=isCreatePageButton(event.target);if(!button)return;
+    if(!hasGeneratedTasks()){
+      event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
+      alert('O cronograma ainda não possui atividades geradas.');return;
+    }
     if(plannerReady()&&fullCapacityReady())return;
-    event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
     const result=finalizeExistingSchedule();
-    if(result.ok){alert('O cronograma foi recalculado e toda a capacidade disponível até a véspera da prova foi validada. A página será recarregada; depois clique em “Criar página” novamente.');location.reload();return}
+    if(result.ok){
+      // Não bloqueie nem recarregue: deixe o clique seguir para createPublicPlanPage.
+      return;
+    }
+    event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();
     alert(result.reason||'Não foi possível concluir a validação final do cronograma.');
   }
   function capacityHint(){
