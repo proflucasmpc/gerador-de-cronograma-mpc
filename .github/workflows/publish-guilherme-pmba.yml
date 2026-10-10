@@ -4,15 +4,25 @@ on:
   push:
     branches: [main]
     paths:
+      - '.github/workflows/publish-guilherme-pmba.yml'
       - 'scripts/publish_guilherme_pmba.py'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Gerar e publicar plano
-        run: python scripts/publish_guilherme_pmba.py
+        run: python scripts/publish_guilherme_pmba.py | tee guilherme-pmba-published.json
+      - name: Registrar link publicado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add guilherme-pmba-published.json
+          git commit -m "Registrar link do cronograma Guilherme PMBA"
+          git push origin HEAD:main
