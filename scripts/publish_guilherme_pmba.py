@@ -123,6 +123,24 @@ plan={
 "studyRoutine":{"mode":"continuous","referenceDate":START.isoformat(),"referenceStatus":"off","windows":[{"moment":"Tarde/noite","time":"16:00","duration":240,"environment":"Casa","types":["Teoria","Exercícios","Revisão","Resumo","Lei seca","Simulado parcial"],"videoOnly":False}],"workWindows":[],"offWindows":[],"blackoutRanges":[]},
 "subjects":subjects,"syllabus":[{"name":k,"countInMetrics":True,"topics":[{"title":x,"subtopics":[]} for x in v]} for k,v in U.items()],"tasks":tasks
 }
+# Se uma execução anterior deixou uma publicação de teste registrada, invalide-a antes
+# de criar a versão definitiva. A chave nunca é impressa na saída da execução atual.
+try:
+    with open("guilherme-pmba-published.json",encoding="utf-8") as fh:
+        previous=json.load(fh)
+    if previous.get("id") and previous.get("manageKey"):
+        delete_req=urllib.request.Request(
+            "https://lucasmpc.com.br/api/plans?id="+previous["id"],
+            headers={"X-Plan-Key":previous["manageKey"],"User-Agent":"github-actions"},
+            method="DELETE"
+        )
+        with urllib.request.urlopen(delete_req,timeout=60) as r:
+            r.read()
+except Exception:
+    pass
+
 req=urllib.request.Request("https://lucasmpc.com.br/api/plans",data=json.dumps(plan,ensure_ascii=False).encode(),headers={"Content-Type":"application/json","User-Agent":"github-actions"},method="POST")
 with urllib.request.urlopen(req,timeout=60) as r:
-    print(r.read().decode())
+    result=json.loads(r.read().decode())
+    # Repositório público: nunca exponha a chave de gerenciamento.
+    print(json.dumps({"id":result.get("id"),"path":result.get("path")},ensure_ascii=False))
