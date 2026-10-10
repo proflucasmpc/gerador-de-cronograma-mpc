@@ -1,0 +1,18 @@
+name: Publicar cronograma Guilherme PMBA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/publish_guilherme_pmba.py'
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gerar e publicar plano
+        run: python scripts/publish_guilherme_pmba.py
