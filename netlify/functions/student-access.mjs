@@ -12,6 +12,11 @@ const BOOTSTRAP_STUDENTS = {
     planId: 'TWTFC9GZ56',
     codeHash: '19781524ccbc5ca1084c11b3f91ee357bad78df33c84e328fe5eac1025fdc6ce',
     maxDevices: 2
+  },
+  guilherme: {
+    planId: 'VJTVTS4GCS',
+    codeHash: '72496a26678ae9475c494333e5341b0e91f6cdcb65340b3b67058b302858bca3',
+    maxDevices: 2
   }
 };
 
