@@ -121,8 +121,8 @@ plan={
 "examDate":"","examDateUnknown":True,"contestStage":"estudo_vagas","startDate":START.isoformat(),"endDate":END.isoformat(),
 "hoursPerDay":4,"scheduleStyle":"weekly","publicTheme":"masculino","generalGuidance":guidance,
 "studyRoutine":{"mode":"continuous","referenceDate":START.isoformat(),"referenceStatus":"off","windows":[{"moment":"Tarde/noite","time":"16:00","duration":240,"environment":"Casa","types":["Teoria","Exercícios","Revisão","Resumo","Lei seca","Simulado parcial"],"videoOnly":False}],"workWindows":[],"offWindows":[],"blackoutRanges":[]},
-"subjects":subjects,"tasks":tasks
+"subjects":subjects,"syllabus":[{"name":k,"countInMetrics":True,"topics":[{"title":x,"subtopics":[]} for x in v]} for k,v in U.items()],"tasks":tasks
 }
-req=urllib.request.Request("https://gerador-de-cronograma-mpc.netlify.app/api/plans",data=json.dumps(plan,ensure_ascii=False).encode(),headers={"Content-Type":"application/json","User-Agent":"github-actions"},method="POST")
+req=urllib.request.Request("https://lucasmpc.com.br/api/plans",data=json.dumps(plan,ensure_ascii=False).encode(),headers={"Content-Type":"application/json","User-Agent":"github-actions"},method="POST")
 with urllib.request.urlopen(req,timeout=60) as r:
     print(r.read().decode())
