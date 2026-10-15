@@ -1,4 +1,5 @@
 import { getStore } from '@netlify/blobs';
+import { getBootstrapPlan } from './bootstrap-plans.mjs';
 
 const STORE_NAME = 'mpc-public-plans';
 const MAX_BODY_BYTES = 900_000;
@@ -93,7 +94,7 @@ export default async (req) => {
   const url = new URL(req.url); const store = getStore({ name: STORE_NAME, consistency: 'strong' }); const method = req.method.toUpperCase();
   if (method === 'GET') {
     const id = cleanString(url.searchParams.get('id'), 20).toUpperCase(); if (!ID_RE.test(id)) return json({ error: 'Link de cronograma inválido.' }, 400);
-    const plan = await store.get(id, { type: 'json', consistency: 'strong' }); if (!plan) return json({ error: 'Cronograma não encontrado.' }, 404); return json(publicPlan(plan), 200);
+    const plan = await store.get(id, { type: 'json', consistency: 'strong' }) || getBootstrapPlan(id); if (!plan) return json({ error: 'Cronograma não encontrado.' }, 404); return json(publicPlan(plan), 200);
   }
   if (method === 'POST') {
     let body; try { body = await parseBody(req); } catch (error) { return json({ error: error.message || 'Dados inválidos.' }, error.status || 400); }
