@@ -46,7 +46,17 @@ const normalizedDeviceLimit = value => Math.min(5, Math.max(1, Number.parseInt(v
 async function studentRecord(store, student) {
   let record = await store.get(`student/${student}`, { type: 'json', consistency: 'strong' });
   if (record) return record;
-  const bootstrap = BOOTSTRAP_STUDENTS[student];
+  let bootstrap = BOOTSTRAP_STUDENTS[student];
+  if (!bootstrap && student === 'reginaldo') {
+    const activationCode = Netlify.env.get('REGINALDO_ACCESS_CODE') || '';
+    if (activationCode) {
+      bootstrap = {
+        planId: 'RGNLDFTP26',
+        codeHash: await hash(activationCode.toUpperCase()),
+        maxDevices: 2
+      };
+    }
+  }
   if (!bootstrap) return null;
   record = {
     student,
