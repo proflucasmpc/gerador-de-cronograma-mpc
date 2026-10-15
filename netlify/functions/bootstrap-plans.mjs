@@ -1,3 +1,4 @@
+import { getJorgePlan, JORGE_PLAN_ID } from './jorge-plan.mjs';
 const PLAN_ID = 'RGNLDFTP26';
 
 const TOPICS = {
@@ -319,7 +320,7 @@ Este planejamento usa como base o edital FTP 1/2013 fornecido para a preparaçã
   };
 }
 
-const BOOTSTRAP = { [PLAN_ID]: buildPlan() };
+const BOOTSTRAP = { [PLAN_ID]: buildPlan(), [JORGE_PLAN_ID]: getJorgePlan() };
 
 export function getBootstrapPlan(id) {
   const plan = BOOTSTRAP[String(id || '').toUpperCase()];
