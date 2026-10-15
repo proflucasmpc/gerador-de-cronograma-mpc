@@ -17,6 +17,11 @@ const BOOTSTRAP_STUDENTS = {
     planId: 'VJTVTS4GCS',
     codeHash: '72496a26678ae9475c494333e5341b0e91f6cdcb65340b3b67058b302858bca3',
     maxDevices: 2
+  },
+  jorge: {
+    planId: 'JORGECGU26',
+    codeHash: '0b12c7f6fa0f9e28ee42fe347de5961fdabdf35a71b2613e3a902b007e320f39',
+    maxDevices: 2
   }
 };
 
