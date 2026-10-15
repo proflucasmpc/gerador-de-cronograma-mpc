@@ -1,4 +1,5 @@
 import { getStore } from '@netlify/blobs';
+import { getBootstrapPlan } from './bootstrap-plans.mjs';
 
 const COOKIE = 'mpc_student_session';
 const clean = (value, max = 80) => String(value ?? '').replace(/[^a-zA-Z0-9-]/g, '').slice(0, max);
@@ -19,7 +20,7 @@ export default async req => {
   const session = await access.get(`session/${await hash(token)}`, { type: 'json', consistency: 'strong' });
   if (!session || session.student !== student || session.active === false) return json({ error: 'Acesso não autorizado.', code: 'ACTIVATION_REQUIRED' }, 401);
   const plans = getStore({ name: 'mpc-public-plans', consistency: 'strong' });
-  const plan = await plans.get(session.planId, { type: 'json', consistency: 'strong' });
+  const plan = await plans.get(session.planId, { type: 'json', consistency: 'strong' }) || getBootstrapPlan(session.planId);
   if (!plan) return json({ error: 'Cronograma não encontrado.' }, 404);
   const { _manageHash, ...safe } = plan;
   return json(safe);
